@@ -46,9 +46,12 @@ class ModelConnect:
             msg = ( 
                     f"{Fore.YELLOW}WARNING{Fore.RESET}: "
                     f"Expected message to be a list, "
-                    f"but got {Fore.YELLOW}{type(message)}{Fore.RESET} instead."
+                    f"but got {Fore.YELLOW}{type(message)}{Fore.RESET} instead.\n"
+                    f"Converting to List"
                     )
-            assert type(message) == list, msg
+            if type(message) != list:
+                print(message)
+                message = [str(message)]
             # for embeddings we want the temperature to be low to be more deterministic
             temperature = temperature if temperature is not None else 0.
         temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
@@ -60,16 +63,16 @@ class ModelConnect:
         """
         Prepares the context based on the method name and model.
         """
-        message, name, stream, temperature, context_len, num_predict = \
+        messages, name, stream, temperature, context_len, num_predict = \
                                             self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
         context = {'model': name, 'stream': stream}
         if name.startswith('gpt'):
-            context['messages'] = message
+            context['messages'] = messages
             context['temperature'] = temperature
         else:
-            context['prompt'] = message
+            context['prompt'] = messages
             context['options'] = {  'temperature': temperature,
                                     'num_ctx': context_len,
                                 }
