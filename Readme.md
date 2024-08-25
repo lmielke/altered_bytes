@@ -6,5 +6,5 @@ coming soon
 
 ## get and install
 ```shell
-    git clone git@gitlab.com:larsmielke2/altered.git ./altered_bytes
+    git clone https://github.com/lmielke/altered_bytes.git ./altered_bytes
 ```
