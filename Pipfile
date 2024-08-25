@@ -18,7 +18,7 @@ setuptools = "*"
 ollama = "*"
 
 [dev-packages]
-logunittest = {editable = true, path = "/Users/Lars/python_venvs/packages/logunittest"}
+logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}
 black = "*"
 pre-commit = "*"
 toml = "*"
