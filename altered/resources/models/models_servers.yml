@@ -1,0 +1,136 @@
+aliasses:
+  models:
+    dl3:8b: dolphin-llama3
+    dl3:8bk: dolphin-llama3:8b-256k
+    gpt3: gpt-3.5-turbo-0125
+    gpt4: gpt-4-1106-preview
+    gpt4o: gpt-4o
+    l3:70b: llama3.1:70b
+    l3:8b: llama3.1
+    m8: mixtral:8x22b
+    q2b: qwen2:72b
+  servers:
+    '0': while-ai_0
+    '1': while-ai_1
+    oai: openAI
+models:
+  dolphin-llama3:
+    blob_id: ea025c107c1c
+    context_length: '8192'
+    embedding_length: '4096'
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 3 months ago
+    name: dolphin-llama3
+    new_update_available: false
+  dolphin-llama3:8b-256k:
+    blob_id: ea025c107c1c
+    context_length: '8192'
+    embedding_length: '4096'
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 3 months ago
+    name: dolphin-llama3:8b-256k
+    new_update_available: false
+  gpt-3.5-turbo-0125:
+    blob_id: null
+    context_length: null
+    embedding_length: null
+    general.architecture: null
+    general.file_type: null
+    last_update: null
+    name: gpt-3.5-turbo-0125
+    new_update_available: false
+  gpt-4-1106-preview:
+    blob_id: null
+    context_length: 8192
+    embedding_length: null
+    general.architecture: null
+    general.file_type: null
+    last_update: null
+    name: gpt-4-1106-preview
+    new_update_available: false
+  gpt-4o:
+    blob_id: null
+    context_length: 8192
+    embedding_length: null
+    general.architecture: null
+    general.file_type: null
+    last_update: null
+    name: gpt-4o
+    new_update_available: false
+  llama3.1:70b:
+    blob_id: a677b4a4b70c
+    context_length: '131072'
+    embedding_length: '8192'
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: llama3.1:70b
+    new_update_available: false
+  llama3.1:
+    blob_id: 8eeb52dfb3bb
+    context_length: '131072'
+    embedding_length: '4096'
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: llama3.1
+    new_update_available: false
+  mixtral:8x22b:
+    blob_id: 94e70a590f93
+    context_length: '65536'
+    embedding_length: '6144'
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 4 weeks ago
+    name: mixtral:8x22b
+    new_update_available: false
+  qwen2:72b:
+    blob_id: f6ac28d6f58a
+    context_length: '32768'
+    embedding_length: '8192'
+    general.architecture: qwen2
+    general.file_type: Q4_0
+    last_update: 2 months ago
+    name: qwen2:72b
+    new_update_available: false
+servers:
+  last_update: null
+  openAI:
+    get_embeddings_port: null
+    generates_port: null
+    generate_port: null
+    key_path: os.environ.get('secrets')/9_secrets/openai/open_ai_key.yml
+    model_address: null
+    models_to_load: null
+  while-ai_0:
+    get_embeddings_port: 5555
+    generates_port: 5555
+    generate_port: 11434
+    key_path: null
+    model_address: http://192.168.0.235
+    models_to_load:
+    - codellama:70b
+    - dolphin-llama3.1:70b
+  while-ai_1:
+    get_embeddings_port: 5555
+    generates_port: 5555
+    generate_port: 11434
+    key_path: null
+    model_address: http://192.168.0.245
+    models_to_load:
+    - llama3.1
+    - dolphin-llama3.1
+defaults:
+  generate:
+    model: llama3.1
+    server: while-ai_0
+  generates:
+    model: llama3.1
+    server: while-ai_0
+  get_embeddings:
+    model: llama3.1
+    server: while-ai_1
+  sub_domain: get_embeddings
+  keep_alive: 200

@@ -1,0 +1,30 @@
+aliasses:
+  models:
+    tm: test_dolphin-llama3:8b-256k
+  servers:
+    oai: openAI
+    tst: test_server
+models:
+  test_dolphin-llama3:8b-256k:
+    blob_id: '123456789'
+    context_length: '9999'
+    embedding_length: '4444'
+    general.architecture: llama
+    general.file_type: Q99
+    last_update: 3 months ago
+    name: test_dolphin-llama3:8b-256k
+    new_update_available: false
+servers:
+  openAI:
+    embedding_port: null
+    generate_port: null
+    key_path: C:\Users\lars\python_venvs\packages\altered_bytes\altered\test\data\api_key.yml
+    model_address: null
+    models_to_load: null
+  test_server:
+    embedding_port: 1234
+    generate_port: 5678
+    key_path: null
+    model_address: http://localhost
+    models_to_load:
+    - test_dolphin-llama3:8b-256k
