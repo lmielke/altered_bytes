@@ -9,7 +9,6 @@ pyyaml = "*"
 requests = "*"
 tabulate = "*"
 altered = {editable = true, path = "."}
-logunittest = {editable = true, path = "/Users/Lars/python_venvs/packages/logunittest"}
 tox = "*"
 pytest = "*"
 psutil = "*"
@@ -19,6 +18,7 @@ setuptools = "*"
 ollama = "*"
 
 [dev-packages]
+logunittest = {editable = true, path = "/Users/Lars/python_venvs/packages/logunittest"}
 black = "*"
 pre-commit = "*"
 toml = "*"
