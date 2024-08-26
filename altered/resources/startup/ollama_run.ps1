@@ -45,7 +45,7 @@ Stop-Transcript
 
 # we also start docker in case openWebUi is used
 # timeout /t 15
-# winget uninstall Docker.DockerDesktop
+winget uninstall Docker.DockerDesktop
 # timeout /t 15
 # Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # timeout /t 120
