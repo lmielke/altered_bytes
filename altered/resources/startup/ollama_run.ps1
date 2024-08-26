@@ -1,15 +1,47 @@
 # ollama_run.ps1
 # This runs the our simple intermediate Ollama server in the background on system startup.
 #
-# lets wait 10 seconds to let the ollama service start first
 Start-Sleep -Seconds 15
-$package_dir = "C:\Users\lars\python_venvs\packages\altered_bytes"
-# cd "$env:altered_bytes"
-cd $package_dir
-# Write-Host "Starting Simple Ollama Server"
+# Start logging
+$logFile = "C:\Users\lars\python_venvs\packages\altered_bytes\altered\resources\startup\ollama_run.log"
+Start-Transcript -Path $logFile -Append
+
+# Log the current directory and environment variables
+Write-Output "Starting ollama_run.ps1 script..."
+Write-Output "Timestamp: $(Get-Date)"
+Write-Output "Current Directory: $(Get-Location)"
+Write-Output "altered_bytes Environment Variable: $env:altered_bytes"
+
+# Ensure the environment variable is set (in case it’s not available in the task context)
+if (-not $env:altered_bytes) {
+    Write-Output "ERROR: Environment variable 'altered_bytes' is not set."
+    Stop-Transcript
+    exit 1
+}
+
+# Change directory and log the result
+try {
+    cd "$env:altered_bytes"
+    Write-Output "Successfully changed directory to: $(Get-Location)"
+} catch {
+    Write-Output "ERROR: Failed to change directory to $env:altered_bytes. Exception: $_"
+    Stop-Transcript
+    exit 1
+}
 
 # Start the Python server script in detached mode using pipenv run
-Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "./altered/simple_server.py" -WindowStyle Hidden
+try {
+    Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "./altered/simple_server.py" -WindowStyle Hidden
+    Write-Output "Successfully started the Python server script."
+} catch {
+    Write-Output "ERROR: Failed to start the Python server script. Exception: $_"
+    Stop-Transcript
+    exit 1
+}
+
+# End logging
+Write-Output "ollama_run.ps1 script completed."
+Stop-Transcript
 
 # # Uncomment and copy this script to the remote terminal
 # # Windows: Define the action to run the ollama_run.ps1 script
