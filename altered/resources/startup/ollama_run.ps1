@@ -2,8 +2,10 @@
 # This runs the our simple intermediate Ollama server in the background on system startup.
 #
 # lets wait 10 seconds to let the ollama service start first
-Start-Sleep -Seconds 30
-cd "$env:altered_bytes"
+Start-Sleep -Seconds 15
+$package_dir = "C:\Users\lars\python_venvs\packages\altered_bytes"
+# cd "$env:altered_bytes"
+cd $package_dir
 # Write-Host "Starting Simple Ollama Server"
 
 # Start the Python server script in detached mode using pipenv run
