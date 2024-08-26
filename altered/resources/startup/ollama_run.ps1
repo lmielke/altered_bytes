@@ -4,6 +4,8 @@
 # lets wait 10 seconds to let the ollama service start first
 Start-Sleep -Seconds 30
 cd "$env:altered_bytes"
+# Write-Host "Starting Simple Ollama Server"
+
 # Start the Python server script in detached mode using pipenv run
 Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "./altered/simple_server.py" -WindowStyle Hidden
 
@@ -24,5 +26,3 @@ Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "./altered/simpl
 
 # check if running
 #  Get-ScheduledTask -TaskName "Start Simple Ollama Server" | Format-List *
-
-cat 'C:\Users\lars\python_venvs\packages\altered_bytes/altered/resources/startup/ollama_run.ps1'
