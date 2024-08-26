@@ -44,10 +44,10 @@ Write-Output "ollama_run.ps1 script completed."
 Stop-Transcript
 
 # we also start docker in case openWebUi is used
-timeout /t 15
-winget uninstall Docker.DockerDesktop
-timeout /t 15
-Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+# timeout /t 15
+# winget uninstall Docker.DockerDesktop
+# timeout /t 15
+# Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # timeout /t 120
 # docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 
