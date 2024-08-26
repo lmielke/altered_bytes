@@ -123,12 +123,15 @@ servers:
     - llama3.1
     - dolphin-llama3.1
 defaults:
+  # default ollama server that comes with ollama
   generate:
     model: llama3.1
     server: while-ai_0
+  # altered_bytes default server for generate responses
   generates:
     model: llama3.1
     server: while-ai_0
+  # altered_bytes default server for embeddings
   get_embeddings:
     model: llama3.1
     server: while-ai_1
