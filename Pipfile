@@ -9,20 +9,21 @@ pyyaml = "*"
 requests = "*"
 tabulate = "*"
 altered = {editable = true, path = "."}
-tox = "*"
-pytest = "*"
 psutil = "*"
 jinja2 = "*"
 graphviz = "*"
 setuptools = "*"
+openai = "*"
 ollama = "*"
+numpy = "*"
 
 [dev-packages]
-logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}
+# logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}
 black = "*"
 pre-commit = "*"
 toml = "*"
-openai = "*"
+tox = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"
