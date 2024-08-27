@@ -35,6 +35,8 @@ This is a simple HTTP server that connects to the Ollama API. It can handle both
    - Download the installer.
 
 2. **Install Docker Desktop:**
+Note that as of 08/24 there is a problem with the UAC elevation prompt while running Docker Desktop on Windows 11. The workaround one that I wouldnt post in public. (see UAC controlls)
+Also see: https://github.com/docker/for-win/issues/13806
    - Run the Docker Desktop installer and follow the prompts.
    - Ensure Hyper-V is enabled during installation.
    - After installation, Docker Desktop should start automatically. If it doesn’t, you can start it manually from the Start menu.
