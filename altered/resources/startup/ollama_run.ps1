@@ -47,7 +47,8 @@ Stop-Transcript
 # timeout /t 15
 # winget uninstall Docker.DockerDesktop
 timeout /t 60
-Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+Start-Service -Name "com.docker.service"
+# Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # timeout /t 120
 # docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 
