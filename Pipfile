@@ -8,14 +8,13 @@ colorama = "*"
 pyyaml = "*"
 requests = "*"
 tabulate = "*"
-altered = {editable = true, path = "."}
 psutil = "*"
 jinja2 = "*"
 graphviz = "*"
 setuptools = "*"
-openai = "*"
 ollama = "*"
 numpy = "*"
+altered = {editable = true, path = "."}
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

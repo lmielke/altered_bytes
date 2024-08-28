@@ -48,16 +48,19 @@ class Test_Assistant(unittest.TestCase):
         outs= self.test_inst.post(
                                     [
                                     context['messages'][0]['content'],
+                                    context['messages'][0]['content'],
                                     'Why is the sky not green?',
                                     ],
-                                    # alias='l3:8b_1',
+                                    alias='l3:8b_1',
                                     num_predict = 100,
                                     sub_domain='generates',
+                                    aggregation_method='sum',
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
         for i, out in enumerate(outs.get('results')):
-            out = {k: f"{vs}"[:80] for k, vs in out.items()}
-            print(tb(out.items()))
+            tbl = {k: f"{vs}"[:200] for k, vs in out.items()}
+            print(tb(tbl.items()))
+
         # out = self.test_inst.generate(
         #                                 ['Why is the sky blue?'], 
         #                                 alias=('llama3.1', 'while-ai_1'),# as alias 'l3:8b_1',

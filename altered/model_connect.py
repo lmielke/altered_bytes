@@ -37,6 +37,7 @@ class ModelConnect:
                                                         stream:str=False,
                                                         temperature:float=None,
                                                         num_predict:int=None,
+                                                        aggregation_method:str=None,
                                                         **kwargs,
         ) -> dict:
         print(f"{Fore.YELLOW}sub_domain: {sub_domain}{Fore.RESET}")
@@ -57,13 +58,13 @@ class ModelConnect:
         temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
         context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
-        return message, name, stream, temperature, context_len, num_predict
+        return message, name, stream, temperature, context_len, num_predict, aggregation_method
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        messages, name, stream, temperature, context_len, num_predict = \
+        messages, name, stream, temperature, context_len, num_predict, aggregation_method = \
                                             self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
@@ -78,6 +79,7 @@ class ModelConnect:
                                 }
             if num_predict is not None: 
                 context['options']['num_predict'] = num_predict
+            context['aggregation_method'] = aggregation_method
             context['keep_alive'] = msts.config.defaults.get('keep_alive')
         # keep_alive seems to be in seconds (docs say minutes)
         return context
