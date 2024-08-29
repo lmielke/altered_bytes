@@ -120,9 +120,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self, *args, **kwargs):
         overall_start = time.time()
         try:
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            data = json.loads(post_data)
+            data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
             sub_domain = self.path.split('/')[-1]
             prompts = data.get('prompt')
             model = data.get('model')
@@ -171,7 +169,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                         response = ollama_client.embeddings(model=model, prompt=prompt)
                         responses.append({'prompt': prompt, 'embedding': response['embedding']})
                     elif sub_domain == 'generates':
-                        response = ollama_client.generate(model=model, prompt=prompt)
+                        response = ollama_client.generate(
+                                                            model=model, 
+                                                            prompt=prompt,
+                                                            options=options,
+                                                            stream=stream,
+                                    )
                         responses.append({'prompt': prompt, 'response': response['response']})
                 except Exception as e:
                     print(f"An error occurred while processing prompt: {prompt}. Error: {e}")
