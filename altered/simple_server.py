@@ -41,12 +41,19 @@ class Aggregations:
         return instruct
 
     text_aggregations: Dict[str, Callable[[int], str]] = {
-        'sum': partial(create_aggregation_prompt,
+        'max': partial(create_aggregation_prompt,
             instruction=(
-                f"Aggregate all those responses into a single response. The response "
-                f"should incorporate all relevant aspects from all provided "
-                f"input responses no matter their relevance."
+                f"Provide a comprehensive summary that captures the summary of all ideas "
+                f"provided by all input responses, include all aspects regardless "
+                f"of their relevance. "
+                f"Only leave out aspects that are obviously completely irrelevant."
             )
+        ),
+        'min': partial(create_aggregation_prompt,
+            instruction=(
+                f"Provide a concise summary that captures the core idea common to "
+                f"all or most input responses! Focus on the most essential information."
+            ),
         ),
         'mean': partial(create_aggregation_prompt,
             instruction=(
@@ -56,18 +63,11 @@ class Aggregations:
                 f"Leave out aspects that find no or little mention."
             )
         ),
-        'max': partial(create_aggregation_prompt,
+        'best': partial(create_aggregation_prompt,
             instruction=(
                 f"Find the text among the inputs that best addresses the question "
                 f"or problem (best answer), and expand upon it, incorporating any "
                 f"unique relevant information from the other responses."
-            )
-        ),
-        'min': partial(create_aggregation_prompt,
-            instruction=(
-                f"Provide a concise summary that captures the core idea common to "
-                f"all input responses, focusing on the most "
-                f"essential information."
             )
         ),
         'std': partial(create_aggregation_prompt,
@@ -89,7 +89,7 @@ class Aggregations:
 
     @classmethod
     def aggregate_text(cls, prompts:List[str], responses:List[str], agg_method:str, 
-                            *args, **kwargs
+                            options:dict, *args, **kwargs
         ) -> str | List[str]:
         """
         This function aggregates multiple text responses into a single one.
@@ -109,7 +109,9 @@ class Aggregations:
                 f"{combined_texts}"
             )
             # Use the Ollama client to generate the aggregated response
-            response = ollama_client.generate(prompt=final_prompt, **kwargs)
+            if agg_method in ['max', 'mean']:
+                options['num_predict'] = options.get('num_predict', 100) * 2
+            response = ollama_client.generate(prompt=final_prompt, options=options, **kwargs)
             return response['response']
         # Return original list if agg_method is unsupported
         return responses

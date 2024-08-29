@@ -54,7 +54,7 @@ class Test_Assistant(unittest.TestCase):
                                     alias='l3:8b_1',
                                     num_predict = 100,
                                     sub_domain='generates',
-                                    agg_method='sum',
+                                    agg_method='min',
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
         for i, out in enumerate(outs.get('results')):

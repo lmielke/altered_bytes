@@ -27,9 +27,10 @@ class ModelConnect:
         if lower is None:
             lower = 0.1
         if upper is None:
-            upper = 0.8
+            upper = 0.6
         rd_temp = min(max(lower, rd.random()), upper)
         print(f"{Fore.YELLOW}Warning {Fore.RESET}random temperature set: {rd_temp:.2f}")
+        return rd_temp
 
     def get_params(self, message:[str, list], *args, sub_domain:str,
                                                         name:str,
@@ -54,7 +55,8 @@ class ModelConnect:
                 print(message)
                 message = [str(message)]
             # for embeddings we want the temperature to be low to be more deterministic
-            temperature = temperature if temperature is not None else 0.
+            if sub_domain == 'get_embeddings':
+                temperature = temperature if temperature is not None else 0.
         temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
         context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
