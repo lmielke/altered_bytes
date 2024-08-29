@@ -14,8 +14,7 @@ cd altered_bytes
 # on Windows based ollama server do
 # This will create a shortcut in the startup folder that automatically runs the 
 # simple_server.py script on startup
-cp ".ltered
-esources\startup\ollama_run.ps1 - Shortcut.lnk" "~\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
+cp "./altered/resources/startup/simple_server.bat" "~/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
 
 # for headless startup see ./altered/resources/startup/ollama_run.ps1
 ```

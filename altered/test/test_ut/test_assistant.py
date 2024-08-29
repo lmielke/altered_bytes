@@ -51,9 +51,9 @@ class Test_Assistant(unittest.TestCase):
                                     context['messages'][0]['content'],
                                     'Why is the sky not green?',
                                     ],
-                                    alias='l3:8b_0',
+                                    alias='l3:8b_1',
                                     num_predict = 100,
-                                    sub_domain='generates',
+                                    sub_domain='get_embeddings',
                                     aggregation_method='sum',
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
