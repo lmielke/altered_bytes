@@ -88,9 +88,8 @@ class Aggregations:
     }
 
     @classmethod
-    def aggregate_text(cls, prompts:List[str], responses:List[str], 
-                            method:str, model:str, *args, 
-                            **kwargs
+    def aggregate_text(cls, prompts:List[str], responses:List[str], agg_method:str, 
+                            *args, **kwargs
         ) -> str | List[str]:
         """
         This function aggregates multiple text responses into a single one.
@@ -98,11 +97,11 @@ class Aggregations:
         a more comprehensive answer to a question or problem. This function
         aggregates those responses into a single one.
         """
-        if method in cls.text_aggregations:
-            aggregation_prompt = cls.text_aggregations[method](len(prompts))
+        if agg_method in cls.text_aggregations:
+            aggregation_prompt = cls.text_aggregations[agg_method](len(prompts))
             combined_texts = "\n\n".join(
-                f"Prompt {i+1}: {pr}\nResponse {i+1}: {rs}"
-                for i, (pr, rs) in enumerate(zip(prompts, responses))
+                f"Prompt {i+1}: {prompt}\nResponse {i+1}: {response}"
+                for i, (prompt, response) in enumerate(zip(prompts, responses))
             )
             final_prompt = (
                 f"{aggregation_prompt}\n\n"
@@ -110,72 +109,83 @@ class Aggregations:
                 f"{combined_texts}"
             )
             # Use the Ollama client to generate the aggregated response
-            response = ollama_client.generate(model=model, prompt=final_prompt)
+            response = ollama_client.generate(prompt=final_prompt, **kwargs)
             return response['response']
-        # Return original list if method is unsupported
+        # Return original list if agg_method is unsupported
         return responses
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self, *args, **kwargs):
-        overall_start = time.time()
+        start_time = time.time()
         try:
-            data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-            sub_domain = self.path.split('/')[-1]
-            prompts = data.get('prompt')
-            model = data.get('model')
-            aggregation_method = data.get('aggregation_method')
+            kwargs.update(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
             # General input validations
-            if prompts is None or model is None:
-                self.send_error(400, 'No prompt or model provided')
-                return
-            if not isinstance(prompts, list):
-                self.send_error(400, 'Prompt should be a list of strings')
+            if not self.successful_server_validations(*args, **kwargs):
                 return
             # Generate responses
-            responses = self.respond(prompts, sub_domain, model)
+            responses = self.respond(*args, **kwargs)
             # Process the original aggregation method
-            self.process_responses(prompts, responses, sub_domain, aggregation_method, model)
+            self.process_responses(*args, responses=responses, **kwargs)
             # Process the std aggregation
-            if len(responses) >= 2 and aggregation_method != 'std':
-                # if an aggregation record exists, it needs to be excluded from std calc
-                self.process_responses(prompts, responses, sub_domain, 'std', model)
+            self.get_response_stats(*args, responses=responses, **kwargs)
             # Generate the response payload
-            response_payload = self.mk_payload(responses, overall_start)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(response_payload.encode('utf-8'))
+            self.wfile.write(self.mk_payload(responses, start_time))
         
         except Exception as e:
             print(f"An error occurred: {e}")
             self.send_error(500, str(e))
 
-    def mk_payload(self, responses:List[Dict[str, str]], overall_start:float) -> str:
-        overall_end = time.time()
-        server_time = f"{overall_end - overall_start:.3f}"
+    def successful_server_validations(self, *args, model:str, prompts:List[str], **kwargs) -> bool:
+        if prompts is None or model is None:
+            self.send_error(400, 'No prompt or model provided')
+            return False
+        if not isinstance(prompts, list):
+            self.send_error(400, 'Prompt should be a list of strings')
+            return False
+        return True
+
+    def get_response_stats(self, *args, responses:List[Dict[str, str]], agg_method:str, **kwargs):
+        # if an aggregation record exists, it needs to be excluded from std calc
+        if len(responses) >= 2 and agg_method != 'std':
+            kwargs['agg_method'] = 'std'
+            self.process_responses(*args, responses=responses, **kwargs)
+
+    def mk_payload(self, responses:List[Dict[str, str]], start_time:float) -> str:
         response_payload = json.dumps({
             'results': responses,
-            'server_time': server_time
+            'server_time': f"{time.time() - start_time:.3f}"
         })
-        return response_payload
+        return response_payload.encode('utf-8')
     
-    def respond(self, prompts:List[str], sub_domain:str, model:str) -> List[Dict[str, str]]:
+    def respond(self, *args, prompts:List[str], sub_domain:str, agg_method:str, options:dict, **kwargs,
+        ) -> List[Dict[str, str]]:
         responses = []
         try:
             for prompt in prompts:
+                options['seed'] = np.random.randint(0, 1000)
                 try:
                     if sub_domain == 'get_embeddings':
-                        response = ollama_client.embeddings(model=model, prompt=prompt)
-                        responses.append({'prompt': prompt, 'embedding': response['embedding']})
+                        response = ollama_client.embeddings(prompt=prompt, options=options, **kwargs)
+                        responses.append(
+                                            {
+                                                'prompt': prompt, 
+                                                'embedding': response['embedding'],
+                                                'temperature': options['temperature']
+                                            }
+                                        )
                     elif sub_domain == 'generates':
-                        response = ollama_client.generate(
-                                                            model=model, 
-                                                            prompt=prompt,
-                                                            options=options,
-                                                            stream=stream,
-                                    )
-                        responses.append({'prompt': prompt, 'response': response['response']})
+                        response = ollama_client.generate(prompt=prompt, options=options, **kwargs)
+                        responses.append(
+                                            {
+                                                'prompt': prompt, 
+                                                'response': response['response'],
+                                                'temperature': options['temperature']
+                                            }
+                                        )
                 except Exception as e:
                     print(f"An error occurred while processing prompt: {prompt}. Error: {e}")
                     responses.append({'prompt': prompt, 'error': str(e)})
@@ -183,46 +193,40 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             print(f"An error occurred during response generation: {e}")
         return responses
 
-    def process_responses(self, prompts:List[str], responses:List[str], sub_domain:str, 
-                                aggregation_method:str, model:str,
-                                *args, **kwargs,
+    def process_responses(self, *args, prompts:List[str], responses:List[str], sub_domain:str, 
+                                agg_method:str, model:str,
+                                **kwargs,
         ) -> None:
         """
         This function processes multiple responses generated by the language model.
         It performes aggregations as well as statistical analysis on the responses.
-        NOTE: std (Standard Deviation) is technically handled like an aggregation_method 
+        NOTE: std (Standard Deviation) is technically handled like an agg_method 
         even so it is not a real aggregation.
         """
-        if not aggregation_method:
+        if not agg_method:
             return
-        # Only the original prompts responses should be considered not appended aggregation records
+        # Only the original prompts and responses are considered, NOT aggregation records
         slc = slice(None, len(prompts))
-        # Extract the embeddings from the responses dictionary
+        # get_embeddings returns a vector,so here we perform a statistical aggregation
         if sub_domain == 'get_embeddings':
-            aggregated_response = Aggregations.aggregate_embeddings(
-                [r['embedding'] for r in responses[slc] if 'embedding' in r], 
-                aggregation_method
+            agg_response = Aggregations.aggregate_embeddings(
+                            [r['embedding'] for r in responses[slc] if 'embedding' in r], 
+                            agg_method,
             )
-            responses.append(
-                {   
-                    'embedding': aggregated_response,
-                    'aggregation_method': aggregation_method,
-                }
-            )
+            # agg_method is added to mark the record as an aggregation record
+            responses.append({'embedding': agg_response, 'agg_method': agg_method, } )
+        # generate gets texts, so here we perform a semantic aggreation
         elif sub_domain == 'generates':
             # Extract the responses from the responses dictionary
-            aggregated_response = Aggregations.aggregate_text(
-                prompts, 
-                [r['response'] for r in responses[slc] if 'response' in r], 
-                aggregation_method,
-                model=model
+            agg_response = Aggregations.aggregate_text(
+                                prompts, 
+                                [r['response'] for r in responses[slc] if 'response' in r], 
+                                agg_method,
+                                model=model,
+                                **kwargs,
             )
-            responses.append(
-                {  
-                    'response': aggregated_response,
-                    'aggregation_method': aggregation_method,
-                }
-            )
+            # agg_method is added to mark the record as an aggregation record
+            responses.append({'response': agg_response, 'agg_method': agg_method, } )
 
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=5555, 
         *args, **kwargs

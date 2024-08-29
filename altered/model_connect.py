@@ -37,7 +37,7 @@ class ModelConnect:
                                                         stream:str=False,
                                                         temperature:float=None,
                                                         num_predict:int=None,
-                                                        aggregation_method:str=None,
+                                                        agg_method:str=None,
                                                         **kwargs,
         ) -> dict:
         print(f"{Fore.YELLOW}sub_domain: {sub_domain}{Fore.RESET}")
@@ -58,29 +58,31 @@ class ModelConnect:
         temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
         context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
-        return message, name, stream, temperature, context_len, num_predict, aggregation_method
+        return message, name, stream, temperature, context_len, num_predict, agg_method, sub_domain
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        messages, name, stream, temperature, context_len, num_predict, aggregation_method = \
+        messages, name, stream, temperature, context_len, num_predict, agg_method, sub_domain = \
                                             self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
-        context = {'model': name, 'stream': stream}
+        context = {'model': name,}
         if name.startswith('gpt'):
             context['messages'] = messages
             context['temperature'] = temperature
         else:
-            context['prompt'] = messages
+            context['prompts'] = messages
             context['options'] = {  'temperature': temperature,
                                     'num_ctx': context_len,
                                 }
             if num_predict is not None: 
                 context['options']['num_predict'] = num_predict
-            context['aggregation_method'] = aggregation_method
+            context['agg_method'] = agg_method
             context['keep_alive'] = msts.config.defaults.get('keep_alive')
+            context['sub_domain'] = msts.config.defaults.get('sub_domain') if sub_domain is None else sub_domain
+            if sub_domain != 'get_embeddings': context['stream'] = stream
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 
@@ -88,14 +90,14 @@ class ModelConnect:
         # if no sub-domain is specified we get it from default params
         if sub_domain is None:
             sub_domain = msts.config.defaults.get('sub_domain')
-        return sub_domain
+        return {'sub_domain': sub_domain}
 
 
     def post(self, *args, **kwargs) -> dict:
         """
         Sends a message to the appropriate assistant and handles the response.
         """
-        kwargs['sub_domain'] = self.set_sub_domain(*args, **kwargs)
+        kwargs.update(self.set_sub_domain(*args, **kwargs))
         # method names may only use underscore
         return getattr( self, self.method_name_from_server(*args, **kwargs)
                         )(  self.prep_context(*args,
@@ -116,8 +118,6 @@ class ModelConnect:
         sub_domain: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
-        print(f"{context = }")
-        print(f"URL: {msts.config.get_url(*args, **kwargs)}")
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},
