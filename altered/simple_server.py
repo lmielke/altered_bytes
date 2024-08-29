@@ -35,7 +35,8 @@ class Aggregations:
             f"<INST>"
             f"You have been given a question or problem together with "
             f"a sample of {n} language model responses. Your task is to:"
-            f"{instruction}"
+            f"{instruction}\n"
+            f"Follow the instructions closely! Do not use any introduction/greeting phrases."
             f"</INST>"
         )
         return instruct
