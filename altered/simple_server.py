@@ -1,8 +1,6 @@
-import json
-import yaml
+import json, os, time, yaml
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from ollama import Client
-import time
 from typing import List, Dict
 import numpy as np
 from colorama import Fore, Style
@@ -16,11 +14,12 @@ class Aggregations:
     def load_text_aggregations(self, *args, **kwargs):
         text_aggregations_dir = os.path.join(
                                                 os.path.dirname(__file__), 
-                                                'ressources',
+                                                'resources',
                                                 'strategies',
                                                 )
         text_aggregations_name = 'text_aggregations.yaml'
-        with open(os.path.join(text_aggregations_dir, text_aggreations_name), 'r') as file:
+        print(f"load_text_aggregations: {text_aggregations_dir = }")
+        with open(os.path.join(text_aggregations_dir, text_aggregations_name), 'r') as file:
             return yaml.safe_load(file)
 
     def aggregate_embeddings(self, embeddings: List[List[float]], method: str, *args, **kwargs
@@ -81,9 +80,7 @@ class Aggregations:
         return responses
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        self.aggregations = Aggregations()
-        super().__init__(*args, **kwargs)
+    aggregations = None  # This will be set when the server starts
 
     def do_POST(self, *args, **kwargs):
         start_time = time.time()
@@ -195,12 +192,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             # agg_method is added to mark the record as an aggregation record
             responses.append({'response': agg_response, 'agg_method': agg_method})
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=5555, 
+class AggregationsHTTPServer(HTTPServer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.RequestHandlerClass.aggregations = Aggregations(*args, **kwargs)
+        print("Aggregations loaded successfully.")
+
+def run(server_class=AggregationsHTTPServer, handler_class=SimpleHTTPRequestHandler, port=5555, 
         *args, **kwargs):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f"Starting the HTTP server on port {port}...")
     httpd.serve_forever()
+
 
 if __name__ == '__main__':
     run()
