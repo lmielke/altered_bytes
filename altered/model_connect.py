@@ -41,7 +41,7 @@ class ModelConnect:
                                                         agg_method:str=None,
                                                         **kwargs,
         ) -> dict:
-        print(f"{Fore.YELLOW}sub_domain: {sub_domain}{Fore.RESET}")
+        print(f"{Fore.YELLOW}sub_domain:{Fore.RESET} {sub_domain}")
         if sub_domain in ['get_embeddings', 'generates']:
             # for embeddings and generate[s]! message is a list, to allow for multiple messages to be embedded
             # with a single server call

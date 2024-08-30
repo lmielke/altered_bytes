@@ -1,0 +1,35 @@
+# text_aggregations.yaml
+
+max: >
+  Provide a comprehensive summary that captures the summary of all ideas 
+  provided by all input responses, include all aspects regardless 
+  of their relevance. 
+  Only leave out aspects that are obviously completely irrelevant.
+
+min: >
+  Provide a concise summary that captures the core idea common to 
+  all or most input responses! Focus on the most essential information.
+
+mean: >
+  Aggregate these responses into a single response. The response 
+  should incorporate the more relevant aspects depending on their 
+  mentioning frequency and elaboration within the input responses. 
+  Leave out aspects that find no or little mention.
+
+best: >
+  Find the text among the inputs that best addresses the question 
+  or problem (best answer), and expand upon it, incorporating any 
+  unique relevant information from the other responses.
+
+std: >
+  Estimate the semantic deviation between the provided responses (std).
+  STD here is an integer value (from 0 to 3) for the semantic deviation.
+  - 0: No deviation, responses are extremely similar or even identical.
+  - 1: Low deviation, responses are similar but differ in some details. 
+    For example, one answer might go deeper or explain additional aspects.
+  - 2: Moderate deviation, responses differ in several aspects. 
+    Some outliers might even differ in their overall topic.
+  - 3: High deviation, responses are very different, mostly describing 
+    different unrelated topics.
+  Respond with a json string containing the std value and your reasoning! 
+  Example: {'responses_std': '1', 'reasoning': 'The responses ...'}
