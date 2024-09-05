@@ -15,6 +15,7 @@ setuptools = "*"
 ollama = "*"
 numpy = "*"
 altered = {editable = true, path = "."}
+pandas = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

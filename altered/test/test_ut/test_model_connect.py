@@ -8,13 +8,13 @@ import altered.settings as sts
 
 from altered.model_connect import ModelConnect
 
-class Test_Assistant(unittest.TestCase):
+class Test_ModelConnect(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 0
         cls.testData = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
-        cls.test_inst = ModelConnect()
+        cls.m_con = ModelConnect()
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
@@ -45,7 +45,7 @@ class Test_Assistant(unittest.TestCase):
         expected = False
         context = {'messages': [{'role': 'user', 'content': 'Why is the sky blue?'}]}
         # initialize test class
-        outs= self.test_inst.post(
+        r = self.m_con.post(
                                     [
                                     context['messages'][0]['content'],
                                     context['messages'][0]['content'],
@@ -57,17 +57,17 @@ class Test_Assistant(unittest.TestCase):
                                     agg_method='min',
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
-        for i, out in enumerate(outs.get('results')):
+        for i, out in enumerate(r.get('results')):
             tbl = {k: f"{vs}"[:200] for k, vs in out.items()}
             print(tb(tbl.items()))
 
-        # out = self.test_inst.generate(
+        # out = self.m_con.generate(
         #                                 ['Why is the sky blue?'], 
         #                                 alias=('llama3.1', 'while-ai_1'),# as alias 'l3:8b_1',
         #                                 sub_domain='get_embeddings', # [get_embeddings, generate]
         #                                 )
         # print(out)
-        # out = self.test_inst.generate(
+        # out = self.m_con.generate(
         #                                 'Explain why the sky is blue!', 
         #                                 alias=('llama3.1', 'while-ai_1'),# as alias 'l3:8b_1',
         #                                 sub_domain='generate', # [get_embeddings, generate]

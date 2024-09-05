@@ -7,18 +7,21 @@ from colorama import Fore, Style
 
 olc = Client(host='http://localhost:11434')
 
-class Aggregations:
-    def __init__(self, *args, **kwargs):
-        self.text_aggregations = self.load_text_aggregations(*args, **kwargs)
 
-    def load_text_aggregations(self, *args, **kwargs):
-        text_aggregations_dir = os.path.join(
+class Aggregations:
+
+
+    def __init__(self, *args, **kwargs):
+        agg_file_name = 'prompt_aggreg.yaml'
+        self.prompt_aggreg = self.load_prompt_aggreg(agg_file_name, *args, **kwargs)
+
+    def load_prompt_aggreg(self, agg_file_name, *args, **kwargs):
+        prompt_aggreg_dir = os.path.join(
                                                 os.path.dirname(__file__), 
                                                 'resources',
                                                 'strategies',
                                                 )
-        text_aggregations_name = 'text_aggregations.yaml'
-        with open(os.path.join(text_aggregations_dir, text_aggregations_name), 'r') as file:
+        with open(os.path.join(prompt_aggreg_dir, agg_file_name), 'r') as file:
             return yaml.safe_load(file)
 
     def aggregate_embeddings(self, embeddings: List[List[float]], method: str, *args, **kwargs
@@ -40,12 +43,15 @@ class Aggregations:
         return embeddings
 
     def create_aggregation_prompt(self, n: int, agg_method: str) -> str:
-        instruction = self.text_aggregations.get(agg_method, "")
-        instruct = (
+        instruction = self.prompt_aggreg.get(agg_method, "")
+        if not instruction:
+            return None
+        else:
+            instruct = (
                         f"<INST>"
                             f"You have been given a question or problem together with "
                             f"a sample of {n} language model responses. Your task is to:"
-                                f"{instruction}\n"
+                                f"{instruction['prompt']}\n"
                             f"Follow the instructions closely! "
                             f"Do not use any introduction/greeting phrases."
                         f"</INST>"
@@ -60,7 +66,7 @@ class Aggregations:
         a more comprehensive answer to a question or problem. This function
         aggregates those responses into a single one.
         """
-        if agg_method in self.text_aggregations:
+        if agg_method in self.prompt_aggreg:
             aggregation_prompt = self.create_aggregation_prompt(len(prompts), agg_method)
             combined_texts = "\n\n".join(
                 f"Prompt {i+1}: {prompt}\nResponse {i+1}: {response}"
@@ -71,9 +77,10 @@ class Aggregations:
                 f"Here are the input texts:\n\n"
                 f"{combined_texts}"
             )
+            num_predict_mult = self.prompt_aggreg[agg_method].get('num_predict_mult', 2)
             # Use the Ollama client to generate the aggregated response
             if agg_method in ['max', 'mean']:
-                options['num_predict'] = options.get('num_predict', 100) * 2
+                options['num_predict'] = options.get('num_predict', 100) * num_predict_mult
             response = olc.generate(prompt=final_prompt, options=options, **kwargs)
             return response['response']
         # Return original list if agg_method is unsupported
@@ -83,7 +90,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     aggregations = None  # This will be set when the server starts
 
     def do_POST(self, *args, **kwargs):
-        start_time = time.time()
+        network_up_time, start_time = self.set_times(*args, **kwargs)
         try:
             kwargs.update(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
             # General input validations
@@ -99,11 +106,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(self.mk_payload(responses, start_time))
+            self.wfile.write(self.mk_payload(
+                                                responses, 
+                                                network_up_time, 
+                                                start_time
+                                )
+            )
         
         except Exception as e:
             print(f"An error occurred: {e}")
             self.send_error(500, str(e))
+
+    def set_times(self, *args, network_up_time, **kwargs):
+        start_time = time.time()
+        network_up_time = network_up_time - start_time
+        return network_up_time, start_time
+
 
     def successful_server_validations(self, *args, model: str, prompts: List[str], **kwargs
         ) -> bool:
@@ -123,15 +141,20 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             kwargs['agg_method'] = 'std'
             self.process_responses(*args, responses=responses, **kwargs)
 
-    def mk_payload(self, responses: List[Dict[str, str]], start_time: float) -> bytes:
+    def mk_payload(self, responses: List[Dict[str, str]],
+                            network_up_time: float,
+                            start_time: float
+        ) -> bytes:
         response_payload = json.dumps({
             'results': responses,
-            'server_time': f"{time.time() - start_time:.3f}"
+            'network_up_time': network_up_time,
+            'network_down_time': time.time(),
+            'total_server_time': f"{time.time() - start_time:.3f}"
         })
         return response_payload.encode('utf-8')
     
-    def respond(self, *args, prompts:List[str], sub_domain:str, options:dict, agg_method:str=None, 
-                        **kwargs
+    def respond(self, *args, prompts:List[str], sub_domain:str, options:dict, 
+                agg_method:str=None, **kwargs,
         ) -> List[Dict[str, str]]:
         responses = []
         try:

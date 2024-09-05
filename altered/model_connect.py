@@ -15,12 +15,13 @@ class ModelConnect:
     For some assistants, Ollama is currently hosting and running the models. 
     See model_settings.models for the assistants and their respective models.
     The remote Ollama machines are listening on 0.0.0.0:11434 and are accessible 
-    via the local private Network. 
+    via the local private Network.
+    On how to use see project_dir/altered/test/test_ut/test_assistant.py
     """
     
     def __init__(self, *args, **kwargs) -> None:
         self.min_context_len = 2000
-        self.to_msgs = lambda m: [{'role': 'user', 'content': m}]
+        self.to_msgs = lambda msg: [{'role': 'user', 'content': msg}]
 
 
     def random_temp(self, lower:float=None, upper:float=None) -> float:
@@ -41,7 +42,7 @@ class ModelConnect:
                                                         agg_method:str=None,
                                                         **kwargs,
         ) -> dict:
-        print(f"{Fore.YELLOW}sub_domain:{Fore.RESET} {sub_domain}")
+        # print(f"{Fore.YELLOW}sub_domain:{Fore.RESET} {sub_domain}")
         if sub_domain in ['get_embeddings', 'generates']:
             # for embeddings and generate[s]! message is a list, to allow for multiple messages to be embedded
             # with a single server call
@@ -120,8 +121,8 @@ class ModelConnect:
         sub_domain: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
-        print(f"{Fore.YELLOW}context:{Fore.RESET} {context}")
-        print(f"{Fore.YELLOW}url:{Fore.RESET} {msts.config.get_url(*args, **kwargs)}")
+        # print(f"{Fore.YELLOW}context:{Fore.RESET} {context}")
+        # print(f"{Fore.YELLOW}url:{Fore.RESET} {msts.config.get_url(*args, **kwargs)}")
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},

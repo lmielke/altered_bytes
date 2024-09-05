@@ -1,0 +1,59 @@
+# default_fields.yml
+# This file contains the fields that are used to define the structure of a pandas DataFrame.
+# name of the table/data set that the record belongs to
+# meta: {"name": "name", "type": "string", "default": ""}
+name: null
+
+# unique identifier for the record. The record can be uniquely selected by this field.
+# meta: {"name": "unique_name", "type": "string", "default": ""}
+unique_name: null
+
+# the main content of the record. This can be text or image data.
+# if no content is provided, the source field must be filled.
+# every record has to contain either a source or a content field.
+# meta: {"name": "content", "type": "string", "default": "fields.source"}
+content: null
+
+# The prompt contains the entire prompt sent to the model. Its used for debugging purpose.
+# every record has to contain either a source or a prompt field.
+# meta: {"name": "prompt", "type": "string", "default": "fields.source"}
+prompt: null
+
+# the main role sender of the record. This can be 'user', 'system', 'assistant'
+# meta: {"name": "role", "type": "category", "default": "user"}
+role: user
+
+# category of the record. This can be used to group records together.
+# Examples: physics, biology, chemistry
+# meta: {"name": "category", "type": "category", "default": ""}
+category: null
+
+# source of the content. This can be a URL, file, cmd or sql query.
+# if no source is provided, the content field must be filled.
+# every record has to contain either a source or a content field.
+# meta: {"name": "source", "type": "string", "default": "fields.content"}
+source: null
+
+# function or method associated with the record. This might represent additional
+# information or an action that can be performed. The content for example might describe
+# how and when to use the tools.
+# meta: {"name": "tools", "type": "string", "default": "ls"}
+tools: data.show()
+
+# techincal fields for metadata
+# The hash represents the first N charactes of the embedding of the content.
+# This is used to match the record against its vector representation in a vector store/db.
+# To retrieve the record, the embedding is retrieved from the vector store using 
+# cosine similarity against a query vector. The retrieved embedding is then hashed itself
+# and matched against the hash of the record. If the hashes match, the record is retrieved.
+# meta: {"name": "hash", "type": "string", "default": null}
+hash: null
+
+# model used to embedd the content. The query vector must also be embedded 
+# using the same model as the record to be retrieved.
+# meta: {"name": "model", "type": "category", "default": null}
+model: null
+
+# timestamp of the record. This is used to determine the temporaryal order of the records.
+# meta: {"name": "timestamp", "type": "datetime64[ns]", "default": null}
+timestamp: null

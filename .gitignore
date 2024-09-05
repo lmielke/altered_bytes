@@ -8,6 +8,7 @@ users/__pycache__/
 *.npy
 *.png
 *.jpg
+*.sublime-workspace
 zz_rapit_alter.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
