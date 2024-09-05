@@ -32,7 +32,13 @@ class Test_Chat(unittest.TestCase):
 
     def test_run(self, *args, **kwargs):
         chat = Chat(name='ut_chat')
-        chat.run('Hello, Who are you?', *args, verbose=0, depth=1, agg_method=None, **kwargs)
+        chat.run('Hello, Who are you?', *args, 
+                        verbose=0, 
+                        alias='l3:8b_1',
+                        num_predict = 100,
+                        depth=1, 
+                        **kwargs
+        )
 
 if __name__ == "__main__":
     unittest.main()

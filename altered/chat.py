@@ -79,14 +79,19 @@ class Chat:
 
     def post(self, user_prompt:str, *args, depth:int=1, agg_method:str=None, **kwargs):
         # Post the message to the AI model
+        # some params here are coming as kwargs from the source and are directly forwarded
+        # Examples: alias='l3:8b_1', num_predict = 100,
+        # This post method only retrieves text results
+        kwargs['sub_domain'] = 'generates'
+        kwargs['agg_method'] = 'best' if depth != 1 and (agg_method is None) else agg_method
         user_prompts = [user_prompt for _ in range(depth)]
-        r = self.assi.post(
-                                            user_prompts,
-                                            alias='l3:8b_1',
-                                            num_predict = 100,
-                                            sub_domain='generates',
-                                            agg_method=agg_method,
-                        )
+        # we post the user prompt to the AI model
+        r = self.assi.post(user_prompts, *args, **kwargs)
+        response = self.extract_response_content(r, agg_method, *args, **kwargs)
+        return response
+
+    def extract_response_content(self, r:dict, *args, agg_method:str, **kwargs) -> dict:
+        # r comes as a dictionary with 'results' containing a list of dictionaries
         results = r.get('results')
         if not results or type(results) != list:
             raise ValueError(f"Error: No results returned from the AI model.")
