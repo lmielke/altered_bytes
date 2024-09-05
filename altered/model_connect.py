@@ -121,8 +121,6 @@ class ModelConnect:
         sub_domain: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
-        # print(f"{Fore.YELLOW}context:{Fore.RESET} {context}")
-        # print(f"{Fore.YELLOW}url:{Fore.RESET} {msts.config.get_url(*args, **kwargs)}")
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},

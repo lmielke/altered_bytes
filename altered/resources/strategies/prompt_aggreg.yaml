@@ -6,11 +6,13 @@ max:
     provided by all input responses, include all aspects regardless 
     of their relevance. 
     Only leave out aspects that are obviously completely irrelevant.
+    Refrain from conversational comments! Do not explain your reasoning !
   num_predict_mult: 3
 min:
   prompt: >
     Provide a concise summary that captures the core idea common to 
     all or most input responses! Focus on the most essential information.
+    Refrain from conversational comments! Do not explain your reasoning !
   num_predict_mult: 2
 mean:
   prompt: >
@@ -18,12 +20,14 @@ mean:
     should incorporate the more relevant aspects depending on their 
     mentioning frequency and elaboration within the input responses. 
     Leave out aspects that find no or little mention.
+    Refrain from conversational comments! Do not explain your reasoning !
   num_predict_mult: 2
 best:
   prompt: >
     Find the text among the inputs that best addresses the question 
     or problem (best answer), and expand upon it, incorporating any 
     unique relevant information from the other responses.
+    Refrain from conversational comments! Do not explain your reasoning !
   num_predict_mult: 1
 std:
   prompt: >

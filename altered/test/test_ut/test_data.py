@@ -82,6 +82,7 @@ class Test_Data(unittest.TestCase):
             'name': 'new_entry',
             'unique_name': 'unique_001',
             'content': 'Some content',
+            'prompt': 'Full prompt as posted to the model',
             'role': 'user',
             'category': 'test_category',
             'source': 'Some source',

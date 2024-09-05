@@ -77,22 +77,31 @@ class Chat:
         instructs = f"<INST>\n{instructs}\n</INST>" if instructs else ''
         return (f"{context}\n{user_prompt}\n\n{instructs}").strip().strip('\n')
 
-    def post(self, user_prompt:str, *args, **kwargs):
+    def post(self, user_prompt:str, *args, depth:int=1, agg_method:str=None, **kwargs):
         # Post the message to the AI model
+        user_prompts = [user_prompt for _ in range(depth)]
         r = self.assi.post(
-                                            [user_prompt],
+                                            user_prompts,
                                             alias='l3:8b_1',
                                             num_predict = 100,
                                             sub_domain='generates',
-                                            agg_method=None,
+                                            agg_method=agg_method,
                         )
+        print(f"\nr: {r}")
+        
+
+        exit()
+
+
+
         results = r.get('results')
         if not results or type(results) != list:
             raise ValueError(f"Error: No results returned from the AI model.")
-        elif len(results) == 1:
-            response = results[0]
-            response['content'] = response.get('response').strip()
-            response['role'] = 'assistant'
+        for i, result in enumerate(results):
+            if result.get('agg_method') == agg_method:
+                response = result
+                response['content'] = response.get('response').strip()
+                response['role'] = 'assistant'
         return response
 
     def add_to_chat(self, prompt:str, *args, **kwargs):
