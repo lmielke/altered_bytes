@@ -111,10 +111,16 @@ class ModelConnect:
                                 **kwargs,
                             ), *args, **kwargs 
                             )
+        self.get_stats(r, *args, **kwargs)
+        return r
+
+    def get_stats(self, r, *args, **kwargs) -> dict:
+        """
+        we add the current model times  to the total times
+        """
         r['network_down_time'] += -time.time()
         self.times = {k: float(f"{self.times.get(k, 0.0) + float(vs):.3f}")
                                                 for k, vs in r.items() if k in self.times}
-        return r
 
     def method_name_from_server(self, *args, **kwargs):
         return (
