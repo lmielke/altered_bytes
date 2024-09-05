@@ -87,13 +87,6 @@ class Chat:
                                             sub_domain='generates',
                                             agg_method=agg_method,
                         )
-        print(f"\nr: {r}")
-        
-
-        exit()
-
-
-
         results = r.get('results')
         if not results or type(results) != list:
             raise ValueError(f"Error: No results returned from the AI model.")

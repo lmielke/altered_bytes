@@ -3,9 +3,7 @@
 import altered.model_params as msts
 from typing import Dict, Union, Tuple
 from openai import OpenAI
-import json
-import re
-import requests
+import json, re, requests, time
 from colorama import Fore, Style
 import random as rd
 
@@ -22,6 +20,11 @@ class ModelConnect:
     def __init__(self, *args, **kwargs) -> None:
         self.min_context_len = 2000
         self.to_msgs = lambda msg: [{'role': 'user', 'content': msg}]
+        self.times = {
+                        'network_up_time': 0.0, 
+                        'network_down_time': 0.0, 
+                        'total_server_time': 0.0,
+                        }
 
 
     def random_temp(self, lower:float=None, upper:float=None) -> float:
@@ -102,12 +105,16 @@ class ModelConnect:
         """
         kwargs.update(self.set_sub_domain(*args, **kwargs))
         # method names may only use underscore
-        return getattr( self, self.method_name_from_server(*args, **kwargs)
+        r = getattr(self, self.method_name_from_server(*args, **kwargs)
                         )(  self.prep_context(*args,
                                 **msts.config.get_model(*args, **kwargs).get('model_file'), 
                                 **kwargs,
                             ), *args, **kwargs 
                             )
+        r['network_down_time'] += -time.time()
+        self.times = {k: float(f"{self.times.get(k, 0.0) + float(vs):.3f}")
+                                                for k, vs in r.items() if k in self.times}
+        return r
 
     def method_name_from_server(self, *args, **kwargs):
         return (
@@ -121,6 +128,7 @@ class ModelConnect:
         sub_domain: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
+        context['network_up_time'] = time.time()
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},

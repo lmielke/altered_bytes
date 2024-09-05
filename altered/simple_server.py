@@ -90,9 +90,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     aggregations = None  # This will be set when the server starts
 
     def do_POST(self, *args, **kwargs):
-        network_up_time, start_time = self.set_times(*args, **kwargs)
         try:
             kwargs.update(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
+            network_up_time, start_time = self.set_times(*args, **kwargs)
             # General input validations
             if not self.successful_server_validations(*args, **kwargs):
                 return
@@ -117,9 +117,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             print(f"An error occurred: {e}")
             self.send_error(500, str(e))
 
-    def set_times(self, *args, network_up_time, **kwargs):
+    def set_times(self, *args, network_up_time:float=None, **kwargs):
         start_time = time.time()
-        network_up_time = network_up_time - start_time
+        network_up_time = f"{start_time - network_up_time if network_up_time else 0.0:.3f}"
         return network_up_time, start_time
 
 
@@ -154,7 +154,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         return response_payload.encode('utf-8')
     
     def respond(self, *args, prompts:List[str], sub_domain:str, options:dict, 
-                agg_method:str=None, **kwargs,
+                agg_method:str=None, network_up_time:str=None, **kwargs,
         ) -> List[Dict[str, str]]:
         responses = []
         try:
