@@ -2,6 +2,14 @@
 
 git_commit_msg_prompt: >
         Summarize the <context> Text to be summarized </context> in less than 50 words!
-        Do not use introductory words, start with: Modified ..., Added ..., Removed ..., Fixed ... ect.
+        Add NO explanation to your answer! Do not explain your reasoning!
+        Respond in json format: 
+                {"commit_msg": "# Modifications\n
+                                ## Message Formatting\n
+                                - Modified set_format to allow various response formats 
+                                - Introduction of the format parameter.
+                                # Bug Fixes\n
+                                - ...
+                "}
 
     
