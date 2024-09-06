@@ -1,0 +1,18 @@
+# prompt_services.yml
+
+git_commit_msg_prompt: >
+        You have been provided with <context> ... </context> information. 
+        These information contain results from running 'git diff' and 'git status' 
+        on the current package directory. 
+        Based entirely on the <context> ... </context> information you received,
+        create a single summarizing string to be used in git commit -m '$message' !`n
+
+        Note that Untracked files will be added before commint using 'git add -A'.
+        Behavioral changes are more important than structural changes or print statements.
+        Example: 'get_statistics method for server time added/modified for use in self.times.'
+        NOTE: Your response is directly pasted into the '$message'. Provide the raw -m string.
+        Do not simply repeat the examples!
+        Do not add any conversational context. 
+        Do not explain your reasoning!
+
+    
