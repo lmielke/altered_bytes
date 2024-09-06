@@ -87,3 +87,10 @@ class Prompt:
             prompt_appendix += self.prompt_formats['markdown_response_postfix']
         return f"{instructs}\n\n{prompt_appendix}"
 
+
+    def get_template(self, name:str, *args, **kwargs):
+        """
+        Gets a json template to be used inside the prompt.
+        """
+        
+        pass
