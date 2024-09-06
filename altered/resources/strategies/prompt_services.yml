@@ -13,7 +13,7 @@ git_commit_msg_prompt: >
         as message for: git commit -m '$message' !`n
         If there are neither any changes nor any Untracked files, respond with 'No Changes !'
         Your response is directly used as the -m '$message'. Provide only the raw message string!
-        Do not add any conversational context! 
+        Be specific about the changed Feature!
         Use more than 15 words!
         Do not explain your reasoning!
 

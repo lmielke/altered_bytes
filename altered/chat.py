@@ -54,7 +54,7 @@ class Chat:
         user_prompt = {'content': user_input, 'role': 'user'}
         return user_prompt
 
-    def mk_prompt(self, user_prompt:str='', *args, instructs:str='', context:str='', **kwargs):
+    def mk_prompt(self, user_prompt:dict={}, *args, instructs:str='', context:str='', **kwargs):
         msg = f"{Fore.RED} mk_prompt: Provide either user_prompt or instructs! {Fore.RESET}"
         assert user_prompt.get('content') or instructs, msg
         # we always add the chat chat_history for context (check if needed)
@@ -63,19 +63,26 @@ class Chat:
             context += "\n<chat_history>\n" + str(table['content']) + "\n</chat_history>\n"
         # depending on the inputs the prompt is constructed with user_prompt and instructs
         if user_prompt and not instructs:
-            instructs = self.prompt_params.get('msg_and_not_instructs_prefix', '')
-        elif instructs and not user_prompt:
-            pass
-        if user_prompt and instructs:
+            instructs = self.prompt_params.get('msg_and_not_instructs_prefix', '').strip()
+        elif user_prompt and instructs:
             prefix = self.prompt_params.get('msg_and_instructs_prefix', '')
             instructs = re.sub( r'(<INST>\s+)(.*)(</INST>)', rf'\1{prefix}\2\3', instructs,
                                 flags=re.MULTILINE,
-                        )
-
-        context = f"<context>\n{context if context else 'None'}\n</context>"
-        user_prompt = f"<user_prompt>\n{user_prompt['content']}\n</user_prompt>" if user_prompt else ''
-        instructs = f"<INST>\n{instructs}\n</INST>" if instructs else ''
-        return (f"{context}\n{user_prompt}\n\n{instructs}").strip().strip('\n')
+                        ).strip()
+        prompt = (
+                    f"<context>\n"
+                        f"{context if context else 'None'}"
+                    f"\n</context>\n"
+                    
+                    f"\n<user_prompt>\n"
+                        f"{user_prompt.get('content', '# None')}"
+                    f"\n</user_prompt>\n"
+                    
+                    f"\n<INST>\n"
+                        f"{instructs}"
+                    f"\n</INST>\n"
+                    )
+        return prompt
 
     def post(self, user_prompt:str, *args, depth:int=1, agg_method:str=None, **kwargs):
         # Post the message to the AI model
