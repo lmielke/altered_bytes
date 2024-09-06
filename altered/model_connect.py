@@ -104,7 +104,6 @@ class ModelConnect:
         Sends a message to the appropriate assistant and handles the response.
         """
         kwargs.update(self.set_sub_domain(*args, **kwargs))
-        # method names may only use underscore
         r = getattr(self, self.method_name_from_server(*args, **kwargs)
                         )(  self.prep_context(*args,
                                 **msts.config.get_model(*args, **kwargs).get('model_file'), 
@@ -123,6 +122,12 @@ class ModelConnect:
                                                 for k, vs in r.items() if k in self.times}
 
     def method_name_from_server(self, *args, **kwargs):
+        """
+        The method name to contact the model is derived from the server name.
+        For example server: whlile-ai_0 results in while_ai method to be run.
+        """
+        
+        # method names may only use underscore
         return (
                 msts.config.get_model(*args, **kwargs).get('server')
                 .split('_')[0].replace('-', '_')

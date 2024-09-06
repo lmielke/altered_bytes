@@ -9,11 +9,12 @@ git_commit_msg_prompt: >
         summarized in a meaningful way to be used as commit message. 
 
         Based entirely on the <context> ... </context> information you received,
-        create a single meaningful <context> summary (between 10 to 20 words) to be directly used 
+        create a meaningful <context> summary (min 15 to max 30 words) to be directly used 
         as message for: git commit -m '$message' !`n
         If there are neither any changes nor any Untracked files, respond with 'No Changes !'
         Your response is directly used as the -m '$message'. Provide only the raw message string!
-        Do not add any conversational context. 
+        Do not add any conversational context! 
+        Use more than 15 words!
         Do not explain your reasoning!
 
     
