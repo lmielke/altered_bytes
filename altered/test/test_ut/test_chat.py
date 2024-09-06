@@ -36,6 +36,7 @@ class Test_Chat(unittest.TestCase):
                         verbose=0, 
                         alias='l3:8b_1',
                         num_predict = 100,
+                        format='markdown',
                         depth=1, 
                         **kwargs
         )
