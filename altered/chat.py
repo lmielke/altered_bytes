@@ -69,6 +69,7 @@ class Chat:
             instructs = re.sub( r'(<INST>\s+)(.*)(</INST>)', rf'\1{prefix}\2\3', instructs,
                                 flags=re.MULTILINE,
                         ).strip()
+        # this is what the prompt will look like
         prompt = (
                     f"<context>\n"
                         f"{context if context else 'None'}"
