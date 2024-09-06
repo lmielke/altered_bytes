@@ -4,7 +4,7 @@ prompt.py
 """
 import os, re, sys, yaml
 from colorama import Fore, Style
-
+from altered.model_connect import ModelConnect
 import altered.settings as sts
 
 
@@ -15,6 +15,7 @@ class Prompt:
 
     def __init__(self, *args, **kwargs):
         self.prompt_params = self.load_prompt_params(*args, **kwargs)
+        self.assi = ModelConnect()
 
     def load_prompt_params(self, *args, **kwargs):
         with open(self.prompt_params_path, 'r') as f: 
@@ -57,3 +58,15 @@ class Prompt:
         if not table['content'].empty and (table['content'].str.len() > 0).any():
             context += "\n<chat_history>\n" + str(table['content']) + "\n</chat_history>\n"
         return context if context else 'None'
+
+    def post(self, user_prompt:str, *args, depth:int=1, agg_method:str=None, **kwargs):
+        # Post the message to the AI model
+        # some params here are coming as kwargs from the source and are directly forwarded
+        # Examples: alias='l3:8b_1', num_predict = 100,
+        # This post method only retrieves text results
+        kwargs['sub_domain'] = 'generates'
+        kwargs['agg_method'] = 'best' if depth != 1 and (agg_method is None) else agg_method
+        user_prompts = [user_prompt for _ in range(depth)]
+        # we post the user prompt to the AI model
+        r = self.assi.post(user_prompts, *args, **kwargs)
+        return r

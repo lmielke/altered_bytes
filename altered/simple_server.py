@@ -93,6 +93,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         try:
             kwargs.update(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
             network_up_time, start_time = self.set_times(*args, **kwargs)
+            del kwargs['network_up_time']
             # General input validations
             if not self.successful_server_validations(*args, **kwargs):
                 return
