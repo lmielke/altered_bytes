@@ -74,7 +74,6 @@ class Prompt:
         return self.assi.post(user_prompts, *args, **kwargs)
 
     def set_format(self, instructs, *args, format:str=None, **kwargs):
-        print(f"{Fore.CYAN}{format = }{Fore.RESET}")
         if format is None:
             return instructs
         prompt_appendix = ''

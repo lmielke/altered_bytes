@@ -1,15 +1,18 @@
 # prompt_services.yml
 
 git_commit_msg_prompt: >
-        Summarize the <context> Text to be summarized </context> in less than 50 words!
-        Add NO explanation to your answer! Do not explain your reasoning!
-        Respond in json format: 
+        Summarize above <context> Text to be summarized </context> in less than 50 words!
+        Respond in json format.
+        Below you see an Example to be used as a template:
                 {"commit_msg": "# Modifications\n
                                 ## Message Formatting\n
-                                - Modified set_format to allow various response formats 
-                                - Introduction of the format parameter.
+                                - Modified ...
+                                - New paramter ...
                                 # Bug Fixes\n
                                 - ...
                 "}
+        Do not explain your answer! Do not explain your reasoning!
+        Provide only the json object!
+
 
     
