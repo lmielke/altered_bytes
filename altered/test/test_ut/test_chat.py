@@ -5,13 +5,15 @@ import unittest
 
 # test package imports
 import altered.settings as sts
+from altered.yml_parser import YmlParser
 
 from altered.chat import Chat
 
 class Test_Chat(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.verbose = 2
+        cls.verbose = 1
+        cls.test_data_path = os.path.join(sts.resources_dir, 'kwargs', 'chat_run.yml')
         cls.testData = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -31,15 +33,13 @@ class Test_Chat(unittest.TestCase):
         print(chat.data.show())
 
     def test_run(self, *args, **kwargs):
-        chat = Chat(name='ut_chat')
-        chat.run('Hello, Who are you?', *args, 
-                        verbose=0, 
-                        alias='l3:8b_1',
-                        num_predict = 100,
-                        format='markdown',
-                        depth=1, 
-                        **kwargs
-        )
+        chat = Chat(name='ut_chat', verbose=self.verbose)
+        # chat.table().fields.describe(fmt='tbl')
+        yml = YmlParser()
+        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
+        yml.data['verbose'] = self.verbose
+        chat.run(*args, **yml.data)
+
 
 if __name__ == "__main__":
     unittest.main()

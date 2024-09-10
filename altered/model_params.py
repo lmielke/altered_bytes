@@ -90,7 +90,7 @@ class ModelParams:
         with open(path, 'w') as file:
             yaml.safe_dump(self.config, file)
 
-    def unpack_alias(self, *args, alias:str=None, sub_domain:str=None, **kwargs) -> Tuple[str, str]:
+    def unpack_alias(self, *args, alias:str=None, service_endpoint:str=None, **kwargs) -> Tuple[str, str]:
         """
         alias:[str, tuple] combined model_server alias 
                             i.e. 'l31:8b_0' -> (modelAlias_server_id)
@@ -105,14 +105,14 @@ class ModelParams:
                     Then the combined alias for model/server would be l31:8b_0 and l31:8b_1.
         """
         # gpt´s can be delivered with any server_alias, it will always be oai
-        if alias is None and sub_domain is None:
-            raise ValueError(f"{Fore.RED}Alias or sub_domain must be specified{Fore.RESET}")
+        if alias is None and service_endpoint is None:
+            raise ValueError(f"{Fore.RED}Alias or service_endpoint must be specified{Fore.RESET}")
         model_name, server_name = None, None
         if alias is None:
             model_alias, server_alias = None, None
-            model_name = self.defaults.get(sub_domain, {})['model']
-            server_name = self.defaults.get(sub_domain, {})['server']
-            # server_name = self.defaults['servers'].get(sub_domain)
+            model_name = self.defaults.get(service_endpoint, {})['model']
+            server_name = self.defaults.get(service_endpoint, {})['server']
+            # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
         elif type(alias) == tuple:
             model_alias, server_alias = None, None
@@ -161,18 +161,18 @@ class ModelParams:
                 raise ValueError(f"Parameters for server '{server_name}' not found")
         return {'model_file': model_file, 'server': server_name, 'params': params, }
 
-    def get_url(self, *args, sub_domain:str=None, **kwargs) -> str:
+    def get_url(self, *args, service_endpoint:str=None, **kwargs) -> str:
         """
         Retrieves the URL for the specified model alias.
         alias:str combined model_server alias i.e. 'l31:8b_0' or 'l31:8b_1'.
-        sub_domain:str ['get_embeddings', 'generate']
+        service_endpoint:str ['get_embeddings', 'generate']
 
         Returns:
             str: The URL for the model alias.
         """
-        sp = self.get_model(*args, sub_domain=sub_domain, **kwargs).get('params')
-        port = sp.get(f'{sub_domain}_port', '')
-        url = f"{sp.get('model_address', '')}:{port}/api/{sub_domain}"
+        sp = self.get_model(*args, service_endpoint=service_endpoint, **kwargs).get('params')
+        port = sp.get(f'{service_endpoint}_port', '')
+        url = f"{sp.get('model_address', '')}:{port}/api/{service_endpoint}"
         return url
 
     def get_api_key(self, *args, **kwargs) -> str:

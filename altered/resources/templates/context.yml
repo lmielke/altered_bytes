@@ -1,0 +1,8 @@
+prompt_title: Unittest
+context:
+  chat_history: null
+  rag_selection: null
+user_prompt:
+  question: null
+instruct:
+  role: You are a helpful assistant.

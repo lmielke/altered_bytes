@@ -99,14 +99,14 @@ servers:
   last_update: null
   openAI:
     get_embeddings_port: null
-    generates_port: null
+    get_generates_port: null
     generate_port: null
     key_path: os.environ.get('secrets')/9_secrets/openai/open_ai_key.yml
     model_address: null
     models_to_load: null
   while-ai_0:
     get_embeddings_port: 5555
-    generates_port: 5555
+    get_generates_port: 5555
     generate_port: 11434
     key_path: null
     model_address: http://192.168.0.235
@@ -115,7 +115,7 @@ servers:
     - dolphin-llama3.1:70b
   while-ai_1:
     get_embeddings_port: 5555
-    generates_port: 5555
+    get_generates_port: 5555
     generate_port: 11434
     key_path: null
     model_address: http://192.168.0.245
@@ -128,12 +128,12 @@ defaults:
     model: llama3.1
     server: while-ai_0
   # altered_bytes default server for generate responses
-  generates:
+  get_generates:
     model: llama3.1
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:
     model: llama3.1
     server: while-ai_1
-  sub_domain: get_embeddings
+  service_endpoint: get_embeddings
   keep_alive: 200

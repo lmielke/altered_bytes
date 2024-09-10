@@ -36,7 +36,7 @@ class ModelConnect:
         print(f"{Fore.YELLOW}Warning {Fore.RESET}random temperature set: {rd_temp:.2f}")
         return rd_temp
 
-    def get_params(self, message:[str, list], *args, sub_domain:str,
+    def get_params(self, message:[str, list], *args, service_endpoint:str,
                                                         name:str,
                                                         context_length:int,
                                                         stream:str=False,
@@ -45,8 +45,8 @@ class ModelConnect:
                                                         agg_method:str=None,
                                                         **kwargs,
         ) -> dict:
-        # print(f"{Fore.YELLOW}sub_domain:{Fore.RESET} {sub_domain}")
-        if sub_domain in ['get_embeddings', 'generates']:
+        # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
+        if service_endpoint in ['get_embeddings', 'get_generates']:
             # for embeddings and generate[s]! message is a list, to allow for multiple messages to be embedded
             # with a single server call
             msg = ( 
@@ -59,18 +59,18 @@ class ModelConnect:
                 print(message)
                 message = [str(message)]
             # for embeddings we want the temperature to be low to be more deterministic
-            if sub_domain == 'get_embeddings':
+            if service_endpoint == 'get_embeddings':
                 temperature = temperature if temperature is not None else 0.
         temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
         context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
-        return message, name, stream, temperature, context_len, num_predict, agg_method, sub_domain
+        return message, name, stream, temperature, context_len, num_predict, agg_method, service_endpoint
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        messages, name, stream, temperature, context_len, num_predict, agg_method, sub_domain = \
+        messages, name, stream, temperature, context_len, num_predict, agg_method, service_endpoint = \
                                             self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
@@ -87,25 +87,24 @@ class ModelConnect:
                 context['options']['num_predict'] = num_predict
             context['agg_method'] = agg_method
             context['keep_alive'] = msts.config.defaults.get('keep_alive')
-            context['sub_domain'] = msts.config.defaults.get('sub_domain') if sub_domain is None else sub_domain
-            if sub_domain != 'get_embeddings': context['stream'] = stream
+            context['service_endpoint'] = msts.config.defaults.get('service_endpoint') if service_endpoint is None else service_endpoint
+            if service_endpoint != 'get_embeddings': context['stream'] = stream
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 
-    def set_sub_domain(self, *args, sub_domain:str=None, **kwargs) -> str:
+    def set_service_endpoint(self, *args, service_endpoint:str=None, **kwargs) -> str:
         # if no sub-domain is specified we get it from default params
-        if sub_domain is None:
-            sub_domain = msts.config.defaults.get('sub_domain')
-        return {'sub_domain': sub_domain}
+        if service_endpoint is None:
+            service_endpoint = msts.config.defaults.get('service_endpoint')
+        return {'service_endpoint': service_endpoint}
 
 
     def post(self, *args, **kwargs) -> dict:
         """
         Sends a message to the appropriate assistant and handles the response.
         """
-        kwargs.update(self.set_sub_domain(*args, **kwargs))
-        r = getattr(self, self.method_name_from_server(*args, **kwargs)
-                        )(  self.prep_context(*args,
+        kwargs.update(self.set_service_endpoint(*args, **kwargs))
+        r = self.ollama(self.prep_context(*args,
                                 **msts.config.get_model(*args, **kwargs).get('model_file'), 
                                 **kwargs,
                             ), *args, **kwargs 
@@ -121,25 +120,26 @@ class ModelConnect:
         self.times = {k: float(f"{self.times.get(k, 0.0) + float(vs):.3f}")
                                                 for k, vs in r.items() if k in self.times}
 
-    def method_name_from_server(self, *args, **kwargs):
-        """
-        The method name to contact the model is derived from the server name.
-        For example server: whlile-ai_0 results in while_ai method to be run.
-        """
+    # def method_name_from_server(self, *args, **kwargs):
+    #     """
+    #     The method name to contact the model is derived from the server name.
+    #     For example server: whlile-ai_0 results in ollama method to be run.
+    #     """
         
-        # method names may only use underscore
-        return (
-                msts.config.get_model(*args, **kwargs).get('server')
-                .split('_')[0].replace('-', '_')
-                )
+    #     # method names may only use underscore
+    #     return (
+    #             msts.config.get_model(*args, **kwargs).get('server')
+    #             .split('_')[0].replace('-', '_')
+    #             )
 
-    def while_ai(self, context: dict, *args, **kwargs, ) -> dict:
+    def ollama(self, context: dict, *args, **kwargs, ) -> dict:
         """
         Handles communication with a custom AI assistant.
-        sub_domain: str, ['get_embeddings', 'generate']
+        service_endpoint: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
         context['network_up_time'] = time.time()
+        print(msts.config.get_url(*args, **kwargs))
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},

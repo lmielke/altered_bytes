@@ -8,6 +8,7 @@ project_dir = os.path.dirname(package_dir)
 project_name = os.path.basename(project_dir)
 
 resources_dir = os.path.join(package_dir, "resources")
+templates_dir = os.path.join(resources_dir, "templates")
 
 test_dir = os.path.join(package_dir, "test")
 test_data_dir = os.path.join(test_dir, "data")

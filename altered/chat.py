@@ -17,75 +17,59 @@ class Chat:
 
     exit_terms = {'/bye', '/quit'}
 
+
     def __init__(self, name:str, *args, **kwargs):
         self.name = name
-        self.init_msg = None
-        self.prompt = Prompt()
-        self.data = Data(name=self.name)
+        self.init_prompt = None
+        self.prompt = Prompt(*args, **kwargs)
+        self.data = Data(*args, name=self.name, **kwargs)
         # lambda is needed here because the table reference breaks when data is added
         self.table = lambda: getattr(self.data, self.name)
+        self.warnings = {}
 
-    def run(self, user_input:str=None, *args, **kwargs):
+    def run(self, user_prompt:str=None, *args, **kwargs):
         # First we create the inital user_promt to run the chat
-        user_prompt = {'content': user_input, 'role': 'user'}
-        if self.init_msg is None: self.init_msg = user_prompt
+        if self.init_prompt is None: self.init_prompt = user_prompt
+        self.user_prompt, self.response = user_prompt, None
         # the chat loop starts here
         # self.add_to_chat(user_prompt, *args, **kwargs)
-        while not user_prompt['content'] in self.exit_terms:
-            context = self.prep_context(*args, **kwargs)
-            self.add_to_chat(user_prompt, *args, **kwargs)
-            r = self.prompt(user_prompt, *args, context=context, **kwargs)
-            response = self.extract_response_content(r, *args, **kwargs)
-            os.system('cls')
-            self.add_to_chat(response, *args, **kwargs)
-            self.data.show(*args, color=Fore.GREEN, **kwargs)
-            user_prompt = self.get_user_input(*args, **kwargs)
+        while not self.user_prompt in self.exit_terms:
+            self.next_chat_item(*args, **kwargs)
+        # exit uses /bye or /quit
         print(f"{Fore.GREEN}Exiting Chat{Fore.RESET}")
 
-    def get_user_input(self, *args, **kwargs) -> str:
+    def next_chat_item(self, *args, **kwargs):
+        # we send the user_prompt and the chat_history to the model (promt handles post())
+        self.response = self.prompt(    *args,  
+                                        user_prompt=self.user_prompt,
+                                        context=self.prep_context(*args, **kwargs), 
+                                        **kwargs, 
+                        )
+        # we add user_promt after getting the response to avoid having the current user_prompt
+        # inside the chat_history
+        self.add_to_chat(self.user_prompt, *args, role='user', **kwargs)
+        self.add_to_chat(self.response, *args, role='assistant', **kwargs)
+        lambda kwargs: os.system('cls') if not kwargs.get('verbose') else None
+        self.data.show(*args, color=Fore.GREEN, **kwargs)
+        self.user_prompt = self.get_user_prompt(*args, **kwargs)
+
+    def get_user_prompt(self, *args, **kwargs) -> str:
         print(f"{Fore.YELLOW} \nWant to add a user_prompt to the next prompt ? {Fore.RESET}")
-        user_input = input(f"You: ").strip()
-        user_prompt = {'content': user_input, 'role': 'user'}
+        user_prompt = input(f"You: ").strip()
         return user_prompt
 
-    def extract_response_content(self, r:dict, *args,   depth:int=1, 
-                                                        agg_method:str=None, **kwargs
-        ) -> dict:
-        # r comes as a dictionary with 'results' containing a list of dictionaries
-        agg_method = 'best' if depth != 1 and (agg_method is None) else agg_method
-        results = r.get('results')
-        if not results or type(results) != list:
-            raise ValueError(f"Error: No results returned from the AI model.")
-        for i, result in enumerate(results):
-            if result.get('agg_method') == agg_method:
-                response = result
-                response['content'] = response.get('response').strip()
-                response['role'] = 'assistant'
-        return response
+    def add_to_chat(self, content:[str, dict], *args, role:str, **kwargs):
+        if isinstance(content, str): content = {'content': content, 'role': role}
+        self.data.append({k: content.get(k, None) for k, vs in self.data.fields.items()})
 
-    def add_to_chat(self, prompt:str, *args, **kwargs):
-        rec = self.mk_record(prompt, *args, **kwargs)
-        self.data.append(rec)
+    def prep_context(self, *args, context:dict={}, **kwargs):
+        context.update(self.prep_history(*args, **kwargs))
+        return context
 
-    def mk_record(self, result:str, *args, **kwargs):
-        rec = {k: result.get(k, None) for k, vs in self.data.fields.items()}
-        return rec
-
-    def prep_context(self, *args, context: str = '', **kwargs):
+    def prep_history(self, *args, history:list=[], **kwargs):
         if not self.table()['content'].empty and (self.table()['content'].str.len() > 0).any():
             # we add the chat history for context (check if needed)
-            history = '\n'.join(
-                                    [
-                                        f"{i}: {row['role']} -> {row['content']}"
-                                            for i, row in self.table().iterrows()
-                                                if isinstance(row['content'], str)
-                                    ]
-            )
-
-            context += (
-                            f"\n<chat_history>\n"
-                                f"{history}"
-                            f"\n</chat_history>\n"
-            )
-
-        return context if context else 'None'
+            for i, row in self.table().iterrows():
+                if isinstance(row['content'], str):
+                    history.append({'role':row['role'], 'content': row['content']})
+        return {'chat_history': history if history else None}

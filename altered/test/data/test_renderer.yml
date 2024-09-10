@@ -1,0 +1,19 @@
+prompt_title: Unittest
+# context contains all additional information that is needed to answer the question such as
+# chat history, RAG selection, and other information
+context:
+  chat_history:
+    - role: user
+      content: Hello
+    - role: assistant
+      content: Hello! How can I assist you today?
+  rag_selection:
+    os_infos: Windows 10
+    project_infos: altered_bytes infos
+  infos: This is Unittest.
+# a single string containing the last user interaction
+user_prompt: Why is the sky blue?
+# a dictionary with instructions where key is header and value is text
+instruct:
+  assi_role: You are a helpful assistant.
+  instruct: Please provide an answer to the user's question.

@@ -53,7 +53,7 @@ class Test_ModelConnect(unittest.TestCase):
                                     ],
                                     alias='l3:8b_1',
                                     num_predict = 100,
-                                    sub_domain='generates',
+                                    service_endpoint='get_generates',
                                     format='json',
                                     agg_method='best',
                 )
@@ -65,13 +65,13 @@ class Test_ModelConnect(unittest.TestCase):
         # out = self.m_con.generate(
         #                                 ['Why is the sky blue?'], 
         #                                 alias=('llama3.1', 'while-ai_1'),# as alias 'l3:8b_1',
-        #                                 sub_domain='get_embeddings', # [get_embeddings, generate]
+        #                                 service_endpoint='get_embeddings', # [get_embeddings, generate]
         #                                 )
         # print(out)
         # out = self.m_con.generate(
         #                                 'Explain why the sky is blue!', 
         #                                 alias=('llama3.1', 'while-ai_1'),# as alias 'l3:8b_1',
-        #                                 sub_domain='generate', # [get_embeddings, generate]
+        #                                 service_endpoint='generate', # [get_embeddings, generate]
         #                                 )
         # print(out)
         # tests and asserts

@@ -30,13 +30,14 @@ Related Documents:
 
 import base64, csv, hashlib, json, os, re, shutil, yaml
 import pandas as pd
+from altered.labeled_data_frame import LabeledDataFrame
 from tabulate import tabulate as tb
 from datetime import datetime as dt
 from typing import List, Dict, Any, Optional
 from colorama import Fore, Style
 import altered.settings as sts
 import altered.hlp_directories as hlp_dirs
-import altered.hlp_printing as hlp_print
+import altered.hlp_printing as hlpp
 
 default_fields = 'default_fields.yml'
 props_ident = r'(?:#\s*meta:\s+)(.*)\n'
@@ -49,7 +50,7 @@ class Data:
     and adding new records to the table.
     """
 
-    def __init__(self, name: str, *args, **kwargs):
+    def __init__(self, *args, name: str, **kwargs):
         """
         Initialize the Data object with a name and optional fields.
 
@@ -63,15 +64,15 @@ class Data:
         self.fields:Dict[str, Any] = {}
         self.record:Dict[str, Any] = {}
         self.dtypes:Dict[str, Any] = {}
-
         # getattr(self, self.name):pd.DataFrame = pd.DataFrame(columns=[])
         # the main data object is named after self.name so we can call it like self.[self.name]
-        setattr(self, self.name, pd.DataFrame(columns=[]))
+        setattr(self, self.name, LabeledDataFrame(columns=[]))
         self.mk_data_dir(*args, **kwargs)
         self.load_from_disk(*args, **kwargs)
         self.load_fields(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
+
 
     def mk_data_dir(self, *args, data_dir:Optional[str]=None, **kwargs) -> str:
         """
@@ -98,8 +99,8 @@ class Data:
         Returns:
             Dict[str, Any]: Loaded field definitions.
         """
-        file_path = os.path.join(sts.data_dir, fields_path)
-        with open(file_path, 'r') as fields_file:
+        self.fields_path = os.path.join(sts.data_dir, fields_path)
+        with open(self.fields_path, 'r') as fields_file:
             fields_content = fields_file.read()
             for prop in re.findall(props_ident, fields_content):
                 _props = json.loads(prop.strip())
@@ -117,7 +118,7 @@ class Data:
             return
         self.dtypes = {field: properties['type'] for field, properties in self.fields.items()}
         columns = {field: pd.Series(dtype=dtype) for field, dtype in self.dtypes.items()}
-        setattr(self, self.name, pd.DataFrame(columns).astype(self.dtypes))
+        setattr(self, self.name, LabeledDataFrame(columns).astype(self.dtypes))
 
     def add_init_record(self, *args, **kwargs) -> None:
         """
@@ -128,8 +129,12 @@ class Data:
         init_record = {k: self.record[vs['name']] for k, vs in self.fields.items()}
         init_record['timestamp'] = self.time_stamp
         # we dont use append here for future extentiabilty
-        setattr(self, self.name, pd.DataFrame([init_record], 
+        setattr(self, self.name, LabeledDataFrame([init_record], 
                         columns=getattr(self, self.name).columns).astype(self.dtypes))
+        getattr(self, self.name).fields.add_labels(         name='Default Fields', 
+                                                            labels=self.fields_path, 
+                                                            description="Default Fields",
+                                        )
 
     def save_to_disk(self, *args, **kwargs) -> None:
         """
@@ -205,8 +210,8 @@ class Data:
             return
         # prep texts for better readabiltiy
         df = getattr(self, self.name)
-        df['content'] = df['content'].apply(lambda x: hlp_print.wrap_text(x))
-        df['prompt'] = df['prompt'].apply(lambda x: hlp_print.wrap_text(x))
+        df['content'] = df['content'].apply(lambda x: hlpp.wrap_text(x))
+        df['prompt'] = df['prompt'].apply(lambda x: hlpp.wrap_text(x))
         # this only shows the columns of the df that have at least one value in it
         if verbose:
             df = getattr(self, self.name).to_dict(orient='records')
