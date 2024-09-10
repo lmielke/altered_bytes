@@ -13,7 +13,8 @@ class Test_Chat(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
-        cls.test_data_path = os.path.join(sts.resources_dir, 'kwargs', 'chat_run.yml')
+        cls.test_data_dir = os.path.join(sts.resources_dir,)
+        cls.test_data_path = os.path.join(cls.test_data_dir, 'kwargs', 'chat_run.yml')
         cls.testData = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -38,7 +39,9 @@ class Test_Chat(unittest.TestCase):
         yml = YmlParser()
         yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
         yml.data['verbose'] = self.verbose
-        chat.run(*args, **yml.data)
+        yml.data['fmt'] = 'json'
+        chat.run(*args, **yml.data, 
+                    example=os.path.join(self.test_data_dir, 'strategies', 'simple_answer.yml'))
 
 
 if __name__ == "__main__":

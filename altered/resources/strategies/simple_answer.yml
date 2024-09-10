@@ -1,0 +1,11 @@
+# simple_answer.yml
+# This is a simple example file for a model response json.
+
+# meta: {"name": "user_prompt", "type": "string", "default": "", "example": "Hello, Who are you?"}
+# user_prompt question/problem statement that founds/initiates the thought/chat
+user_prompt: null
+
+# meta: {"name": "answer", "type": "string", "default": "", "example": "I am a helpful assistant. How can I help you today?"}
+# answer is the models response
+answer: null
+

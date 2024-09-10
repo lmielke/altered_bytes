@@ -64,8 +64,8 @@ class Data:
         self.fields:Dict[str, Any] = {}
         self.record:Dict[str, Any] = {}
         self.dtypes:Dict[str, Any] = {}
-        # getattr(self, self.name):pd.DataFrame = pd.DataFrame(columns=[])
-        # the main data object is named after self.name so we can call it like self.[self.name]
+        # the main data object is named like self.name so we can call it like self.[self.name]
+        # NOTE: this is a DataFrame constructor inheriting from pd.DataFrame
         setattr(self, self.name, LabeledDataFrame(columns=[]))
         self.mk_data_dir(*args, **kwargs)
         self.load_from_disk(*args, **kwargs)
@@ -131,9 +131,11 @@ class Data:
         # we dont use append here for future extentiabilty
         setattr(self, self.name, LabeledDataFrame([init_record], 
                         columns=getattr(self, self.name).columns).astype(self.dtypes))
-        getattr(self, self.name).fields.add_labels(         name='Default Fields', 
-                                                            labels=self.fields_path, 
-                                                            description="Default Fields",
+        # we add labels and descriptions to the DataFrame. This can be used to send 
+        # the DataFrame fields to a file or as Field Example to an LLM.
+        getattr(self, self.name).fields.add_labels( name='Default Fields', 
+                                                    labels=self.fields_path, 
+                                                    description="Default Fields",
                                         )
 
     def save_to_disk(self, *args, **kwargs) -> None:

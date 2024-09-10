@@ -22,11 +22,13 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     prompt = re.sub(r'<user_prompt>\s*</user_prompt>', '', prompt, flags=re.MULTILINE)
     if verbose >= 2:
         # we replace the <tags> in prompt with colorized tags
-        p = prompt.replace('context>', f"{Fore.BLUE}context>{Fore.RESET}")
-        p = p.replace('rag_db_matches>', f"{Fore.GREEN}rag_db_matches>{Fore.RESET}")
-        p = p.replace('user_prompt>', f"{Fore.YELLOW}user_prompt>{Fore.RESET}")
-        p = p.replace('previous_responses>', f"{Fore.CYAN}previous_responses>{Fore.RESET}")
-        p = p.replace('INST>', f"{Fore.CYAN}INST>{Fore.RESET}")
+        p = (
+            prompt.replace('context>', f"{Fore.BLUE}context>{Fore.RESET}")
+                .replace('rag_db_matches>', f"{Fore.GREEN}rag_db_matches>{Fore.RESET}")
+                .replace('user_prompt>', f"{Fore.YELLOW}user_prompt>{Fore.RESET}")
+                .replace('previous_responses>', f"{Fore.CYAN}previous_responses>{Fore.RESET}")
+                .replace('INST>', f"{Fore.CYAN}INST>{Fore.RESET}")
+        )
         print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")
 
 
