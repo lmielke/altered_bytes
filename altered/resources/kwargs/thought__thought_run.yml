@@ -1,4 +1,4 @@
-# chat_run.yml
+# thought__thought_run.yml
 # This file contains the fields needed to start a simple thought/chat.
 
 # meta: {"name": "user_prompt", "type": "string", "default": "", "example": "Hello, Who are you?"}

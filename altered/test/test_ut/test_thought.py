@@ -1,4 +1,4 @@
-# test_chat.py
+# unittestst_thought.py
 
 import os, re, shutil, sys, time, yaml
 import unittest
@@ -7,14 +7,15 @@ import unittest
 import altered.settings as sts
 from altered.yml_parser import YmlParser
 
-from altered.chat import Chat
+from altered.thought import Thought
+Thought.thoughts_dir = os.path.join(sts.test_data_dir, 'thoughts')
 
-class Test_Chat(unittest.TestCase):
+class Test_Thought(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
         cls.test_data_dir = os.path.join(sts.resources_dir,)
-        cls.test_data_path = os.path.join(cls.test_data_dir, 'kwargs', 'chat_run.yml')
+        cls.test_data_path = os.path.join(cls.test_data_dir, 'kwargs', 'thought__thought_run.yml')
         cls.testData = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -30,17 +31,17 @@ class Test_Chat(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        chat = Chat(name='ut_chat')
-        print(chat.data.show())
+        thought = Thought(name='ut_thought')
+        print(thought.data.show())
 
     def test_run(self, *args, **kwargs):
-        chat = Chat(name='ut_chat', verbose=self.verbose)
-        # chat.table().fields.describe(fmt='tbl')
+        thought = Thought(name='ut_thought', verbose=self.verbose)
+        # we use YmlParser here to load the test_data kwargs from a YAML file
         yml = YmlParser()
-        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
+        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run thought")
         yml.data['verbose'] = self.verbose
         yml.data['fmt'] = 'json'
-        chat.run(*args, **yml.data, 
+        thought.run(*args, **yml.data, 
                     example=os.path.join(self.test_data_dir, 'strategies', 'simple_answer.yml'))
 
 

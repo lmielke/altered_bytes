@@ -1,4 +1,5 @@
 import pandas as pd
+pd.options.display.max_colwidth = 120
 from altered.yml_parser import YmlParser
 
 class LabeledDataFrame(pd.DataFrame):

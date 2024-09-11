@@ -80,15 +80,13 @@ class Instructions:
         # we add instructions for the response fmts to the prompt
         # Example: 'json_response_prefix' contains the instruct prefix if the fmt is 'json'
         # expected from the model (markdown, json, yaml)
-        print(f"{response_template = }")
-        names = [f'{fmt}_response_{n}' for n in ['prefix', 'default_template', 'postfix',]]
-
         self._data['fmts'] = ''
-        for name in names:
-            if response_template and 'default_template' in name:
-                self._data['fmts'] += f"Example Response: \n{response_template}"
+        for name in ['prefix', 'default_template', 'postfix',]:
+            if response_template and name == 'default_template':
+                self._data['fmts'] += self.instructs_fmts[f'{fmt}_response_template_intro']
+                self._data['fmts'] += f"{response_template}"
             else:
-                self._data['fmts'] += self.instructs_fmts[name]
+                self._data['fmts'] += self.instructs_fmts[f'{fmt}_response_{name}']
 
     def load_prompt_params(self, file_name, *args, **kwargs):
         params_path = os.path.join(sts.resources_dir, 'strategies', f"{file_name}.yml")

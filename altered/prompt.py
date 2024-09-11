@@ -8,7 +8,7 @@ from altered.model_connect import ModelConnect
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
-import altered.hlp_printing as hlp_print
+import altered.hlp_printing as hlpp
 import altered.settings as sts
 
 
@@ -40,7 +40,7 @@ class Prompt:
                     **kwargs,
                         )
         # NOTE: to pretty print the prompt, provide a verbose flag >= 2
-        hlp_print.pretty_prompt(self._data, *args, **kwargs)
+        hlpp.pretty_prompt(self._data, *args, **kwargs)
 
     def post(self, *args,   alias:str = None, num_predict:int = None, depth:int=1,
                             agg_method:str=None, verbose:int = 0, **kwargs,
@@ -71,4 +71,5 @@ class Prompt:
                 response = result
                 response['content'] = response.get('response').strip()
                 response['role'] = 'assistant'
+                response['model'] = r.get('model')
         return response

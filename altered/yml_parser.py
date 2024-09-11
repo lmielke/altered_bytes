@@ -25,6 +25,7 @@ class YmlParser:
         meta, fields = {}, {}
         for i, block in enumerate(self.fields.split('\n\n')):
             block = block.strip()
+            if not block: continue
             if not block.startswith(self.meta_flag):
                 if i != 0:
                     print(
@@ -51,7 +52,7 @@ class YmlParser:
         if fmt == 'tbl':
             return self._field_info_tabular()
         elif fmt in ['yaml', 'yml']:
-            return self.fields
+            return self.fields[1:]
         elif fmt == 'json':
             return self._field_info_json()
         else:
@@ -65,14 +66,15 @@ class YmlParser:
         This returns not a real json string but a json like file with comments
         """
         json_str = ''
-        for line in self.fields.split('\n'):
+        for line in self.fields.split('\n')[1:]:
             if not line:
                 json_str += '\n'
             elif not line.startswith('#') and ':' in line:
                 k, vs = line.split(':', 1)
-                j = '{' + f'"{k}": "{self._meta[k].get("example", "null")}"' + '}\n'
+                j = '{' + f'"{k}": "{self._meta[k].get("example", "null")}"' + '},\n'
                 j = re.sub(r'(")(\d+)(")', r'\2', j)
                 j = j.replace('"null"', 'null').replace('""', 'null')
+                j = j.replace('.yml', f'.json').replace('.yaml', f'.json')
                 json_str += j
             else:
                 json_str += f"{line}\n"

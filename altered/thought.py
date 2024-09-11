@@ -2,44 +2,55 @@
 chat.py
 This class orchestrates the communication between the user and the AI assistant.
 It stores and manages the chat chat_history and creates the chat message for the next prompt and
-receives the response from the AI model. 
+receives the response from the AI LLM. 
 """
 
 import os, re, sys, yaml
 from tabulate import tabulate as tb
 from colorama import Fore, Style
-from altered.data import Data
+
 import altered.settings as sts
 from altered.prompt import Prompt
+from altered.data import Data
 
 
-class Chat:
+class Thought:
 
     exit_terms = {'/bye', '/quit'}
+    thoughts_dir = os.path.join(sts.resources_dir, 'thoughts')
 
 
     def __init__(self, name:str, *args, **kwargs):
-        self.name = name
-        self.init_prompt = None
+        # name of the thought can be used to locate/reference the saved thought
+        self.name, self.thought_dir = self.mk_thought_dir(name, *args, **kwargs)
+        # user_promt that initiates the thought process/chain
+        self.init_user_prompt = None
+        # prompt constructor for LLM interaction
         self.prompt = Prompt(*args, **kwargs)
-        self.data = Data(*args, name=self.name, **kwargs)
-        # lambda is needed here because the table reference breaks when data is added
+        # Data represents the thought table structure, where each line is a thought element
+        self.data = Data(*args, name=name, data_dir=self.thought_dir, **kwargs)
+        # lambda is needed for self.table because the obj reference breaks when rec is added
         self.table = lambda: getattr(self.data, self.name)
-        self.warnings = {}
 
     def run(self, user_prompt:str=None, *args, **kwargs):
         # First we create the inital user_promt to run the chat
-        if self.init_prompt is None: self.init_prompt = user_prompt
+        if self.init_user_prompt is None: self.init_user_prompt = user_prompt
         self.user_prompt, self.response = user_prompt, None
         # the chat loop starts here
         # self.add_to_chat(user_prompt, *args, **kwargs)
         while not self.user_prompt in self.exit_terms:
             self.next_chat_item(*args, **kwargs)
         # exit uses /bye or /quit
-        print(f"{Fore.GREEN}Exiting Chat{Fore.RESET}")
+        print(f"{Fore.GREEN}Finlizing Thought{Fore.RESET}")
+        self.data.save_to_disk(*args, **kwargs)
+
+    def mk_thought_dir(self, name:str, *args, **kwargs):
+        name = re.sub(r'\W+', '_', name.lower())
+        thought_dir = os.path.join(self.thoughts_dir, name)
+        return name, thought_dir
 
     def next_chat_item(self, *args, **kwargs):
-        # we send the user_prompt and the chat_history to the model (promt handles post())
+        # we send the user_prompt and the chat_history to the LLM (promt handles post())
         self.response = self.prompt(    *args,  
                                         user_prompt=self.user_prompt,
                                         context=self.prep_context(*args, **kwargs), 
@@ -59,7 +70,8 @@ class Chat:
         return user_prompt
 
     def add_to_chat(self, content:[str, dict], *args, role:str, **kwargs):
-        if isinstance(content, str): content = {'content': content, 'role': role}
+        if isinstance(content, str): content = {'content': content, }
+        content.update({'role': role, 'name': self.name})
         self.data.append({k: content.get(k, None) for k, vs in self.data.fields.items()})
 
     def prep_context(self, *args, context:dict={}, **kwargs):

@@ -39,8 +39,8 @@ import altered.settings as sts
 import altered.hlp_directories as hlp_dirs
 import altered.hlp_printing as hlpp
 
-default_fields = 'default_fields.yml'
-props_ident = r'(?:#\s*meta:\s+)(.*)\n'
+default_fields = 'data__data_load_fields_default.yml'
+meta_identifier = r'(?:#\s*meta:\s+)(.*)\n'
 
 
 class Data:
@@ -50,7 +50,7 @@ class Data:
     and adding new records to the table.
     """
 
-    def __init__(self, *args, name: str, **kwargs):
+    def __init__(self, *args, name:str, **kwargs):
         """
         Initialize the Data object with a name and optional fields.
 
@@ -60,19 +60,21 @@ class Data:
         """
         self.name:str = name
         self.time_stamp:dt = dt.now()
-        self.data_dir:Optional[str] = None
+        self.data_dir:Optional[str] = self.mk_data_dir(*args, **kwargs)
         self.fields:Dict[str, Any] = {}
         self.record:Dict[str, Any] = {}
         self.dtypes:Dict[str, Any] = {}
         # the main data object is named like self.name so we can call it like self.[self.name]
         # NOTE: this is a DataFrame constructor inheriting from pd.DataFrame
         setattr(self, self.name, LabeledDataFrame(columns=[]))
-        self.mk_data_dir(*args, **kwargs)
         self.load_from_disk(*args, **kwargs)
         self.load_fields(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
 
+    @property
+    def df(self) -> LabeledDataFrame:
+        return getattr(self, self.name)
 
     def mk_data_dir(self, *args, data_dir:Optional[str]=None, **kwargs) -> str:
         """
@@ -84,9 +86,9 @@ class Data:
         Returns:
             str: Path to the data directory.
         """
-        self.data_dir = data_dir if data_dir else os.path.join(sts.data_dir, self.name)
-        os.makedirs(self.data_dir, exist_ok=True)
-        return self.data_dir
+        data_dir = data_dir if data_dir else os.path.join(sts.data_dir, self.name)
+        os.makedirs(data_dir, exist_ok=True)
+        return data_dir
 
     def load_fields(self, *args, fields_path:Optional[str]=default_fields, **kwargs,
         ) -> Dict[str, Any]:
@@ -102,7 +104,7 @@ class Data:
         self.fields_path = os.path.join(sts.data_dir, fields_path)
         with open(self.fields_path, 'r') as fields_file:
             fields_content = fields_file.read()
-            for prop in re.findall(props_ident, fields_content):
+            for prop in re.findall(meta_identifier, fields_content):
                 _props = json.loads(prop.strip())
                 self.fields[_props['name']] = _props
             fields_file.seek(0)
@@ -128,6 +130,7 @@ class Data:
         
         init_record = {k: self.record[vs['name']] for k, vs in self.fields.items()}
         init_record['timestamp'] = self.time_stamp
+        init_record['name'] = self.name
         # we dont use append here for future extentiabilty
         setattr(self, self.name, LabeledDataFrame([init_record], 
                         columns=getattr(self, self.name).columns).astype(self.dtypes))
@@ -138,7 +141,7 @@ class Data:
                                                     description="Default Fields",
                                         )
 
-    def save_to_disk(self, *args, **kwargs) -> None:
+    def save_to_disk(self, *args, verbose:int=0, **kwargs) -> None:
         """
         Save the current DataFrame to disk as a CSV file.
 
@@ -146,6 +149,7 @@ class Data:
         """
         file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
         file_path = os.path.join(self.data_dir, file_name)
+        if verbose: print(f"{Fore.YELLOW}Saving {self.name} to:{Fore.RESET} {file_path}")
         getattr(self, self.name).to_csv(file_path, index=False)
 
     def load_from_disk(self, *args, file_name:Optional[str]=None, **kwargs) -> None:
@@ -161,7 +165,11 @@ class Data:
         elif file_name == 'latest':
             file_names = [f for f in os.listdir(self.data_dir) if re.match(sts.data_regex, f)]
             if not file_names:
-                raise FileNotFoundError(f"No files matching regex found in {self.data_dir}")
+                msg =   (
+                            f"{Fore.RED}ERROR:{Fore.RESET}"
+                            f" No files matching {sts.data_regex} found in {self.data_dir}"
+                        )
+                raise FileNotFoundError(msg)
             file_path = os.path.join(self.data_dir, file_names[0])
         else:
             file_path = os.path.join(self.data_dir, file_name)
@@ -196,7 +204,7 @@ class Data:
         # Concatenate only if the new record_series is not empty or all-NA
         setattr(self, self.name,    pd.concat(
                                     [
-                                        getattr(self, self.name), 
+                                        self.df, 
                                         pd.Series(record).to_frame().T.astype(self.dtypes),
                                     ],
                                             ignore_index=True,

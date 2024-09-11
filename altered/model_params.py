@@ -144,7 +144,7 @@ class ModelParams:
         else:
             raise ValueError(f"Server '{server_name}' not found in servers")
 
-    def get_model(self, *args, **kwargs) -> Dict[str, Dict[str, Union[str, Dict[str, Union[str, int, None]]]]]:
+    def get_model(self, *args, **kwargs) -> dict:
         """
         Takes an model alias and returns the model parameters like server_name and 
         server params.

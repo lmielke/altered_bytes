@@ -2,9 +2,13 @@
 # The following are the default templates for the different response formats
 # json responses
 json_response_prefix: >
-    Please respond in JSON format.
+    Please respond in JSON using the structure and format provided below.
+json_response_template_intro: >
+    The following is a simple JSON example for a LLM response. For clarity,
+    comments have been added between the lines. All lines must be provided as a single JSON.
+    Example:
 json_response_default_template: >
-    Example: Question: Why is the nicht sky black? 
+    Example: Question: Why is the night sky black? 
             {
                 # The answer field contains the resonse to this propmts instructions.
                 "answer": "The reason for this is that the Earth's atmosphere scatters and absorbs some of the light from the stars ...", 
@@ -12,12 +16,16 @@ json_response_default_template: >
                 "sources": "https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html"
             }
 json_response_postfix: >
-   Provide only the json object with no surrounding text!
-# json responses
+   Provide only the JSON object with no surrounding text!
+# yaml responses
 yaml_response_prefix: >
-    Please respond in YAML format.
+    Please respond in YAML using the structure and format provided below.
+yaml_response_template_intro: >
+    The following is a simple YAML example for a LLM response. For clarity,
+    comments have been added between the lines. All lines must be provided as a single YAML.
+    Example:
 yaml_response_default_template: >
-    Example: Question: Why is the nicht sky black? 
+    Example: Question: Why is the night sky black? 
             # The answer field contains the resonse to this propmts instructions.
             answer: The reason for this is that the Earth's atmosphere scatters and absorbs some of the light from the stars ...
             # This field provides one or more sources to support your answer.
@@ -25,10 +33,14 @@ yaml_response_default_template: >
                 - https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html
                 - ...
 yaml_response_postfix: >
-   Provide only the yaml string with no surrounding text!
+   Provide only the YAML string with no surrounding text!
 # markdonw responses
 markdown_response_prefix: >
-    Please respond in markdown format.
+    Please respond in markdown using the structure and format provided below.
+markdown_response_template_intro: >
+    The following is a simple markdown example for a LLM response. For clarity,
+    comments have been added between the lines. All lines must be provided as a single markdown.
+    Example:
 markdown_response_default_template: >
     Example: Question: Why is the night sky black? 
             # Title of your answer

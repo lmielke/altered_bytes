@@ -56,7 +56,6 @@ class ModelConnect:
                     f"Converting to List"
                     )
             if type(message) != list:
-                print(message)
                 message = [str(message)]
             # for embeddings we want the temperature to be low to be more deterministic
             if service_endpoint == 'get_embeddings':
@@ -104,11 +103,14 @@ class ModelConnect:
         Sends a message to the appropriate assistant and handles the response.
         """
         kwargs.update(self.set_service_endpoint(*args, **kwargs))
+        # print(f"model_connect.post: {kwargs = }")
+        # print(msts.config.get_model(*args, **kwargs).get('model_file'))
         r = self.ollama(self.prep_context(*args,
                                 **msts.config.get_model(*args, **kwargs).get('model_file'), 
                                 **kwargs,
                             ), *args, **kwargs 
                             )
+        r['model'] = msts.config.get_model(*args, **kwargs).get('model_file').get('name')
         self.get_stats(r, *args, **kwargs)
         return r
 
@@ -120,18 +122,6 @@ class ModelConnect:
         self.times = {k: float(f"{self.times.get(k, 0.0) + float(vs):.3f}")
                                                 for k, vs in r.items() if k in self.times}
 
-    # def method_name_from_server(self, *args, **kwargs):
-    #     """
-    #     The method name to contact the model is derived from the server name.
-    #     For example server: whlile-ai_0 results in ollama method to be run.
-    #     """
-        
-    #     # method names may only use underscore
-    #     return (
-    #             msts.config.get_model(*args, **kwargs).get('server')
-    #             .split('_')[0].replace('-', '_')
-    #             )
-
     def ollama(self, context: dict, *args, **kwargs, ) -> dict:
         """
         Handles communication with a custom AI assistant.
@@ -139,18 +129,19 @@ class ModelConnect:
         """
         # we are sending the request to the server
         context['network_up_time'] = time.time()
-        print(msts.config.get_url(*args, **kwargs))
+        # print(f"model_connect.ollama.url: {msts.config.get_url(*args, **kwargs)}")
+        # print(f"model_connect.ollama.context: {context}")
         r = requests.post(  
                             msts.config.get_url(*args, **kwargs),
                             headers={'Content-Type': 'application/json'},
                             data=json.dumps(context),
         )
         r.raise_for_status()
-        outs = r.json()
-        for i, out in enumerate(outs.get('results')):
-            # out['response'] = out.get('response', out.get('embedding'))
-            out['num_results'] = len(outs.get('results'))
-        return outs
+        rslts = r.json()
+        for i, rslt in enumerate(rslts.get('results')):
+            # rslt['response'] = rslt.get('response', rslt.get('embedding'))
+            rslt['num_results'] = len(rslts.get('results'))
+        return rslts
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """
