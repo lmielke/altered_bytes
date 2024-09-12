@@ -110,7 +110,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             payload, total_server_time = self.mk_payload(responses, network_up_time, start_time)
             self.wfile.write(payload)
-            print(f"Response sent successfully. prompt_counter = {self.prompt_counter}, total_server_time = {total_server_time}.")
+            print(f"Response sent successfully. prompt_counter = {SimpleHTTPRequestHandler.prompt_counter}, total_server_time = {total_server_time}.")
         
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -120,7 +120,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         start_time = time.time()
         network_up_time = f"{start_time - network_up_time if network_up_time else 0.0:.3f}"
         return network_up_time, start_time
-
 
     def successful_server_validations(self, *args, model: str, prompts: List[str], **kwargs
         ) -> bool:
@@ -150,9 +149,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                                     'network_up_time': network_up_time,
                                     'network_down_time': time.time(),
                                     'total_server_time': total_server_time,
-                                    'prompt_counter': self.prompt_counter
+                                    'prompt_counter': SimpleHTTPRequestHandler.prompt_counter
                     })
-        self.prompt_counter += 1
+        SimpleHTTPRequestHandler.prompt_counter += 1
         return payload.encode('utf-8'), total_server_time
     
     def respond(self, *args, prompts:List[str], service_endpoint:str, options:dict, 
