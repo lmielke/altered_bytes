@@ -110,7 +110,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             payload, total_server_time = self.mk_payload(responses, network_up_time, start_time)
             self.wfile.write(payload)
-            print(f"Response sent successfully. prompt_counter = {SimpleHTTPRequestHandler.prompt_counter}, total_server_time = {total_server_time}.")
+            print(
+                    f"Service {kwargs.get('service_endpoint')} responded successfully. "
+                    f"\n\tprompt_counter = {SimpleHTTPRequestHandler.prompt_counter}, "
+                    f"\n\ttotal_server_time = {total_server_time}."
+                    )
         
         except Exception as e:
             print(f"An error occurred: {e}")
