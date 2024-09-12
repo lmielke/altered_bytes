@@ -6,6 +6,7 @@ import numpy as np
 from colorama import Fore, Style
 
 olc = Client(host='http://localhost:11434')
+prompt_counter = 0
 
 
 class Aggregations:
@@ -107,12 +108,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(self.mk_payload(
-                                                responses, 
-                                                network_up_time, 
-                                                start_time
-                                )
-            )
+            payload, total_server_time = self.mk_payload(responses, network_up_time, start_time )
+            self.wfile.write(payload)
+            print(f"Response sent successfully. {prompt_counter = }, {total_server_time = }.")
         
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -146,13 +144,16 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                             network_up_time: float,
                             start_time: float
         ) -> bytes:
-        response_payload = json.dumps({
-            'results': responses,
-            'network_up_time': network_up_time,
-            'network_down_time': time.time(),
-            'total_server_time': f"{time.time() - start_time:.3f}"
-        })
-        return response_payload.encode('utf-8')
+        total_server_time = f"{time.time() - start_time:.3f}"
+        payload = json.dumps({
+                                    'results': responses,
+                                    'network_up_time': network_up_time,
+                                    'network_down_time': time.time(),
+                                    'total_server_time': total_server_time,
+                                    'prompt_counter': prompt_counter
+                    })
+        prompt_counter += 1
+        return payload.encode('utf-8'), total_server_time
     
     def respond(self, *args, prompts:List[str], service_endpoint:str, options:dict, 
                 agg_method:str=None, network_up_time:str=None, **kwargs,

@@ -27,6 +27,7 @@ class Memory(Data):
     based on cosine similarity.
     """
     service_endpoint = 'get_embeddings'
+    mem_file_ext = 'npy'
 
 
     def __init__(self, *args, name:str, **kwargs ):
@@ -69,7 +70,8 @@ class Memory(Data):
         self.vectors = np.stack((embedding, normalized)).astype(self.dtype)[None, ...]
         self.data.at[0, 'hash'] = hashified
         self.data.at[0, 'tools'] = str(self)
-        self.explain(self.vectors)
+        if verbose:
+            self.explain(self.vectors)
 
     def hashify(self, vector: np.ndarray, num: int = 16) -> str:
         """
@@ -92,10 +94,10 @@ class Memory(Data):
         """
         # add this for getting the embedding directly
         return self.assi.post(
-                                            contents, 
-                                            service_endpoint=self.service_endpoint, 
-                                            **kwargs
-                            ).get('results')
+                                contents, 
+                                service_endpoint=self.service_endpoint, 
+                                **kwargs
+                ).get('results')
 
     def update_vector_store(self, vector: np.ndarray, *args, **kwargs) -> None:
         """
@@ -128,8 +130,8 @@ class Memory(Data):
                                 )
         # then we add the record to the storage
         record = {k: record.get(k, None) for k, vs in self.fields.items()}
-        record['hash'] = self.hashify(normalized)
-        record['name'] = self.name
+        # we generate a hash to match records from self.vectors agains self.data
+        record['name'], record['hash'] = self.name, self.hashify(normalized)
         super().append(record, *args, **kwargs)
         self.data.set_index('hash', inplace=True, drop=False)
 
@@ -151,34 +153,38 @@ class Memory(Data):
         records = self.to_records(nearest, *args, **kwargs)
         # Add the 'num_tokens' column to the DataFrame (should be the content length // 4)
         records['stats']['total_tokens'] = sum(r['num_tokens'] for r in records['records'])
-        _25, _50, _75 = records['stats']['25%'], records['stats']['50%'], records['stats']['75%']
-        rs = [(
-                r['content'].split('\n')[0], 
-                r['distances'],
-                r['num_tokens']) for r in records['records']]
+        self.mk_stats_table(records, *args, **kwargs)
         if verbose: 
-            self.stats_str = ''
-            stats_tbl = []
-            for i, r in enumerate(rs):
-                color = Fore.GREEN if r[1] <= _25 else Fore.YELLOW if r[1] <= _50 else Fore.RED
-                quartil = '25%' if r[1] <= _25 else '50%' if r[1] <= _50 else '75%'
-                # z_score is the number of standard deviations from the mean
-                z_score = r[1] / records['stats']['std']
-                stats_tbl.append({
-                                    f"Top {len(rs)} RAG results": f"{color}{r[0]}{Fore.RESET}", 
-                                    f"distance": f"{color}{r[1]}{Fore.RESET}", 
-                                    f"quartil": f"{color}{quartil}{Fore.RESET}",
-                                    f"z_score": f"{color}{z_score:.2f}{Fore.RESET}",
-                                    f"num_tokens": f"{color}{r[2]}{Fore.RESET}",
-                                    })
-            self.stats_str += f"{Fore.YELLOW}\nResults/Stats for rag search: {Fore.RESET}\n"
-            self.stats_str += f"{Fore.GREEN}Query: {Fore.RESET}{query}\n"
-            self.stats_str += tb(stats_tbl, headers="keys", tablefmt="grid")
-            self.stats_str += f"\nStats: {records['stats']}\n"
-            print(self.stats_str)
+            print(
+                        f"{Fore.YELLOW}\nResults/Stats for rag search: {Fore.RESET}\n"
+                        f"{Fore.GREEN}Query: {Fore.RESET}{query}\n"
+                        f"{tb(self.stats_tbl, headers='keys', tablefmt='grid')}"
+                        f"\nStats: {records['stats']}\n"
+                    )
         return records
 
-    
+    def mk_stats_table(self, records:list[dict], *args, **kwargs):
+        self.stats_tbl, color, quartil = [], '', ''
+        for i, r in enumerate(records['records']):
+            content, dists, num_tokens = r['content'], r['distances'], r['num_tokens']
+            if dists <= records['stats']['25%']:
+                color = Fore.GREEN
+                quartil = '25%'
+            elif dists <= records['stats']['50%']:
+                color = Fore.YELLOW
+                quartil = '50%'
+            else:
+                color = Fore.RED
+                quartil = '75%'
+
+            # z_score is the number of standard deviations from the mean
+            self.stats_tbl.append({
+                f"Top {len(records['records'])} RAG results": f"{color}{content}{Fore.RESET}", 
+                f"distance": f"{color}{dists}{Fore.RESET}", 
+                f"quartil": f"{color}{quartil}{Fore.RESET}",
+                f"z_score": f"{color}{dists / records['stats']['std']:.2f}{Fore.RESET}",
+                f"num_tokens": f"{color}{num_tokens}{Fore.RESET}", })
+
     def to_records(self, df: pd.DataFrame, start: float) -> List[Dict[str, Any]]:
         """
         Converts the DataFrame of records into a list of dictionaries.
@@ -228,6 +234,36 @@ class Memory(Data):
         # get L2 norm distances for ranking and sorting using pre consolidated self.vectors
         distances = np_norm(self.vectors[top, 0, :] - v, axis=1)[:n]
         return top[np.argsort(distances)], distances
+
+    def save_to_disk(self, *args, verbose:int=0, **kwargs,) -> None:
+        """
+        NOTE:
+        The parent save_to_disk method also performs a cleanup of the data directory.
+        cleanup uses max_files:int=sts.max_files, exts:set={'csv', 'npy'}, verbose:int=0,
+        """
+        # super takes care of saving self.data (pd.DataFrame) to disk and returns the path
+        data_saved_path = super().save_to_disk(*args, verbose=verbose, **kwargs)
+        # we save the self.vectors (np.ndarray) to disk using the parents file_path
+        np.save(f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}", self.vectors)
+        if verbose >= 2: 
+            path = f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}" 
+            print(  f"{Fore.YELLOW}Data.save_to_disk: "
+                    f"Saving {self.name} to:{Fore.RESET} {path}"
+                    )
+
+    def load_from_disk(self, *args, data_file_name:str=None, verbose:int=0, **kwargs) -> None:
+        if data_file_name is None: return
+        data_load_path = super().load_from_disk(*args, 
+                                                        data_file_name=data_file_name,
+                                                        verbose=verbose,
+                            **kwargs)
+        # we save the self.vectors (np.ndarray) to disk using the parents file_path
+        npy_load_path = f"{os.path.splitext(data_load_path)[0]}.{self.mem_file_ext}"
+        if verbose >= 2: 
+            print(f"{Fore.CYAN}Memory.load_from_disk:{Fore.RESET} {npy_load_path = }")
+        with open(npy_load_path, 'rb') as f:
+            self.vectors = np.load(f)
+
 
     def __str__(self, *args, **kwargs):
         return f"Memory(name={self.name}, fields=fields_dict, )"

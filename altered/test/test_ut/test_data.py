@@ -63,8 +63,8 @@ class Test_Data(unittest.TestCase):
         data = Data(name=self.name, fields=self.test_data)
         data.create_table()
         data.save_to_disk()
-        file_name = f"{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
-        data.load_from_disk(file_name=file_name)
+        data_file_name = f"{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
+        data.load_from_disk(data_file_name=data_file_name)
         self.assertFalse(getattr(data, self.name).empty)
 
     def test_cleanup_data_dir(self, *args, **kwargs):
@@ -72,7 +72,7 @@ class Test_Data(unittest.TestCase):
         data = Data(name=self.name, fields=self.test_data)
         data.create_table()
         data.save_to_disk()
-        data.cleanup_data_dir(max_entries=1)
+        data.cleanup_data_dir(max_files=1)
         file_list = [f for f in os.listdir(data.data_dir) if f.endswith('.csv')]
         self.assertLessEqual(len(file_list), 1)
 

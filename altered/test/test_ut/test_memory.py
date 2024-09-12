@@ -14,11 +14,16 @@ class Test_Memory(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
-        cls.test_data_dir = os.path.join(sts.data_dir, 'data__data_load_fields_default.yml')
+        cls.test_data_path = os.path.join(sts.test_data_dir, 'test_memory_data_load_fields.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.name = 'Unittest_Test_Memory'
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
-        cls.memory = Memory(name=cls.name, fields=cls.test_data)
+        cls.memory = Memory(
+                                name=cls.name,
+                                fields=cls.test_data,
+                                data_dir=os.path.join(sts.test_data_dir, cls.name),
+                                verbose=cls.verbose,
+                                )
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
@@ -27,7 +32,7 @@ class Test_Memory(unittest.TestCase):
     @classmethod
     def mk_test_data(cls, *args, **kwargs):
         # Load test data from the YAML file
-        with open(cls.test_data_dir, 'r') as f:
+        with open(cls.test_data_path, 'r') as f:
             return yaml.safe_load(f)
 
     def test___init__(self, *args, **kwargs):
@@ -100,6 +105,26 @@ class Test_Memory(unittest.TestCase):
         # Retrieve similar entries
         nearests = self.memory.get(query, num=5, verbose=self.verbose)
         self.assertEqual(nearests['records'][0]['content'], 'Why is the sky blue?')
+
+    def test_save_to_disk(self, *args, **kwargs):
+        test_contents = [
+                            'What is the capital of France?',
+                            'How does a plane fly?',
+                            'Why is the sky blue?',
+        ]
+        # Add these entries to memory
+        for entry in test_contents:
+            self.memory.append({'role': 'user', 'content': entry})
+        self.memory.save_to_disk(max_files=4, verbose=self.verbose)
+
+    def test_load_from_disk(self, *args, **kwargs):
+        time.sleep(2)
+        self.memory.load_from_disk( *args,
+                                    data_file_name='latest',
+                                    verbose=self.verbose,
+                                    **kwargs,
+                                    )
+        self.memory.show()
 
     def test_get_stats(self, *args, **kwargs):
         expected = False

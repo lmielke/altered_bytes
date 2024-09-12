@@ -1,0 +1,58 @@
+# default_fields.yml
+# Contains the fields to define the structure of a short term memory object.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "gpu_monitoring"}
+# name of the table/data set that the record belongs to
+name: null
+
+# meta: {"name": "content", "type": "string", "default": "fields.source", "example": "nvidia-smi."}
+# the main content of the record. This can be text or image data.
+# if no content is provided, the source field must be filled.
+# every record has to contain either a source or a content field.
+content: null
+
+# meta: {"name": "prompt", "type": "string", "default": "", "example": "How do I monitor the performance of my nvidia gpu in powershell?"}
+# The prompt contains the entire prompt sent to the model. Its used for debugging purpose.
+# every record has to contain either a source or a prompt field.
+prompt: null
+
+# meta: {"name": "role", "type": "category", "default": "user", "example": "user"}
+# the main role sender of the record. This can be 'user', 'system', 'assistant'
+role: user
+
+# meta: {"name": "category", "type": "category", "default": "", "example": "it"}
+# category of the record. This can be used to group records together.
+# Examples: physics, biology, chemistry
+category: null
+
+# meta: {"name": "sub_category", "type": "category", "default": "", "example": "hardware"}
+# sub_category of the record. This can be used to group records together.
+# Examples: for category physics the sub_category can be quantum mechanics, optics, ...
+sub_category: null
+
+# meta: {"name": "source", "type": "string", "default": "fields.content", "example": "https://stackoverflow.com/questions/68533863/running-nvidia-smi-from-windows-powershell"}
+# source of the content. This can be a URL, file, cmd or sql query.
+# if no source is provided, the content field must be filled.
+# every record has to contain either a source or a content field.
+source: null
+
+# meta: {"name": "tools", "type": "string", "default": "", "example": "nvidia-smi"}
+# function or method associated with the record. This might represent additional
+# information or an action that can be performed. The content for example might describe
+# how and when to use the tools.
+tools: data.show()
+
+# meta: {"name": "hash", "type": "string", "default": null, "example": "kduzfiekrje"}
+# techincal fields for metadata
+# Generated Field, always set to null
+hash: null
+
+# meta: {"name": "model", "type": "category", "default": "llama3.1", "example": "llama3.1"}
+# model used to embedd the content. The query vector must also be embedded 
+# using the same model as the record to be retrieved.
+model: null
+
+# meta: {"name": "timestamp", "type": "datetime64[ns]", "default": null, "example": "2024-09-27_07-23-37"}
+# timestamp of the record. This is used to determine the temporaryal order of the records.
+# Generated Field, always set to null
+timestamp: null

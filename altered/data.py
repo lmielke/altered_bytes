@@ -49,6 +49,7 @@ class Data:
     It handles tasks like loading/saving data, managing fields defined in a YAML file,
     and adding new records to the table.
     """
+    data_file_ext = 'csv'
 
     def __init__(self, *args, name:str, **kwargs):
         """
@@ -88,6 +89,7 @@ class Data:
         """
         data_dir = data_dir if data_dir else os.path.join(sts.data_dir, self.name)
         os.makedirs(data_dir, exist_ok=True)
+        print(f"{Fore.CYAN}\nData {self.name = } directory:{Fore.RESET} {data_dir}")
         return data_dir
 
     def load_fields(self, *args, fields_path:Optional[str]=default_fields, **kwargs,
@@ -136,55 +138,75 @@ class Data:
                         columns=getattr(self, self.name).columns).astype(self.dtypes))
         # we add labels and descriptions to the DataFrame. This can be used to send 
         # the DataFrame fields to a file or as Field Example to an LLM.
-        getattr(self, self.name).fields.add_labels( name='Default Fields', 
+        self.df.fields.add_labels( name='Default Fields', 
                                                     labels=self.fields_path, 
                                                     description="Default Fields",
                                         )
 
     def save_to_disk(self, *args, verbose:int=0, **kwargs) -> None:
+
         """
         Save the current DataFrame to disk as a CSV file.
 
         The filename is based on the current timestamp.
         """
-        file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
-        file_path = os.path.join(self.data_dir, file_name)
-        if verbose: print(f"{Fore.YELLOW}Saving {self.name} to:{Fore.RESET} {file_path}")
-        getattr(self, self.name).to_csv(file_path, index=False)
+        data_file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.{self.data_file_ext}"
+        file_path = os.path.join(self.data_dir, data_file_name)
+        if verbose >= 2: 
+            print(  f"{Fore.YELLOW}Data.save_to_disk: "
+                            f"Saving {self.name} to:{Fore.RESET} {file_path}"
+                            )
+        self.df.to_csv(file_path, index=False)
+        self.cleanup_data_dir(*args, verbose=verbose, **kwargs)
+        return file_path
 
-    def load_from_disk(self, *args, file_name:Optional[str]=None, **kwargs) -> None:
+    def load_from_disk(self, *args, data_file_name:Optional[str]=None, verbose:int=0,
+        **kwargs) -> None:
         """
         Load a DataFrame from a CSV file.
 
         Args:
-            file_name (Optional[str]): Name of the file to load.
+            data_file_name (Optional[str]): Name of the file to load.
                 If 'latest', the most recent file is loaded.
         """
-        if file_name is None:
+        if data_file_name is None:
             return
-        elif file_name == 'latest':
-            file_names = [f for f in os.listdir(self.data_dir) if re.match(sts.data_regex, f)]
+        elif data_file_name == 'latest':
+            file_names = [f for f in os.listdir(self.data_dir) 
+                                                        if re.match(sts.data_regex, f)
+                                                        and f.endswith(self.data_file_ext)]
             if not file_names:
                 msg =   (
                             f"{Fore.RED}ERROR:{Fore.RESET}"
                             f" No files matching {sts.data_regex} found in {self.data_dir}"
                         )
                 raise FileNotFoundError(msg)
-            file_path = os.path.join(self.data_dir, file_names[0])
+            # we load the most recent file
+            file_path = os.path.join(self.data_dir, file_names[-1])
         else:
-            file_path = os.path.join(self.data_dir, file_name)
+            # we ensure that the file to be loaded has a valid file extension
+            name, ext = os.path.splitext(data_file_name)[0], self.data_file_ext
+            file_path = os.path.join(self.data_dir, f"{name}.{ext}")
             if not os.path.isfile(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
+        if verbose >= 2: 
+            print(
+                    f"{Fore.CYAN}Data.load_from_disk:{Fore.RESET}"
+                    f" {data_file_name = } -> {file_path = }"
+                    )
         setattr(self, self.name, pd.read_csv(file_path).astype(self.dtypes))
+        return file_path
 
-    def cleanup_data_dir(self, *args, max_entries:int=10, **kwargs) -> None:
+    def cleanup_data_dir(self, *args,   max_files:int=sts.max_files,
+                                        exts:set=sts.data_file_exts,
+        **kwargs) -> None:
         """
         Clean up old CSV files in the data directory, keeping only the most recent ones.
 
         Args:
-            max_entries (int): Maximum number of files to keep.
+            max_files (int): Maximum number of files to keep.
         """
-        hlp_dirs.cleanup_data_dir(self.data_dir, *args, max_entries=max_entries, **kwargs)
+        hlp_dirs.cleanup_data_dir(self.data_dir, max_files, exts, *args, **kwargs)
 
     def append(self, record:Dict[str, Any], *args, **kwargs) -> None:
         """

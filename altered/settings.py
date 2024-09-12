@@ -8,6 +8,7 @@ project_dir = os.path.dirname(package_dir)
 project_name = os.path.basename(project_dir)
 
 resources_dir = os.path.join(package_dir, "resources")
+# max number of files to store in the data directory before being deleted
 templates_dir = os.path.join(resources_dir, "templates")
 
 test_dir = os.path.join(package_dir, "test")
@@ -17,8 +18,8 @@ time_strf = "%Y-%m-%d_%H-%M-%S-%f"
 time_stamp = lambda: dt.now().strftime(time_strf)
 # name of table data when stored to disk
 data_dir = os.path.join(resources_dir, "data")
-data_file_name = "data.csv"
-data_regex = r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.csv$"
+max_files, data_file_exts = 100, {'csv', 'npy'}
+data_regex = r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.[a-z]{3,4}$"
 
 ignore_dirs = {
                 ".git",
