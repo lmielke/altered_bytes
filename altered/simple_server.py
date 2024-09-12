@@ -88,10 +88,7 @@ class Aggregations:
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     aggregations = None  # This will be set when the server starts
-
-    def __init__(self, *args, **kwargs):
-        self.prompt_counter = 0
-        super().__init__(*args, **kwargs)
+    prompt_counter = 0
 
     def do_POST(self, *args, **kwargs):
         try:
