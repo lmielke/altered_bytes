@@ -16,7 +16,7 @@ class ModelConnect:
     via the local private Network.
     On how to use see project_dir/altered/test/test_ut/test_assistant.py
     """
-    
+
     def __init__(self, *args, **kwargs) -> None:
         self.min_context_len = 2000
         self.to_msgs = lambda msg: [{'role': 'user', 'content': msg}]
@@ -137,11 +137,11 @@ class ModelConnect:
                             data=json.dumps(context),
         )
         r.raise_for_status()
-        rslts = r.json()
-        for i, rslt in enumerate(rslts.get('results')):
-            # rslt['response'] = rslt.get('response', rslt.get('embedding'))
-            rslt['num_results'] = len(rslts.get('results'))
-        return rslts
+        r_dict = r.json()
+        print(f"\n{r_dict = }")
+        for i, (field, response) in enumerate(r_dict.copy().items()):
+            r_dict['num_results'] = len(r_dict)
+        return r_dict
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """

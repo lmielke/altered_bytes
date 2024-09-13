@@ -194,7 +194,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Calculate elapsed network up time
         time.sleep(0.01)
-        self.network_up_time = f"{time.time() - network_up_time:.3f}"
+        self.network_up_time = time.time() - network_up_time
         self.server_time = time.time()
 
     def end_timing(self, *args, **kwargs ) -> dict:
@@ -212,8 +212,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         time.sleep(0.01)
         return {
                             'network_up_time': self.network_up_time,
-                            'server_time': f"{time.time() - self.server_time:.3f}",
-                            'network_down_time': f"{time.time():.3f}",
+                            'server_time': time.time() - self.server_time,
+                            'network_down_time': time.time(),
         }
 
     def send_server_response(self, payload: dict, *args, status_code: int = 200, **kwargs):
