@@ -116,7 +116,9 @@ class Endpoints:
                                                     strategy=strat, **kwargs,
                     )
                 # here we prompt the model again
-                aggs.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+                agg = self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs)
+                agg['strategy'] = strat
+                aggs.append(agg)
         return {'responses': aggs}
 
     def unittest(self, *args, **kwargs) -> dict:
