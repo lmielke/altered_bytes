@@ -89,7 +89,6 @@ class Endpoints:
         return {'responses': responses}
 
     def get_generates(self, ep:str, *args, prompts:list, **kwargs) -> dict:
-        print(f"get_generates: {prompts = }")
         responses = []
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
@@ -135,7 +134,6 @@ class Endpoints:
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
-        print(f"Ollama: {func = }, {prompt = }, {kwargs = }, {params = }")
         r = getattr(self.olc, func)(prompt=prompt, **params)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
@@ -153,16 +151,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
-        print(f"\n{Fore.YELLOW}do_POST.in: {Fore.RESET}{kwargs = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
         payload.update(getattr(self.service, ep)(ep, *args, server=self.server, **kwargs))
         # Update response with timing information and other server statistics
-        payload.update(self.end_timing(*args, **kwargs))
+        payload.update(self.end_timing(ep, *args, **kwargs))
         # Send the JSON response
-        print(f"\n{Fore.YELLOW}do_POST.out:{Fore.RESET} {payload.keys() = }")
-        print(f"\n{Fore.YELLOW}do_POST.out:{Fore.RESET} {payload = }")
         self.send_server_response(payload, *args, **kwargs)
 
     def get_kwargs(self, *args, **kwargs) -> dict:
@@ -176,11 +171,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             return
         else:
             self.service.prompt_counter[ep] += 1
-        print(f"Endpoint: {ep}")
         return ep, {'prompt_counter': self.service.prompt_counter}
 
-    def start_timing(self, *args, network_up_time: float, **kwargs
-        ) -> tuple:
+    def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
         """
         Explicitly handles network_up_time passed from kwargs.
         
@@ -196,7 +189,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.network_up_time = time.time() - network_up_time
         self.server_time = time.time()
 
-    def end_timing(self, *args, **kwargs ) -> dict:
+    def end_timing(self, ep, *args, **kwargs ) -> dict:
         """
         Updates the response data with timing information and other server statistics.
         
@@ -209,6 +202,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             Updated response data with additional metadata.
         """
         time.sleep(0.01)
+        print(
+                    f"\nService {ep} responded successfully. "
+                    f"\n\tprompt_counter = {self.service.prompt_counter}, "
+                    f"\n\ttotal_server_time = {time.time() - self.server_time:.2f}"
+                    )
         return {
                             'network_up_time': self.network_up_time,
                             'server_time': time.time() - self.server_time,
