@@ -117,6 +117,7 @@ class Endpoints:
                 # here we prompt the model again
                 agg = self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs)
                 agg['strategy'] = strat
+                agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)
         return {'responses': aggs}
 
