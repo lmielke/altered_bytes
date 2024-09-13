@@ -91,6 +91,7 @@ class Endpoints:
         return {'responses': responses}
 
     def get_generates(self, ep:str, *args, prompts:list, **kwargs) -> dict:
+        print(f"get_generates: {prompts = }")
         responses = []
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
@@ -135,8 +136,9 @@ class Endpoints:
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
-        # r = getattr(self.olc, func)(prompt=prompt, **params)
-        r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
+        print(f"Ollama: {func = }, {prompt = }, {kwargs = }, {params = }")
+        r = getattr(self.olc, func)(prompt=prompt, **params)
+        # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
 
 
@@ -152,6 +154,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
+        print(f"{kwargs = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
@@ -172,6 +175,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             return
         else:
             self.service.prompt_counter[ep] += 1
+        print(f"Endpoint: {ep}")
         return ep, {'prompt_counter': self.service.prompt_counter}
 
     def start_timing(self, *args, network_up_time: float, **kwargs
