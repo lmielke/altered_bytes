@@ -55,10 +55,10 @@ class Test_ModelConnect(unittest.TestCase):
                                     num_predict = 100,
                                     service_endpoint='get_generates',
                                     format='json',
-                                    agg_method='best',
+                                    strategy='prompt_aggregations.best',
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
-        for i, out in enumerate(r.get('results')):
+        for i, out in enumerate(r.get('responses')):
             tbl = {k: f"{vs}"[:200] for k, vs in out.items()}
             print(tb(tbl.items()))
 

@@ -38,7 +38,7 @@ class PromptStrategies:
             strat_group, strat_name = strategy, 'max'
         return self.pr_strategies.get(strat_group).get(strat_name), strat_name
 
-    def mk_agg_prompt(self, prompts:list, responses:list, *args, fmt:str=None, **kwargs) -> dict:
+    def mk_agg_prompt(self, prompts:list, responses:list, *args, fmt:str='plain text', **kwargs) -> dict:
         """
         Generates a prompt based on the specified strategy.
         """
@@ -48,13 +48,11 @@ class PromptStrategies:
                             for i, (prompt, resp) in enumerate(zip(prompts, responses))
         ]
         samples_section = "<samples>\n" + "\n\n".join(sample_pairs) + "\n</samples>"
-        if fmt is not None:
-            format_instruct = f"Provide your answer in {fmt}!"
         new_prompt = (
                         f"\n## Below are {len(prompts)} samples of an LLM's Response.\n"
                         f"{samples_section}\n"
                         f"{' '.join(strats.values())}"
-                        f"\n{format_instruct}"
+                        f"\n{fmt}"
         )
         context = {'number_of': len(prompts)}
         return self.renderer.render_from_string(new_prompt, context )
@@ -105,7 +103,6 @@ class Endpoints:
         Aggregates muliple responses into a single response using the provided 
         aggregation strategy. Also a std is estimated.
         """
-        
         aggs = []
         if len(prompts) >= 2 and strategy is not None:
             for strat in [strategy, f"{self.pr_strat.strategy}.std"]:
@@ -154,7 +151,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
-        print(f"{kwargs = }")
+        print(f"\n{Fore.YELLOW}do_POST.in: {Fore.RESET}{kwargs = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep

@@ -47,7 +47,7 @@ class Prompt:
         hlpp.pretty_prompt(self._data, *args, **kwargs)
 
     def update_model_params(self, *args, alias:str=None, num_predict:int=None, depth:int=1,
-                            agg_method:str=None, verbose:int=0, **kwargs,
+                            strategy:str=None, verbose:int=0, **kwargs,
         ):
         # Construct model parameters specific to this Chat (see ModelConnect.get_params())
         server_params = {
@@ -55,7 +55,7 @@ class Prompt:
                     'alias': alias,
                     'num_predict': num_predict,
                     'verbose': verbose,
-                    'agg_method': 'best' if depth != 1 and agg_method is None else agg_method
+                    'strategy': 'best' if depth != 1 and strategy is None else strategy
                         }
         server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
         return server_params
@@ -70,11 +70,11 @@ class Prompt:
                                     ), *args, **kwargs,
                 )
 
-    def extract(self, *args, depth:int=1, agg_method:str=None, **kwargs) -> dict:
+    def extract(self, *args, depth:int=1, strategy:str=None, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
-        if not self.r.get('results') or type(self.r.get('results')) != list:
-            raise ValueError(f"Error: No valid results returned from the AI model.")
-        agg_method = 'best' if depth != 1 and (agg_method is None) else agg_method
+        if not self.r.get('responses') or type(self.r.get('responses')) != list:
+            raise ValueError(f"Error: No valid responses returned from the AI model.")
+        strategy = 'best' if depth != 1 and (strategy is None) else strategy
         # we create the output record 
         record = {
                         'user_prompt': self.context['user_prompt'], 
@@ -82,9 +82,9 @@ class Prompt:
                         'role': 'assistant',
                         'model': self.r.get('model'),
                     }
-        # r might have a single result or mulitple results. We only return a single result.
-        for i, result in enumerate(self.r.get('results')):
-            if result.get('agg_method') == agg_method:
+        # r might have a single result or mulitple responses. We only return a single result.
+        for i, result in enumerate(self.r.get('responses')):
+            if result.get('strategy') == strategy:
                 record.update(result)
                 break
         else:
@@ -96,7 +96,7 @@ class Prompt:
 
     @staticmethod
     def validate(r:dict, *args, **kwargs) -> dict:
-        resp_content = r.get('results', [])[0].get('response').strip()
+        resp_content = r.get('responses')[0].get('response').strip()
         if not resp_content:
             raise ValueError(f"Error: No response content returned from the AI model.")
         elif '</INST>' in resp_content:
@@ -106,5 +106,5 @@ class Prompt:
                 raise ValueError(f"Error: Multiple Instruction Tags Found")
             elif len(resp_content) == 2:
                 resp_content = resp_content[-1].strip()
-        r['results'][0]['response'] = resp_content
+        r['responses'][0]['response'] = resp_content
         return r
