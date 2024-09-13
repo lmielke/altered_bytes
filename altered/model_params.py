@@ -197,11 +197,15 @@ class ModelParams:
         if not isinstance(key_path, str):
             raise ValueError("key_path must be a string")
         if not os.path.isfile(key_path):
-            raise FileNotFoundError(f"File not found: {key_path}")
+            print(f"File not found: {key_path}! {Fore.RED}Unable to connect to openAi.{Fore.RESET}")
         if not (key_path.endswith('.yml') or key_path.endswith('.yaml')):
             raise ValueError("The key file must be a YAML file")
-        with open(key_path, 'r') as file:
-            self.api_key = yaml.safe_load(file).get('key')
+        try:
+            with open(key_path, 'r') as file:
+                self.api_key = yaml.safe_load(file).get('key')
+        except FileNotFoundError:
+            print(f"self.api_key loading failed. Continuing with None")
+            self.api_key = None
         return self.api_key
 
     def get_model_file(self, url, *args, **kwargs) -> tuple:
