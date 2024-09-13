@@ -19,7 +19,7 @@ class PromptStrategies:
     def __init__(self, *args, **kwargs):
         self.inst = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
-        self.pr_strategies = self.inst.get_strategy(strategy = 'prompt_aggregations')
+        self.pr_strategies = self.inst.get_strategy(strategy = self.strategy)
 
     def load_strategies(self, strategy, *args, **kwargs):
         """

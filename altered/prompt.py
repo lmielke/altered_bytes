@@ -13,6 +13,7 @@ import altered.settings as sts
 
 
 class Prompt:
+    default_aggreg = 'prompt_aggregations.best'
 
     def __init__(self, *args, **kwargs):
         self.assi = ModelConnect()
@@ -55,7 +56,7 @@ class Prompt:
                     'alias': alias,
                     'num_predict': num_predict,
                     'verbose': verbose,
-                    'strategy': 'best' if depth != 1 and strategy is None else strategy
+                    'strategy': self.default_aggreg if depth != 1 and strategy is None else strategy
                         }
         server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
         return server_params
@@ -74,7 +75,7 @@ class Prompt:
         # r comes as a dictionary with 'results' containing a list of dictionaries
         if not self.r.get('responses') or type(self.r.get('responses')) != list:
             raise ValueError(f"Error: No valid responses returned from the AI model.")
-        strategy = 'best' if depth != 1 and (strategy is None) else strategy
+        strategy = self.default_aggreg if depth != 1 and (strategy is None) else strategy
         # we create the output record 
         record = {
                         'user_prompt': self.context['user_prompt'], 
