@@ -162,7 +162,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         # Update response with timing information and other server statistics
         payload.update(self.end_timing(*args, **kwargs))
         # Send the JSON response
-        print(f"do_POST.out: {payload = }")
+        print(f"\n{Fore.YELLOW}do_POST.out:{Fore.RESET} {payload.keys() = }")
+        print(f"\n{Fore.YELLOW}do_POST.out:{Fore.RESET} {payload = }")
         self.send_server_response(payload, *args, **kwargs)
 
     def get_kwargs(self, *args, **kwargs) -> dict:
