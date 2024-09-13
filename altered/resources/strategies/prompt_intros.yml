@@ -3,8 +3,10 @@
 msg_and_not_instructs_prefix: >
     You have been provided with a <user_prompt> ...some text... </user_prompt>. 
     Answer the <user_prompt> directly. 
-    Please refrain from making conversational comments, unless they provide relevant context. 
-    Still, do not hold back when you have something meaningful to say! 
+    Refrain from making conversational or introductory comments!
+    Refrain from commenting on the prompt or these instructions!
+    Start your answer with: Answer: ...
+
 msg_and_instructs_prefix: >
     \nYou have been provided with a <user_prompt> Some text </user_prompt>. 
     Do not respond to that <user_promt> directly. 

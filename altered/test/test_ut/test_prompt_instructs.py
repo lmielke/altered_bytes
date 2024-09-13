@@ -29,7 +29,7 @@ class Test_Instructions(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        self.assertIn('json_response_prefix', self.inst.instructs_fmts.keys())
+        self.assertIn('json', self.inst.instructs_fmts.keys())
 
     # def test_user_prompt(self, *args, **kwargs):
     #     expected = False
@@ -61,7 +61,7 @@ class Test_Instructions(unittest.TestCase):
     def test_get_response_template(self, *args, **kwargs):
         data = self.inst.get_response_template(example=os.path.join(
                                                                 self.test_data_dir, 
-                                                                'chat_run.yml'),
+                                                                'thought__thought_run.yml'),
                                                 fmt='json'
                 )
         print(f"{data = }")
@@ -69,11 +69,17 @@ class Test_Instructions(unittest.TestCase):
     def test_set_response_format(self, *args, **kwargs):
         data = self.inst.get_response_template(example=os.path.join(
                                                                 self.test_data_dir, 
-                                                                'chat_run.yml'),
+                                                                'thought__thought_run.yml'),
                                                 fmt='json'
                 )
         self.inst.set_response_format(data, fmt='json')
         print(f"self.inst._data: {self.inst._data}")
+
+    def test_get_strategy(self, *args, **kwargs):
+        strategy = self.inst.get_strategy(strategy = 'prompt_aggregations')
+        print(f"\n{strategy = }\n")
+        strategy = self.inst.get_strategy(strategy = 'prompt_aggregations.max')
+        print(f"\nmax: {strategy = }\n")
 
     # def test_load_prompt_params(self, *args, **kwargs):
     #     expected = False

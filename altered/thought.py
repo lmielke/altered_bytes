@@ -22,23 +22,24 @@ class Thought:
 
     def __init__(self, name:str, *args, **kwargs):
         # name of the thought can be used to locate/reference the saved thought
+        print(f"{Fore.GREEN}Creating Thought {Fore.RESET}: {name = }")
         self.name, self.thought_dir = self.mk_thought_dir(name, *args, **kwargs)
-        # user_promt that initiates the thought process/chain
-        self.init_user_prompt = None
+        # initial user_promt provided by the user
         # prompt constructor for LLM interaction
         self.prompt = Prompt(*args, **kwargs)
         # Data represents the thought table structure, where each line is a thought element
-        self.data = Data(*args, name=name, data_dir=self.thought_dir, **kwargs)
-        # lambda is needed for self.table because the obj reference breaks when rec is added
-        self.table = lambda: getattr(self.data, self.name)
+        self.data = Data(*args, name=self.name, data_dir=self.thought_dir, **kwargs)
 
-    def run(self, user_prompt:str=None, *args, **kwargs):
+    @property
+    def table(self, *args, **kwargs):
+        return getattr(self.data, self.name)
+
+    def run(self, *args, **kwargs):
         # First we create the inital user_promt to run the chat
-        if self.init_user_prompt is None: self.init_user_prompt = user_prompt
-        self.user_prompt, self.response = user_prompt, None
         # the chat loop starts here
-        # self.add_to_chat(user_prompt, *args, **kwargs)
-        while not self.user_prompt in self.exit_terms:
+        # self.add_to_chat(still_thinking, *args, **kwargs)
+        self.still_thinking = True
+        while self.still_thinking:
             self.next_chat_item(*args, **kwargs)
         # exit uses /bye or /quit
         print(f"{Fore.GREEN}Finlizing Thought{Fore.RESET}")
@@ -50,38 +51,30 @@ class Thought:
         return name, thought_dir
 
     def next_chat_item(self, *args, **kwargs):
-        # we send the user_prompt and the chat_history to the LLM (promt handles post())
-        self.response = self.prompt(    *args,  
-                                        user_prompt=self.user_prompt,
-                                        context=self.prep_context(*args, **kwargs), 
-                                        **kwargs, 
-                        )
-        # we add user_promt after getting the response to avoid having the current user_prompt
+        # we call the prompt with whatever context we have
+        print(f"{kwargs = }")
+        self.p = self.prompt(*args, context=self.thought_history(*args, **kwargs), **kwargs)
+        # we add user_promt after getting the response to avoid having the current still_thinking
         # inside the chat_history
-        self.add_to_chat(self.user_prompt, *args, role='user', **kwargs)
-        self.add_to_chat(self.response, *args, role='assistant', **kwargs)
+        # self.add_to_chat(self.p.get('still_thinking'), *args, role='user', **kwargs)
+        self.add_to_chat(self.p, *args, role='user', **kwargs)
+        self.add_to_chat(self.p, *args, role='assistant', **kwargs)
         lambda kwargs: os.system('cls') if not kwargs.get('verbose') else None
         self.data.show(*args, color=Fore.GREEN, **kwargs)
-        self.user_prompt = self.get_user_prompt(*args, **kwargs)
+        self.still_thinking = self.p.get('still_thinking')
 
-    def get_user_prompt(self, *args, **kwargs) -> str:
-        print(f"{Fore.YELLOW} \nWant to add a user_prompt to the next prompt ? {Fore.RESET}")
-        user_prompt = input(f"You: ").strip()
-        return user_prompt
+    def add_to_chat(self, record:[str, dict], *args, role:str, **kwargs):
+        new_record = {k: record.get(k, None) for k, vs in self.data.fields.items()}
+        if role == 'user':
+            new_record['content'] = record.get('user_prompt')
+            new_record['prompt'] = 'next line'
+        new_record.update({'role': role, 'name': self.name})
+        self.data.append(new_record)
 
-    def add_to_chat(self, content:[str, dict], *args, role:str, **kwargs):
-        if isinstance(content, str): content = {'content': content, }
-        content.update({'role': role, 'name': self.name})
-        self.data.append({k: content.get(k, None) for k, vs in self.data.fields.items()})
-
-    def prep_context(self, *args, context:dict={}, **kwargs):
-        context.update(self.prep_history(*args, **kwargs))
-        return context
-
-    def prep_history(self, *args, history:list=[], **kwargs):
-        if not self.table()['content'].empty and (self.table()['content'].str.len() > 0).any():
+    def thought_history(self, *args, history:list=[], **kwargs) -> list[dict]:
+        if not self.table['content'].empty and (self.table['content'].str.len() > 0).any():
             # we add the chat history for context (check if needed)
-            for i, row in self.table().iterrows():
+            for i, row in self.table.iterrows():
                 if isinstance(row['content'], str):
                     history.append({'role':row['role'], 'content': row['content']})
         return {'chat_history': history if history else None}

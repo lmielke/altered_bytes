@@ -10,17 +10,19 @@ from altered.yml_parser import YmlParser
 
 class Instructions:
 
-    fmts = {'json', 'markdown', 'yaml', 'yml'}
+    fmts = {'json', 'markdown', 'yaml', 'yml', 'plain'}
+    strategy_dir = os.path.join(sts.resources_dir, 'strategies')
 
 
-    def __init__(self, instructs:str=None, *args, **kwargs):
+    def __init__(self, *args, instructs:str=None, **kwargs):
         self.instructs_fmts = self.load_prompt_params('prompt_formats', *args, **kwargs)
         self.instruction_params = self.load_prompt_params('prompt_intros', *args, **kwargs)
-        self._data = instructs if instructs is not None else ''
+        self._data = instructs if instructs is not None else {}
 
     def __call__(self, *args, **kwargs):
         self.get_user_prompt(*args, **kwargs)
         self.create_instruct_dict(*args, **kwargs)
+        self.get_strategy(*args, **kwargs)
         self.set_response_format(self.get_response_template(*args, **kwargs), *args, **kwargs)
         return self
 
@@ -32,9 +34,16 @@ class Instructions:
     def data(self, *args, **kwargs):
         return self._data
 
-    def get_user_prompt(self, *args, user_prompt:str=None, **kwargs):
-        # do something in the future
-        self._user_prompt = user_prompt
+    def get_user_prompt(self, *args, user_prompt:str='', **kwargs) -> str:
+        if not user_prompt:
+            print(
+                    f"{Fore.YELLOW} \nWant to add a user_prompt"
+                    f" to the next prompt ? {Fore.RESET}"
+                    )
+            self._user_prompt = input(f"You: ").strip()
+        else:
+            self._user_prompt = user_prompt
+        return self._user_prompt
 
     def create_instruct_dict(self, *args, user_prompt:str='', instructs:str='', **kwags):
         msg = (
@@ -68,27 +77,47 @@ class Instructions:
         yml.add_labels(name='Prompt Fields', labels=example, description="None")
         return yml.describe(fmt='json' if not fmt else fmt)
 
-    def set_response_format(self, response_template:str=None, *args, fmt:str=None, **kwargs):
+    def set_response_format(self, response_template:str=None, *args, fmt:str='plain', **kwargs):
         """
         Formats can be 'json', 'markdown', or 'yaml'.
         The corresponding strategy yaml file starts with the fmt name.
         """
         if not fmt:
-            return
+            fmt = 'plain'
         elif fmt and (fmt not in self.fmts):
             raise ValueError(f"Error: Invalid fmt '{fmt}' provided.")
         # we add instructions for the response fmts to the prompt
         # Example: 'json_response_prefix' contains the instruct prefix if the fmt is 'json'
         # expected from the model (markdown, json, yaml)
-        self._data['fmts'] = ''
+        self._data['fmts'], fmt_str = '', self.instructs_fmts[fmt]
         for name in ['prefix', 'default_template', 'postfix',]:
             if response_template and name == 'default_template':
-                self._data['fmts'] += self.instructs_fmts[f'{fmt}_response_template_intro']
+                self._data['fmts'] += fmt_str['template_intro']
                 self._data['fmts'] += f"{response_template}"
             else:
-                self._data['fmts'] += self.instructs_fmts[f'{fmt}_response_{name}']
+                self._data['fmts'] += fmt_str[f'{name}']
 
     def load_prompt_params(self, file_name, *args, **kwargs):
         params_path = os.path.join(sts.resources_dir, 'strategies', f"{file_name}.yml")
         with open(params_path, 'r') as f: 
             return yaml.safe_load(f)
+
+    def get_strategy(self, *args, strategy:str=None, **kwargs):
+        if strategy is None: return ''
+        if '.' in strategy:
+            strat_group, strat_name = strategy.split('.')
+        else:
+            strat_group = strategy
+        with open(os.path.join(self.strategy_dir, f"{strat_group}.yml"), 'r') as f:
+            strat = yaml.safe_load(f)
+        if '.' in strategy:
+            strat = strat.get(strat_name)
+            if strat is None:
+                strat = (
+                    f"{Fore.RED}ERROR in Instructions.get_strategy: "
+                    f"Entry '{strat_name}' not found in stategies/'{strat_group}.yml' {Fore.RESET}"
+                      )
+                print(strat)
+        instruction = {strat_group: strat}
+        self._data.update(instruction)
+        return instruction

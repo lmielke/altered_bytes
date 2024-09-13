@@ -1,5 +1,5 @@
 """
-memory.py
+rag_data.py
 Vector store enhanced Data. Uses Data indirectly via Thought.
 Handles RAG (Retrieval Augmented Generation) data for the agents.
 """
@@ -14,16 +14,16 @@ from colorama import Fore, Style
 
 # needed for semantic chunking and query preparation
 from altered.thought import Thought
-# Memory inherits from Thought
+# RAG_DB inherits from Thought
 from altered.data import Data
 # ModelConnect is needed to prompt the Model directly for embeddings
 from altered.model_connect import ModelConnect
 import altered.hlp_printing as hlpp
 
 
-class Memory(Data):
+class RAG_DB(Data):
     """
-    Memory stores content as vectors and retrieves similar content
+    RAG_DB stores content as vectors and retrieves similar content
     based on cosine similarity.
     """
     service_endpoint = 'get_embeddings'
@@ -31,7 +31,7 @@ class Memory(Data):
 
 
     def __init__(self, *args, name:str, **kwargs ):
-        """Initializes the Memory with the given model, setting up storage and server connection.
+        """Initializes the RAG_DB with the given model, setting up storage and server connection.
         Args:
             model (str): The model name for generating embeddings.
         """
@@ -39,17 +39,16 @@ class Memory(Data):
         self.dtype = np.float32
         self.assi = ModelConnect(*args, **kwargs)
         self.setup_storage(*args, **kwargs)
-        self.data.set_index('hash', inplace=True, drop=False)
-
+        self.m_data.set_index('hash', inplace=True, drop=False)
 
     @property
-    def data(self, *args, **kwargs):
+    def m_data(self, *args, **kwargs):
         return getattr(self, self.name)
 
     def setup_storage(self, *args, embedd_size:int=4096, verbose:int=0, **kwargs):
         """
-        Sets up the initial storage for the Memory, including content data and vector embeddings.
-        The Memory utilizes two components for storage: 
+        Sets up the initial storage for the RAG_DB, including content data and vector embeddings.
+        The RAG_DB utilizes two components for storage: 
         - DataFrame (`getattr(self, self.name)`) is the actual DB for the textual data and metadata, and
         - NumPy array (`self.vectors`) is the pointer for the corresponding vector embeddings.
         NOTE: self.vectors dim 1 has two rows: the original vector and its normalized version.
@@ -68,8 +67,8 @@ class Memory(Data):
         normalized = self.normalize(embedding)
         hashified = self.hashify(normalized)
         self.vectors = np.stack((embedding, normalized)).astype(self.dtype)[None, ...]
-        self.data.at[0, 'hash'] = hashified
-        self.data.at[0, 'tools'] = str(self)
+        self.m_data.at[0, 'hash'] = hashified
+        self.m_data.at[0, 'tools'] = str(self)
         if verbose:
             self.explain(self.vectors)
 
@@ -133,7 +132,7 @@ class Memory(Data):
         # we generate a hash to match records from self.vectors agains self.data
         record['name'], record['hash'] = self.name, self.hashify(normalized)
         super().append(record, *args, **kwargs)
-        self.data.set_index('hash', inplace=True, drop=False)
+        self.m_data.set_index('hash', inplace=True, drop=False)
 
     def get(self, query:str, *args, num:int=5, **kwargs):
         start = time.time()
@@ -142,9 +141,9 @@ class Memory(Data):
                                         np.array(self.embedds( query )[0].get('embedding')), 
                                         num,
                                     )
-        # Get the records for num most similar records to the query inside memory
+        # Get the records for num most similar records to the query inside rag_data
         hashes = [self.hashify(self.vectors[ix, 1, :]) for ix in top_num_ixs]
-        nearest = self.data.loc[hashes]
+        nearest = self.m_data.loc[hashes]
         nearest['distances'] = top_num_dists
         return self.get_stats(nearest, query, start, *args, **kwargs )
 
@@ -176,8 +175,6 @@ class Memory(Data):
             else:
                 color = Fore.RED
                 quartil = '75%'
-
-            # z_score is the number of standard deviations from the mean
             self.stats_tbl.append({
                 f"Top {len(records['records'])} RAG results": f"{color}{content}{Fore.RESET}", 
                 f"distance": f"{color}{dists}{Fore.RESET}", 
@@ -260,13 +257,13 @@ class Memory(Data):
         # we save the self.vectors (np.ndarray) to disk using the parents file_path
         npy_load_path = f"{os.path.splitext(data_load_path)[0]}.{self.mem_file_ext}"
         if verbose >= 2: 
-            print(f"{Fore.CYAN}Memory.load_from_disk:{Fore.RESET} {npy_load_path = }")
+            print(f"{Fore.CYAN}RAG_DB.load_from_disk:{Fore.RESET} {npy_load_path = }")
         with open(npy_load_path, 'rb') as f:
             self.vectors = np.load(f)
 
 
     def __str__(self, *args, **kwargs):
-        return f"Memory(name={self.name}, fields=fields_dict, )"
+        return f"RAG_DB(name={self.name}, fields=fields_dict, )"
 
     def explain(self, vectors: np.ndarray, *args, **kwargs):
         """
@@ -286,7 +283,7 @@ class Memory(Data):
             'dtype': vectors.dtype,  # Data type of the elements
             'size': vectors.size,    # Total number of elements
             'itemsize': vectors.itemsize,  # Size of each element in bytes
-            'total_memory_usage (bytes)': vectors.nbytes,  # Total memory usage in bytes
+            'total_memory_usage (bytes)': vectors.nbytes,  # Total rag_data usage in bytes
         }
 
         # Print the explanation in a formatted way

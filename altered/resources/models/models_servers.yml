@@ -125,11 +125,11 @@ servers:
 defaults:
   # default ollama server that comes with ollama
   generate:
-    model: llama3.1
+    model: llama3.1:70b
     server: while-ai_0
   # altered_bytes default server for generate responses
   get_generates:
-    model: llama3.1
+    model: llama3.1:70b
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:
@@ -137,3 +137,4 @@ defaults:
     server: while-ai_1
   service_endpoint: get_embeddings
   keep_alive: 200
+  port: 5555

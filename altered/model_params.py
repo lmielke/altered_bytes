@@ -15,6 +15,8 @@ from colorama import Fore, Style
 
 
 class ModelParams:
+
+
     def __init__(self, *args, **kwargs):
         self.config = self._load_model_configs(*args, **kwargs)
         self.aliasses = self.config.get('aliasses', {})
@@ -105,13 +107,15 @@ class ModelParams:
                     Then the combined alias for model/server would be l31:8b_0 and l31:8b_1.
         """
         # gpt´s can be delivered with any server_alias, it will always be oai
-        if alias is None and service_endpoint is None:
-            raise ValueError(f"{Fore.RED}Alias or service_endpoint must be specified{Fore.RESET}")
+        # if alias is None and service_endpoint is None:
+        #     raise ValueError(f"{Fore.RED}Alias or service_endpoint must be specified{Fore.RESET}")
         model_name, server_name = None, None
+        if (alias is None) and (service_endpoint is None):
+            service_endpoint = self.defaults.get('service_endpoint')
         if alias is None:
             model_alias, server_alias = None, None
-            model_name = self.defaults.get(service_endpoint, {})['model']
-            server_name = self.defaults.get(service_endpoint, {})['server']
+            model_name = self.defaults.get(service_endpoint)['model']
+            server_name = self.defaults.get(service_endpoint)['server']
             # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
         elif type(alias) == tuple:
@@ -150,7 +154,6 @@ class ModelParams:
         server params.
         """
         model_name, server_name = self.unpack_alias(*args, **kwargs)
-
         model_file = self.models.get(model_name)
         if server_name == 'openAI' or server_name is None:
             api_key = self.get_api_key()

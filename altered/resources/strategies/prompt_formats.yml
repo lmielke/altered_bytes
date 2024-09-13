@@ -1,48 +1,51 @@
 # prompt_formats.yml
 # The following are the default templates for the different response formats
 # json responses
-json_response_prefix: >
-    Please respond in JSON using the structure and format provided below.
-json_response_template_intro: >
-    The following is a simple JSON example for a LLM response. For clarity,
-    comments have been added between the lines. All lines must be provided as a single JSON.
-    Example:
-json_response_default_template: >
-    Example: Question: Why is the night sky black? 
+json:
+    prefix: >
+        Please respond in JSON using the structure and format provided below.
+    template_intro: >
+        The following is a simple JSON example for a LLM response. For clarity,
+        comments have been added between the lines. All lines must be provided as a single JSON.
+        Example:
+    default_template: >
+        Example: Question: Why is the night sky black? 
             {
                 # The answer field contains the resonse to this propmts instructions.
                 "answer": "The reason for this is that the Earth's atmosphere scatters and absorbs some of the light from the stars ...", 
                 # This field provides one or more sources to support your answer.
                 "sources": "https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html"
             }
-json_response_postfix: >
-   Provide only the JSON object with no surrounding text!
+    postfix: >
+        Provide only the JSON object with no surrounding text!
 # yaml responses
-yaml_response_prefix: >
-    Please respond in YAML using the structure and format provided below.
-yaml_response_template_intro: >
-    The following is a simple YAML example for a LLM response. For clarity,
-    comments have been added between the lines. All lines must be provided as a single YAML.
-    Example:
-yaml_response_default_template: >
-    Example: Question: Why is the night sky black? 
+yaml:
+    prefix: >
+        Please respond in YAML using the structure and format provided below.
+    template_intro: >
+        The following is a simple YAML example for a LLM response. For clarity,
+        comments have been added between the lines. All lines must be provided as a single YAML.
+        Example:
+    default_template: >
+        Example: Question: Why is the night sky black? 
             # The answer field contains the resonse to this propmts instructions.
             answer: The reason for this is that the Earth's atmosphere scatters and absorbs some of the light from the stars ...
             # This field provides one or more sources to support your answer.
             sources: 
                 - https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html
                 - ...
-yaml_response_postfix: >
-   Provide only the YAML string with no surrounding text!
+    postfix: >
+        Provide only the YAML string with no surrounding text!
 # markdonw responses
-markdown_response_prefix: >
-    Please respond in markdown using the structure and format provided below.
-markdown_response_template_intro: >
-    The following is a simple markdown example for a LLM response. For clarity,
-    comments have been added between the lines. All lines must be provided as a single markdown.
+markdown:
+    prefix: >
+        Please respond in markdown using the structure and format provided below.
+    template_intro: >
+        The following is a simple markdown example for a LLM response. For clarity,
+        comments have been added between the lines. All lines must be provided as a single markdown.
     Example:
-markdown_response_default_template: >
-    Example: Question: Why is the night sky black? 
+    default_template: >
+        Example: Question: Why is the night sky black? 
             # Title of your answer
             ## Reasons why the sky is black at night
             The reason for this is that 
@@ -51,5 +54,21 @@ markdown_response_default_template: >
             -  ... 
             ## Sources
             [Source](https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html, ...)
-markdown_response_postfix: >
-   Provide your entire answer in markdown text.
+    postfix: >
+        Provide your entire answer in markdown text.
+# plain text
+plain:
+    prefix: >
+        Please respond in unformatted plain text.
+    template_intro: >
+        The following is a simple plain text answer example for a LLM response. Do NOT use introducory 
+        words, do NOT comment on the prompt.
+    default_template: >
+        Example: Question: Why is the night sky black? 
+            The night sky is black primarily due to a combination of factors related to 
+            the nature of light, the structure of the universe, and human perception. 
+            The explanation is most commonly addressed by ...
+            You can find more information about this topic under the following link.
+            https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html, ...
+    postfix: >
+        Provide your entire answer in plain text. Do not add any closing comments!

@@ -1,0 +1,4 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_thought,,,user,,,,data.show(),,,2024-09-13 16:47:14.781422
+ut_thought,"Hello, Who are you?",next line,user,,,,,,llama3.1,2024-09-13 16:47:15.594032
+ut_thought,"Hello, Who are you?",next line,assistant,,,,,,llama3.1,2024-09-13 16:47:15.609578

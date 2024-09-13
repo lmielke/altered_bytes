@@ -1,0 +1,59 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+test_deepthought,,,user,,,,"Memory(name=test_deepthought, fields=fields_dict, )",7deb47482161c66b,,2024-09-12 16:58:06.017027
+test_deepthought,How can I monitor my nvidia GPU performance on Windows 10 using powershell?,,user,,,,,301eb94d942412e4,,2024-09-12 16:58:23.555614
+test_deepthought,"
+{
+    ""answer"": ""You can monitor your NVIDIA GPU performance on Windows 10 using
+PowerShell by utilizing the NVIDIA Management Library (NVML) and the Get-NvGpu
+cmdlet. First, ensure you have the NVIDIA drivers installed and the NVML library
+is available. Then, use the following command to retrieve information about your
+GPU: Get-NvGpu | Select-Object -ExpandProperty GpuInfo. This will provide
+details such as GPU name, memory usage, temperature, and more."",
+    ""sources"": ""https://developer.nvidia.com/nvidia-management-library-nvml""
+}","
+
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given
+quesiton, or to solve a problem.
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Contains relevant context information to
+better understand the problem.
+2. User Prompt '<user_prompt>': The recent user message coming from the
+underlying discussion.
+3. Instructions '<INST>': Immediate instructions for the LLM to follow now.
+
+
+<context>
+# Context Information
+Please find attached some context information possibly relevant for this prompt.
+</context>
+
+<user_prompt>
+How can I monitor my nvidia GPU performance on Windows 10 using powershell?
+</user_prompt>
+
+<INST>
+You are a helpful assistant!
+# Your task
+You have been provided with a <user_prompt> ...some text... </user_prompt>.
+Answer the <user_prompt> directly.  Refrain from making conversational or
+introductory comments! Refrain from commenting on the prompt or these
+instructions! Start your answer with: Answer: ...
+
+# Fmts
+Please respond in JSON using the structure and format provided below.
+Example: Question: Why is the night sky black? 
+        {
+            # The answer field contains the resonse to this propmts
+instructions.
+            ""answer"": ""The reason for this is that the Earth's atmosphere
+scatters and absorbs some of the light from the stars ..."",
+            # This field provides one or more sources to support your answer.
+            ""sources"":
+""https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question52.html""
+        }
+Provide only the JSON object with no surrounding text!
+
+</INST>
+
+",assistant,,,,,31199f51fbe417cd,llama3.1:70b,2024-09-12 16:58:23.821180

@@ -10,10 +10,14 @@ context:
   rag_selection:
     os_infos: Windows 10
     project_infos: altered_bytes infos
-  infos: This is Unittest.
+  unittest info: This is test_renderer.
 # a single string containing the last user interaction
 user_prompt: Why is the sky blue?
 # a dictionary with instructions where key is header and value is text
 instruct:
   assi_role: You are a helpful assistant.
   instruct: Please provide an answer to the user's question.
+  prompt_aggregations: >
+      Provide a comprehensive summary that captures the summary of all ideas
+      provided by all input responses, include all aspects regardless of their relevance.\n
+      Only leave out aspects that are obviously completely irrelevant. 

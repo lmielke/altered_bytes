@@ -1,0 +1,130 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_thought,,,user,,,,data.show(),,,2024-09-12 15:03:34.207018
+ut_thought,"Hello, Who are you?",,user,,,,,,,2024-09-12 15:03:38.300782
+ut_thought,"
+
+{""user_prompt"": ""Hello, Who are you?"", ""answer"": ""I am a helpful assistant. How
+can I help you today?""}","
+
+
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given
+quesiton, or to solve a problem.
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Contains relevant context information to
+better understand the problem.
+2. User Prompt '<user_prompt>': The recent user message coming from the
+underlying discussion.
+3. Instructions '<INST>': Immediate instructions for the LLM to follow now.
+
+
+<context>
+# Context Information
+Please find attached some context information possibly relevant for this prompt.
+</context>
+
+<user_prompt>
+Hello, Who are you?
+</user_prompt>
+
+<INST>
+You are a helpful assistant!
+# Your task
+You have been provided with a <user_prompt> ...some text... </user_prompt>.
+Answer the <user_prompt> directly.  Please refrain from making conversational
+comments, unless they provide relevant context.  Still, do not hold back when
+you have something meaningful to say!
+
+# Fmts
+Please respond in JSON using the structure and format provided below.
+The following is a simple JSON example for a LLM response. For clarity, comments
+have been added between the lines. All lines must be provided as a single JSON.
+Example:
+# The provided question/answer yml example string contains 2 fields
+(user_prompt, answer).
+
+# meta: {""name"": ""user_prompt"", ""type"": ""string"", ""default"": """", ""example"":
+""Hello, Who are you?""}
+# user_prompt contains the question/problem statement that founds/initiates the
+thought/chat
+{""user_prompt"": ""Hello, Who are you?""},
+
+# meta: {""name"": ""answer"", ""type"": ""string"", ""default"": """", ""example"": ""I am a
+helpful assistant. How can I help you today?""}
+# The answer field contains the model response
+{""answer"": ""I am a helpful assistant. How can I help you today?""},
+
+
+Provide only the JSON object with no surrounding text!
+
+</INST>
+
+",assistant,,,,,,llama3.1,2024-09-12 15:03:38.300782
+ut_thought,Why is the sky blue?,,user,,,,,,,2024-09-12 15:03:48.222666
+ut_thought,"
+{""user_prompt"": ""Why is the sky blue?"", ""answer"": ""The sky appears blue because
+of a phenomenon called scattering, where shorter (blue) wavelengths of light are
+scattered more than longer (red) wavelengths by the atmosphere and other
+particles, giving the sky its blue color.""}","
+
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given
+quesiton, or to solve a problem.
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Contains relevant context information to
+better understand the problem.
+2. User Prompt '<user_prompt>': The recent user message coming from the
+underlying discussion.
+3. Instructions '<INST>': Immediate instructions for the LLM to follow now.
+
+
+<context>
+# Context Information
+Please find attached some context information possibly relevant for this prompt.
+## Chat History
+This is what was discussed so far.
+1. user: Hello, Who are you?
+2. assistant: 
+{""user_prompt"": ""Hello, Who are you?"", ""answer"": ""I am a helpful assistant. How
+can I help you today?""}
+The recent chat question will be provided as <user_prompt> further below in this
+prompt.
+</context>
+
+<user_prompt>
+Why is the sky blue?
+</user_prompt>
+
+<INST>
+You are a helpful assistant!
+# Your task
+You have been provided with a <user_prompt> ...some text... </user_prompt>.
+Answer the <user_prompt> directly.  Please refrain from making conversational
+comments, unless they provide relevant context.  Still, do not hold back when
+you have something meaningful to say!
+
+# Fmts
+Please respond in JSON using the structure and format provided below.
+The following is a simple JSON example for a LLM response. For clarity, comments
+have been added between the lines. All lines must be provided as a single JSON.
+Example:
+# The provided question/answer yml example string contains 2 fields
+(user_prompt, answer).
+
+# meta: {""name"": ""user_prompt"", ""type"": ""string"", ""default"": """", ""example"":
+""Hello, Who are you?""}
+# user_prompt contains the question/problem statement that founds/initiates the
+thought/chat
+{""user_prompt"": ""Hello, Who are you?""},
+
+# meta: {""name"": ""answer"", ""type"": ""string"", ""default"": """", ""example"": ""I am a
+helpful assistant. How can I help you today?""}
+# The answer field contains the model response
+{""answer"": ""I am a helpful assistant. How can I help you today?""},
+
+
+Provide only the JSON object with no surrounding text!
+
+</INST>
+
+",assistant,,,,,,llama3.1,2024-09-12 15:03:48.238200

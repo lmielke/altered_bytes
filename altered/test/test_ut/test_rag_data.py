@@ -1,4 +1,4 @@
-# test_memory.py
+# test_rag_data.py
 
 import os, re, shutil, sys, time, yaml
 import unittest
@@ -7,7 +7,7 @@ import unittest
 import altered.settings as sts
 from colorama import Fore, Style
 
-from altered.memory import Memory
+from altered.rag_data import RAG_DB
 
 class Test_Memory(unittest.TestCase):
     
@@ -18,7 +18,7 @@ class Test_Memory(unittest.TestCase):
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.name = 'Unittest_Test_Memory'
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
-        cls.memory = Memory(
+        cls.rag_data = RAG_DB(
                                 name=cls.name,
                                 fields=cls.test_data,
                                 data_dir=os.path.join(sts.test_data_dir, cls.name),
@@ -36,8 +36,8 @@ class Test_Memory(unittest.TestCase):
             return yaml.safe_load(f)
 
     def test___init__(self, *args, **kwargs):
-        # Test the initialization of the Memory class
-        self.assertEqual(self.memory.name, 'Unittest_Test_Memory')
+        # Test the initialization of the RAG_DB class
+        self.assertEqual(self.rag_data.name, 'Unittest_Test_Memory')
 
     def test_setup_storage(self, *args, **kwargs):
         expected = False
@@ -75,14 +75,14 @@ class Test_Memory(unittest.TestCase):
         self.assertEqual(self.msg, expected)
 
     def test_append(self, *args, **kwargs):
-        content = 'test_memory.Test_Memory.test_append'
-        # append the content at the last postion in the memory table
-        self.memory.append({'role': 'user', 'content': content})
-        last_memory = self.memory.data.loc[self.memory.hashify(self.memory.vectors[-1, 1])]
+        content = 'test_rag_data.Test_Memory.test_append'
+        # append the content at the last postion in the rag_data table
+        self.rag_data.append({'role': 'user', 'content': content})
+        last_memory = self.rag_data.m_data.loc[self.rag_data.hashify(self.rag_data.vectors[-1, 1])]
         self.assertEqual(content, last_memory['content'])
 
     def test_get(self, *args, **kwargs):
-        # Prepare test entries for memory
+        # Prepare test entries for rag_data
         test_contents = [
                             'What is the capital of France?',
                             'How does a plane fly?',
@@ -96,14 +96,14 @@ class Test_Memory(unittest.TestCase):
                             'Why do we dream?',
         ]
         
-        # Add these entries to memory
+        # Add these entries to rag_data
         for entry in test_contents:
-            self.memory.append({'role': 'user', 'content': entry})
-        self.memory.show()
+            self.rag_data.append({'role': 'user', 'content': entry})
+        self.rag_data.show()
         # Query that is nearest to one of the test entries
         query = "Why is the sky blue?"
         # Retrieve similar entries
-        nearests = self.memory.get(query, num=5, verbose=self.verbose)
+        nearests = self.rag_data.get(query, num=5, verbose=self.verbose)
         self.assertEqual(nearests['records'][0]['content'], 'Why is the sky blue?')
 
     def test_save_to_disk(self, *args, **kwargs):
@@ -112,19 +112,19 @@ class Test_Memory(unittest.TestCase):
                             'How does a plane fly?',
                             'Why is the sky blue?',
         ]
-        # Add these entries to memory
+        # Add these entries to rag_data
         for entry in test_contents:
-            self.memory.append({'role': 'user', 'content': entry})
-        self.memory.save_to_disk(max_files=4, verbose=self.verbose)
+            self.rag_data.append({'role': 'user', 'content': entry})
+        self.rag_data.save_to_disk(max_files=4, verbose=self.verbose)
 
     def test_load_from_disk(self, *args, **kwargs):
         time.sleep(2)
-        self.memory.load_from_disk( *args,
+        self.rag_data.load_from_disk( *args,
                                     data_file_name='latest',
                                     verbose=self.verbose,
                                     **kwargs,
                                     )
-        self.memory.show()
+        self.rag_data.show()
 
     def test_get_stats(self, *args, **kwargs):
         expected = False

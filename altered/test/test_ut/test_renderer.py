@@ -34,13 +34,15 @@ class Test_Render(unittest.TestCase):
                             )
 
     def test_render(self, *args, **kwargs):
-        # self.inst.context['context']['chat_history'] = ['msg1', 'msg2', 'msg3']
         rendered = self.inst.render(template_name='prompt.md', verbose=1,)
         print(rendered)
 
     def test_save_rendered(self, *args, **kwargs):
 
-        self.inst.save_rendered(template_name='prompt.md', output_file='unittest.md')
+        self.inst.save_rendered(
+                                    template_name='prompt.md', 
+                                    output_file='test_renderer_Test_Render.md'
+                                    )
 
 if __name__ == "__main__":
     unittest.main()

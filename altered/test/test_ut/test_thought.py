@@ -16,7 +16,7 @@ class Test_Thought(unittest.TestCase):
         cls.verbose = 1
         cls.test_data_dir = os.path.join(sts.resources_dir,)
         cls.test_data_path = os.path.join(cls.test_data_dir, 'kwargs', 'thought__thought_run.yml')
-        cls.testData = cls.mk_test_data(*args, **kwargs)
+        cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
     @classmethod

@@ -4,6 +4,18 @@ aliasses:
   servers:
     oai: openAI
     tst: test_server
+defaults:
+  generate:
+    model: llama3.1:70b
+    server: while-ai_0
+  get_embeddings:
+    model: test_dolphin-llama3:8b-256k
+    server: test_server
+  get_generates:
+    model: llama3.1:70b
+    server: while-ai_0
+  keep_alive: 200
+  service_endpoint: get_embeddings
 models:
   test_dolphin-llama3:8b-256k:
     blob_id: '123456789'

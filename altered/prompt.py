@@ -20,56 +20,91 @@ class Prompt:
         self.instructs = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
         self._data = None
+        self.warnings = {}
 
     def __call__(self, *args, **kwargs):
+        self.context(*args, **kwargs)
+        self.instructs(*args, **kwargs)
         self.mk_prompt(*args, **kwargs)
-        return self.extract_response_content(self.post(*args, **kwargs), *args, **kwargs)
+        self.post(self.update_model_params(*args, **kwargs), *args, **kwargs)
+        return self.extract(*args, **kwargs)
 
     def mk_prompt(self, *args, context:dict={}, **kwargs):
         """
         Constructs the final prompt as to be send to the AI model.
         """
-        self._data = self.renderer.render(*args,
-                    template_name='prompt.md', 
-                    context={   
-                                'prompt_title': 'LLM Prompt',
-                                'context': self.context(*args, context=context, **kwargs).data,
-                                'user_prompt': self.instructs(*args, **kwargs).user_prompt,
-                                'instruct': self.instructs(*args, **kwargs).data,
-                                },
-                    **kwargs,
-                        )
+        self.context = { 'prompt_title': 'LLM Prompt',
+                        'context': self.context.data,
+                        'user_prompt': self.instructs.user_prompt, 
+                        'instruct': self.instructs.data,
+        } 
+        self._data = self.renderer.render(*args, 
+                                                    template_name='prompt.md', 
+                                                    context=self.context, 
+                                                    **kwargs,
+                    )
         # NOTE: to pretty print the prompt, provide a verbose flag >= 2
         hlpp.pretty_prompt(self._data, *args, **kwargs)
 
-    def post(self, *args,   alias:str = None, num_predict:int = None, depth:int=1,
-                            agg_method:str=None, verbose:int = 0, **kwargs,
+    def update_model_params(self, *args, alias:str=None, num_predict:int=None, depth:int=1,
+                            agg_method:str=None, verbose:int=0, **kwargs,
         ):
         # Construct model parameters specific to this Chat (see ModelConnect.get_params())
-        model_params = {
-                            'service_endpoint': 'get_generates',
-                            'alias': alias,
-                            'num_predict': num_predict,
-                            'verbose': verbose,
+        server_params = {
+                    'service_endpoint': 'get_generates',
+                    'alias': alias,
+                    'num_predict': num_predict,
+                    'verbose': verbose,
+                    'agg_method': 'best' if depth != 1 and agg_method is None else agg_method
                         }
-        model_params['agg_method'] = 'best' if depth != 1 and (agg_method is None) \
-                                                                            else agg_method
+        server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
+        return server_params
+        
+    def post(self, server_params:dict, *args, depth:int=1, **kwargs):
         # self._data is the prompt constructed by self.mk_prompt()
         # we post one or multiple user prompts to the AI model (depth == num of prompt reps)
-        return self.assi.post([self._data for _ in range(depth)], *args, **model_params)
+        self.r = Prompt.validate(
+                                    self.assi.post(
+                                                    [self._data for _ in range(depth)], 
+                                                    *args, **server_params,
+                                    ), *args, **kwargs,
+                )
 
-    def extract_response_content(self, r:dict, *args,   depth:int=1, 
-                                                        agg_method:str=None, **kwargs
-        ) -> dict:
+    def extract(self, *args, depth:int=1, agg_method:str=None, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
+        if not self.r.get('results') or type(self.r.get('results')) != list:
+            raise ValueError(f"Error: No valid results returned from the AI model.")
         agg_method = 'best' if depth != 1 and (agg_method is None) else agg_method
-        results = r.get('results')
-        if not results or type(results) != list:
-            raise ValueError(f"Error: No results returned from the AI model.")
-        for i, result in enumerate(results):
+        # we create the output record 
+        record = {
+                        'user_prompt': self.context['user_prompt'], 
+                        'prompt': self._data,
+                        'role': 'assistant',
+                        'model': self.r.get('model'),
+                    }
+        # r might have a single result or mulitple results. We only return a single result.
+        for i, result in enumerate(self.r.get('results')):
             if result.get('agg_method') == agg_method:
-                response = result
-                response['content'] = response.get('response').strip()
-                response['role'] = 'assistant'
-                response['model'] = r.get('model')
-        return response
+                record.update(result)
+                break
+        else:
+            # if we did not find the aggregation result, we take the last result in r
+            # in case there was only a single result, the single result is the last result
+            record = record.update(result)
+        record['content'] = record.get('response').strip()
+        return record
+
+    @staticmethod
+    def validate(r:dict, *args, **kwargs) -> dict:
+        resp_content = r.get('results', [])[0].get('response').strip()
+        if not resp_content:
+            raise ValueError(f"Error: No response content returned from the AI model.")
+        elif '</INST>' in resp_content:
+            # content most likely contains the instruction tag which we remove here
+            resp_content = resp_content.split('</INST>')
+            if len(resp_content) > 2:
+                raise ValueError(f"Error: Multiple Instruction Tags Found")
+            elif len(resp_content) == 2:
+                resp_content = resp_content[-1].strip()
+        r['results'][0]['response'] = resp_content
+        return r
