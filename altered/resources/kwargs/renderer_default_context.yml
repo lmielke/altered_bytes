@@ -1,6 +1,6 @@
 prompt_title: Unittest
 context:
-  chat_history: null
+  history: null
   rag_selection: null
 user_prompt:
   question: null

@@ -3,7 +3,7 @@
 # Context Information
 Please find attached some context information possibly relevant for this prompt.
 
-{%- if context.chat_history %}
+{%- if context.history %}
 {%- include "context_history.md" ignore missing %}
 {%- endif %}
 

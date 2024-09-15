@@ -46,8 +46,8 @@ class Test_Data(unittest.TestCase):
         # Test the creation of the DataFrame with the correct columns
         data = Data(name=self.name, fields=self.test_data)
         data.create_table()
-        self.assertFalse(getattr(data, self.name).empty)
-        self.assertListEqual(list(getattr(data, self.name).columns), list(self.test_data.keys()))
+        self.assertFalse(data.ldf.empty)
+        self.assertListEqual(list(data.ldf.columns), list(self.test_data.keys()))
 
     def test_save_to_disk(self, *args, **kwargs):
         # Test saving the DataFrame to disk
@@ -65,7 +65,7 @@ class Test_Data(unittest.TestCase):
         data.save_to_disk()
         data_file_name = f"{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
         data.load_from_disk(data_file_name=data_file_name)
-        self.assertFalse(getattr(data, self.name).empty)
+        self.assertFalse(data.ldf.empty)
 
     def test_cleanup_data_dir(self, *args, **kwargs):
         # Test cleanup of the data directory
@@ -93,8 +93,59 @@ class Test_Data(unittest.TestCase):
             'timestamp': pd.Timestamp.now()
         }
         data.append(new_record)
-        self.assertIn('new_entry', getattr(data, self.name)['name'].values)
+        self.assertIn('new_entry', data.ldf['name'].values)
         data.show(color=Fore.CYAN)
+
+
+from altered.labeled_data_frame import LabeledDataFrame
+
+class Test_LabeledDataFrame(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        cls.verbose = 0
+        cls.test_data_path = os.path.join(sts.test_data_dir, 'test_labled_data_frame.yml')
+        cls.test_data = cls.mk_test_data(*args, **kwargs)
+        cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
+
+    @classmethod
+    def tearDownClass(cls, *args, **kwargs):
+        pass
+
+    @classmethod
+    def mk_test_data(cls, *args, **kwargs):
+        test_data = None
+        with open(cls.test_data_path, "r") as f:
+            test_data = yaml.safe_load(f)
+        return test_data
+
+    def test__constructor(self, *args, **kwargs):
+        # Create a DataFrame using the fields from the YAML file
+        df_data = {field: [None] for field in self.test_data.keys()}
+        df = LabeledDataFrame(df_data)
+        self.assertIsInstance(df, LabeledDataFrame)
+        self.assertIsInstance(df, pd.DataFrame)
+
+    def test___init__(self, *args, **kwargs):
+        # Test initialization of LabeledDataFrame using fields from the YAML file
+        df_data = {field: [None] for field in self.test_data.keys()}
+        df = LabeledDataFrame(df_data)
+        self.assertEqual(df.shape[1], len(self.test_data))
+        self.assertEqual(set(df.columns), set(self.test_data.keys()))
+
+    def test_add_description(self, *args, **kwargs):
+        # Create a DataFrame using the fields from the YAML file
+        df_data = {field: [None] for field in self.test_data.keys()}
+        df = LabeledDataFrame(df_data)
+
+        # Add descriptions
+        df.fields.add_labels(   name='Unittest',
+                                labels=self.test_data_path, 
+                                description="Test DataFrame"
+                                )
+
+        print(df.fields.describe())
+
+
 
 if __name__ == "__main__":
     unittest.main()

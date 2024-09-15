@@ -1,0 +1,4 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_v_chat,,,user,,,,"VecDB(name=ut_v_chat, fields=fields_dict, )",7863b102080867bb,,2024-09-15 17:29:26.837803
+ut_v_chat,"Hello, Who are you?",next line,user,,,,,3a3133cbc90a0cf6,llama3.1,2024-09-15 17:29:27.869060
+ut_v_chat,"{""user_prompt"": ""Hello, Who are you?"", ""answer"": ""I am a helpful assistant.""}","VecDB(name=ut_v_chat, fields=fields_dict, )",assistant,,,,,41b13b3a2be0c301,llama3.1,2024-09-15 17:29:28.103434

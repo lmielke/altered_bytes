@@ -1,0 +1,4 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_v_chat,,,user,,,,"VecDB(name=ut_v_chat, fields=fields_dict, )",7863b102080867bb,,2024-09-15 17:03:48.956525
+ut_v_chat,,next line,user,,,,,5ce62d187d64629b,llama3.1,2024-09-15 17:03:49.847152
+ut_v_chat,,"VecDB(name=ut_v_chat, fields=fields_dict, )",assistant,,,,,5ce62d187d64629b,llama3.1,2024-09-15 17:03:49.995687

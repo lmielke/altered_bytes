@@ -11,9 +11,9 @@ def cleanup_data_dir(data_dir:str, max_files:int=sts.max_files, exts:set=None, *
         max_files (int): Maximum number of files to keep.
     """
     if verbose:
-        print(  f"\n{Fore.YELLOW}Cleaning up{Fore.RESET} {data_dir} directory. "
-                f"Keeping only the most recent {Fore.YELLOW}{max_files}{Fore.RESET} files "
-                f"removing files with {Fore.YELLOW}{exts}{Fore.RESET} extension."
+        print(  f"\n{Fore.MAGENTA}Cleaning up{Fore.RESET} {data_dir} directory. "
+                f"Keeping only the most recent {Fore.MAGENTA}{max_files}{Fore.RESET} files "
+                f"removing files with {Fore.MAGENTA}{exts}{Fore.RESET} extension."
         )
     all_paths = [os.path.join(data_dir, f) for f in os.listdir(data_dir)]
     if exts is not None:
@@ -22,5 +22,6 @@ def cleanup_data_dir(data_dir:str, max_files:int=sts.max_files, exts:set=None, *
     all_paths.sort(key=os.path.getctime, reverse=True)
     to_remove = all_paths[max_files - 1:]
     for old_file in to_remove:
-        if verbose: print(f"{Fore.RED}Removing: {Fore.RESET} {old_file}")
+        if verbose:
+            print(f"{Fore.YELLOW}Removing: {Fore.RESET} {old_file}")
         os.remove(old_file)

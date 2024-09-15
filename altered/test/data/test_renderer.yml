@@ -2,7 +2,7 @@ prompt_title: Unittest
 # context contains all additional information that is needed to answer the question such as
 # chat history, RAG selection, and other information
 context:
-  chat_history:
+  history:
     - role: user
       content: Hello
     - role: assistant

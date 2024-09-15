@@ -1,0 +1,6 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_chat,,,user,,,,data.show(),,,2024-09-15 17:29:25.448459
+ut_chat,"Hello, Who are you?",next line,user,,,,,,llama3.1,2024-09-15 17:29:26.509684
+ut_chat,"
+{""user_prompt"": ""Hello, Who are you?"", ""answer"": ""I am a LLM. I'm here to assist
+and provide information.""}",<altered.data.Data object at 0x0000024F7E5D51D0>,assistant,,,,,,llama3.1,2024-09-15 17:29:26.509684

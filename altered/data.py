@@ -28,13 +28,14 @@ Related Documents:
 - test data: sts.project_dir/altered/resources/data/data_name/*_fields.yml
 """
 
-import base64, csv, hashlib, json, os, re, shutil, yaml
+import csv, json, os, re, shutil, yaml
 import pandas as pd
-from altered.labeled_data_frame import LabeledDataFrame
+pd.options.display.max_colwidth = 120
 from tabulate import tabulate as tb
 from datetime import datetime as dt
 from typing import List, Dict, Any, Optional
 from colorama import Fore, Style
+
 import altered.settings as sts
 import altered.hlp_directories as hlp_dirs
 import altered.hlp_printing as hlpp
@@ -67,15 +68,12 @@ class Data:
         self.dtypes:Dict[str, Any] = {}
         # the main data object is named like self.name so we can call it like self.[self.name]
         # NOTE: this is a DataFrame constructor inheriting from pd.DataFrame
-        setattr(self, self.name, LabeledDataFrame(columns=[]))
+        self.ldf = LabeledDataFrame(columns=[])
         self.load_from_disk(*args, **kwargs)
         self.load_fields(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
 
-    @property
-    def df(self) -> LabeledDataFrame:
-        return getattr(self, self.name)
 
     def mk_data_dir(self, *args, data_dir:Optional[str]=None, **kwargs) -> str:
         """
@@ -118,11 +116,11 @@ class Data:
         Create an initial DataFrame with the correct column types based on the 'type'
         field in the loaded YAML file.
         """
-        if not getattr(self, self.name).empty:
+        if not self.ldf.empty:
             return
         self.dtypes = {field: properties['type'] for field, properties in self.fields.items()}
         columns = {field: pd.Series(dtype=dtype) for field, dtype in self.dtypes.items()}
-        setattr(self, self.name, LabeledDataFrame(columns).astype(self.dtypes))
+        self.ldf = LabeledDataFrame(columns).astype(self.dtypes)
 
     def add_init_record(self, *args, **kwargs) -> None:
         """
@@ -134,11 +132,11 @@ class Data:
         init_record['timestamp'] = self.time_stamp
         init_record['name'] = self.name
         # we dont use append here for future extentiabilty
-        setattr(self, self.name, LabeledDataFrame([init_record], 
-                        columns=getattr(self, self.name).columns).astype(self.dtypes))
+        self.ldf = LabeledDataFrame([init_record],
+                        columns=self.ldf.columns).astype(self.dtypes)
         # we add labels and descriptions to the DataFrame. This can be used to send 
         # the DataFrame fields to a file or as Field Example to an LLM.
-        self.df.fields.add_labels( name='Default Fields', 
+        self.ldf.fields.add_labels( name='Default Fields', 
                                                     labels=self.fields_path, 
                                                     description="Default Fields",
                                         )
@@ -152,11 +150,11 @@ class Data:
         """
         data_file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.{self.data_file_ext}"
         file_path = os.path.join(self.data_dir, data_file_name)
-        if verbose >= 2: 
-            print(  f"{Fore.YELLOW}Data.save_to_disk: "
+        if verbose >= 1: 
+            print(  f"{Fore.MAGENTA}Data.save_to_disk: "
                             f"Saving {self.name} to:{Fore.RESET} {file_path}"
                             )
-        self.df.to_csv(file_path, index=False)
+        self.ldf.to_csv(file_path, index=False)
         self.cleanup_data_dir(*args, verbose=verbose, **kwargs)
         return file_path
 
@@ -194,7 +192,7 @@ class Data:
                     f"{Fore.CYAN}Data.load_from_disk:{Fore.RESET}"
                     f" {data_file_name = } -> {file_path = }"
                     )
-        setattr(self, self.name, pd.read_csv(file_path).astype(self.dtypes))
+        self.ldf = pd.read_csv(file_path).astype(self.dtypes)
         return file_path
 
     def cleanup_data_dir(self, *args,   max_files:int=sts.max_files,
@@ -224,32 +222,61 @@ class Data:
             record['timestamp'] = dt.now()
         # here we appending the new record to the DataFrame. Because the dtypes are lost
         # Concatenate only if the new record_series is not empty or all-NA
-        setattr(self, self.name,    pd.concat(
+        self.ldf =    pd.concat(
                                     [
-                                        self.df, 
+                                        self.ldf, 
                                         pd.Series(record).to_frame().T.astype(self.dtypes),
                                     ],
                                             ignore_index=True,
                                     )
-        )
 
-    def show(self, *args, color:object=Fore.YELLOW, verbose:int=0, **kwargs) -> None:
+    def show(self, *args, color:object=Fore.CYAN, verbose:int=0, **kwargs) -> None:
         """
         Display the current DataFrame in a tabular format.
         """
-        if getattr(self, self.name).empty:
+        if self.ldf.empty:
             print("No data available.")
             return
         # prep texts for better readabiltiy
-        df = getattr(self, self.name)
+        df = self.ldf
         df['content'] = df['content'].apply(lambda x: hlpp.wrap_text(x))
         df['prompt'] = df['prompt'].apply(lambda x: hlpp.wrap_text(x))
         # this only shows the columns of the df that have at least one value in it
         if verbose:
-            df = getattr(self, self.name).to_dict(orient='records')
+            df = self.ldf.to_dict(orient='records')
         else:
-            df = getattr(self, self.name).dropna(axis=1, how='all').to_dict(orient='records')
+            df = self.ldf.dropna(axis=1, how='all').to_dict(orient='records')
         tbl = tb(df, headers="keys", tablefmt="grid")
         tbl = '\n'.join([f"{color}{l}{Fore.RESET}"if i == 2 else l 
                                                     for i, l in enumerate(tbl.split("\n"))])
         print(tbl)
+
+    def mk_history(self, *args, history:list=[], **kwargs) -> list[dict]:
+        if not self.ldf['content'].empty and (self.ldf['content'].str.len() > 0).any():
+            # we add the chat history for context (check if needed)
+            for i, row in self.ldf.iterrows():
+                if isinstance(row['content'], str):
+                    history.append({'role':row['role'], 'content': row['content']})
+        return {'history': history if history else None}
+
+from altered.yml_parser import YmlParser
+
+class LabeledDataFrame(pd.DataFrame):
+    """
+    Allows to label the df columns with loaded labels from a YAML fields file.
+    labels can be added like:
+    df.fields.add_labels(name='Unittest', labels=fields_path.yml, description="Test DF")
+    Then the labels can be accessed like:
+    df.fields.describe() or simply df.fields()
+    also the output format can be specified like:
+    df.fields.describe(fmt='tbl/json/yml') 
+    """
+    
+    @property
+    def _constructor(self, *args, **kwargs):
+        return LabeledDataFrame
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields = YmlParser(*args, **kwargs)
+        

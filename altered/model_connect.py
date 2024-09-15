@@ -138,7 +138,6 @@ class ModelConnect:
         )
         r.raise_for_status()
         r_dict = r.json()
-        print(f"\n{r_dict = }")
         for i, (field, response) in enumerate(r_dict.copy().items()):
             r_dict['num_results'] = len(r_dict)
         return r_dict

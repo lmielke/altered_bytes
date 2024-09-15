@@ -1,0 +1,4 @@
+name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
+ut_chat,,,user,,,,data.show(),,,2024-09-15 17:00:20.888123
+ut_chat,,next line,user,,,,,,llama3.1,2024-09-15 17:00:21.794537
+ut_chat,,,assistant,,,,,,llama3.1,2024-09-15 17:00:21.810019

@@ -1,3 +1,0 @@
-name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
-ut_thought,,,user,,,,data.show(),,,2024-09-13 16:39:09.924794
-ut_thought,"{""user_prompt"": ""Hello, Who are you?"", ""answer"": ""I am a helpful assistant.""}",,assistant,,,,,,,2024-09-13 16:39:11.190379
