@@ -1,4 +1,0 @@
-name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
-ut_chat,,,user,,,,data.show(),,,2024-09-15 17:06:06.451842
-ut_chat,,next line,user,,,,,,llama3.1,2024-09-15 17:06:07.326940
-ut_chat,,<altered.data.Data object at 0x00000216287A0350>,assistant,,,,,,llama3.1,2024-09-15 17:06:07.342485
