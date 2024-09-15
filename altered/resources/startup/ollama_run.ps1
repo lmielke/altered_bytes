@@ -31,7 +31,7 @@ try {
 
 # Start the Python server script in detached mode using pipenv run
 try {
-    Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "./altered/simple_server.py" -WindowStyle Hidden
+    Start-Process -FilePath "pipenv" -ArgumentList "run", "python", "-m", "altered.pre_ollama_server" -WindowStyle Hidden
     Write-Output "Successfully started the Python server script."
 } catch {
     Write-Output "ERROR: Failed to start the Python server script. Exception: $_"

@@ -241,10 +241,13 @@ class ServiceHTTPServer(HTTPServer):
 def run(server_class=ServiceHTTPServer, handler_class=SimpleHTTPRequestHandler, port=None, 
             *args, **kwargs
     ):
-    server_address = ('', port if port is not None else msts.config.defaults.get('port'))
-    httpd = server_class(server_address, handler_class, *args, **kwargs)
+    print(f"{msts.config.defaults['port'] = }")
+    port = port if port is not None else msts.config.defaults['port']
+    server_address = ('', port)
+    print(f"{server_address = }")
+    httpd = server_class(server_address, handler_class)
     print(f"Starting the HTTP server on port {port}...")
-    httpd.serve_forever(*args, **kwargs)
+    httpd.serve_forever()
 
 
 if __name__ == '__main__':
