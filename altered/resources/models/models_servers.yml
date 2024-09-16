@@ -138,3 +138,7 @@ defaults:
   service_endpoint: get_embeddings
   keep_alive: 200
   port: 5555
+services:
+  google_se:
+    url: https://www.googleapis.com/customsearch/v1
+    key_path: os.environ.get('secrets')/9_secrets/google_search_engine/se_keys.yml

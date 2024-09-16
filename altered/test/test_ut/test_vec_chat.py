@@ -1,18 +1,15 @@
-# test_thoughts.py
-
-import os, re, shutil, sys, time, yaml
+import os
 import unittest
+from colorama import Fore, Style
 
-# test package imports
-import altered.settings as sts
 from altered.yml_parser import YmlParser
-from colorama import Fore
-from altered.thoughts import Chat
-Chat.chats_dir = os.path.join(sts.test_data_dir, 'thoughts')
+import altered.settings as sts
+from altered.chat_vec import VecChat
+VecChat.chats_dir = os.path.join(sts.test_data_dir, 'thoughts')
 
-verbose = 2
+verbose = 1
 
-class Test_Chat(unittest.TestCase):
+class Test_VecChat(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.test_data_dir = os.path.join(sts.resources_dir,)
@@ -32,20 +29,17 @@ class Test_Chat(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        chat = Chat(name='ut_chat')
-        print(chat.data.show())
-        print(f"{chat.data.fields = }")
+        v_chat = VecChat(name='ut_v_chat')
+        print(v_chat.data.show())
+        print(f"{v_chat.data.fields = }")
 
     def test_run(self, *args, **kwargs):
-        chat = Chat(name='ut_chat', verbose=verbose)
+        print(f"{Fore.RED}test_run: {Fore.RESET}{verbose = }")
+        v_chat = VecChat(name='ut_v_chat', verbose=verbose)
         # we use YmlParser here to load the test_data kwargs from a YAML file
         yml = YmlParser()
-        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
+        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run v_chat")
         yml.data['verbose'] = verbose
         yml.data['fmt'] = 'json'
-        chat.run(*args, **yml.data, 
+        v_chat.run(*args, **yml.data, 
                     example=os.path.join(self.test_data_dir, 'strategies', 'simple_answer.yml'))
-
-
-if __name__ == "__main__":
-    unittest.main()

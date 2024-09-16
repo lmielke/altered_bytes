@@ -1,0 +1,33 @@
+# Contains the fields to define the structure of a short-term memory object for WebSearch.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "TestMemory"}
+# The type of the search result.
+name: null
+
+# meta: {"name": "kind", "type": "string", "default": "", "example": "customsearch#result"}
+# The type of the search result.
+kind: null
+
+# meta: {"name": "title", "type": "string", "default": "", "example": "How to Monitor GPU Performance in PowerShell"}
+# The title of the search result page.
+title: null
+
+# meta: {"name": "source", "type": "string", "default": "", "example": "https://example.com/gpu-performance", "mapping_source": "link"}
+# The URL of the search result.
+source: null
+
+# meta: {"name": "displayLink", "type": "string", "default": "", "example": "example.com"}
+# The display link (simplified domain name).
+displayLink: null
+
+# meta: {"name": "snippet", "type": "string", "default": "", "example": "This page explains how to monitor GPU performance..."}
+# A short summary of the content on the page.
+snippet: null
+
+# meta: {"name": "pagemap", "type": "string", "default": "{}", "example": ""}
+# Additional metadata related to the search result, such as images, authors, etc.
+pagemap: null
+
+# meta: {"name": "content", "type": "string", "default": "", "example": "This is the full body content of the page."}
+# The extracted body content from the page.
+content: null

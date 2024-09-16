@@ -25,6 +25,7 @@ class ModelParams:
         self.defaults = self.config.get('defaults', {})
         self.last_update = dt.now().strftime('%Y-%m-%d')
         self.api_key = self.get_api_key(*args, **kwargs)
+        self.services = self.get_services(*args, **kwargs)
         self.update_models_infos(*args, **kwargs)
 
     def get_config_path(self, *args, **kwargs) -> str:
@@ -188,6 +189,16 @@ class ModelParams:
         # Retrieve the key_path for openAI
         key_path = self.servers.get('openAI', {}).get('key_path')
         assert key_path, "Key path not found in servers"
+        key_path = self.unpack_path_alias(key_path, *args, **kwargs)
+        try:
+            with open(key_path, 'r') as file:
+                self.api_key = yaml.safe_load(file).get('key')
+        except FileNotFoundError:
+            print(f"self.api_key loading failed. Continuing with None")
+            self.api_key = None
+        return self.api_key
+
+    def unpack_path_alias(self, key_path:str, *args, **kwargs):
         # key_path may start with a reference to an environment variable
         key_path_elements = key_path.split('/')
         match = re.search(r"os\.environ\.get\('([A-Za-z0-9_]*)'\)", key_path_elements[0])
@@ -200,13 +211,28 @@ class ModelParams:
             print(f"File not found: {key_path}! {Fore.RED}Unable to connect to openAi.{Fore.RESET}")
         if not (key_path.endswith('.yml') or key_path.endswith('.yaml')):
             raise ValueError("The key file must be a YAML file")
-        try:
-            with open(key_path, 'r') as file:
-                self.api_key = yaml.safe_load(file).get('key')
-        except FileNotFoundError:
-            print(f"self.api_key loading failed. Continuing with None")
-            self.api_key = None
-        return self.api_key
+        return key_path
+
+    def get_services(self, *args, **kwargs) -> Dict:
+        """
+        Retrieves the services from the model configuration file.
+
+        Returns:
+            Dict: A dictionary containing the service endpoints.
+        """
+        services = self.config.get('services', {})
+        # some services use parameter files (.yml) for keys in which case they have a key_path
+        # we find those key_path s and replace key_path by the content of the key file.
+        for service, params in services.items():
+            if 'key_path' in params.keys():
+                key_path = self.unpack_path_alias(params['key_path'])
+                print(f"Loading key file: {key_path}")
+
+                if not os.path.isfile(key_path):
+                    raise FileNotFoundError(f"Key file not found: {key_path}")
+                with open(key_path, 'r') as file:
+                    services[service].update(yaml.safe_load(file))
+        return services
 
     def get_model_file(self, url, *args, **kwargs) -> tuple:
         response = requests.get(url)

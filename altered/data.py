@@ -63,7 +63,7 @@ class Data:
         self.name:str = name
         self.time_stamp:dt = dt.now()
         self.data_dir:Optional[str] = self.mk_data_dir(*args, **kwargs)
-        self.fields:Dict[str, Any] = {}
+        self._fields:Dict[str, Any] = {}
         self.record:Dict[str, Any] = {}
         self.dtypes:Dict[str, Any] = {}
         # the main data object is named like self.name so we can call it like self.[self.name]
@@ -73,6 +73,27 @@ class Data:
         self.load_fields(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
+
+    @property
+    def fields(self, *args, **kwargs):
+        # print(f"{Fore.GREEN}Data.Fields:{Fore.RESET} {self._fields.keys() = }")
+        return self._fields
+
+    @property
+    def mfields(self, *args, **kwargs):
+        _mfields = {}
+        for k, vs in self._fields.items():
+            _mfields[vs.get('mapping_source', k)] = vs
+        return _mfields
+
+    def map_fields(self, record:dict, *args, **kwargs):
+        # some records have to be mapped to the table fiels, which is done
+        # using the meta string from the fields.yml file
+        _record = {}
+        for k, vs in self.fields.items():
+            mk = vs.get('mapping_source', k)
+            _record[k] = record[mk]
+        return _record
 
 
     def mk_data_dir(self, *args, data_dir:Optional[str]=None, **kwargs) -> str:
@@ -87,7 +108,6 @@ class Data:
         """
         data_dir = data_dir if data_dir else os.path.join(sts.data_dir, self.name)
         os.makedirs(data_dir, exist_ok=True)
-        print(f"{Fore.CYAN}\nData {self.name = } directory:{Fore.RESET} {data_dir}")
         return data_dir
 
     def load_fields(self, *args, fields_path:Optional[str]=default_fields, **kwargs,
@@ -106,7 +126,7 @@ class Data:
             fields_content = fields_file.read()
             for prop in re.findall(meta_identifier, fields_content):
                 _props = json.loads(prop.strip())
-                self.fields[_props['name']] = _props
+                self._fields[_props['name']] = _props
             fields_file.seek(0)
             self.record = yaml.safe_load(fields_file)
         return self.record
@@ -118,7 +138,7 @@ class Data:
         """
         if not self.ldf.empty:
             return
-        self.dtypes = {field: properties['type'] for field, properties in self.fields.items()}
+        self.dtypes = {field: properties['type'] for field, properties in self._fields.items()}
         columns = {field: pd.Series(dtype=dtype) for field, dtype in self.dtypes.items()}
         self.ldf = LabeledDataFrame(columns).astype(self.dtypes)
 
@@ -127,8 +147,7 @@ class Data:
         Appends the initial record to the DataFrame. This is a meta record that is designed
         to contain information about the DataFrame and its content.
         """
-        
-        init_record = {k: self.record[vs['name']] for k, vs in self.fields.items()}
+        init_record = {k: self.record[vs['name']] for k, vs in self._fields.items()}
         init_record['timestamp'] = self.time_stamp
         init_record['name'] = self.name
         # we dont use append here for future extentiabilty
@@ -136,7 +155,7 @@ class Data:
                         columns=self.ldf.columns).astype(self.dtypes)
         # we add labels and descriptions to the DataFrame. This can be used to send 
         # the DataFrame fields to a file or as Field Example to an LLM.
-        self.ldf.fields.add_labels( name='Default Fields', 
+        self.ldf._fields.add_labels( name='Default Fields', 
                                                     labels=self.fields_path, 
                                                     description="Default Fields",
                                         )
@@ -213,11 +232,13 @@ class Data:
         Args:
             record (Dict[str, Any]): The record to append.
         """
-        for field in record:
-            if field not in self.record:
-                raise ValueError(f"Unknown field: {field}")
-        if set(self.record) - set(record.keys()):
-            raise ValueError(f"Missing fields: {set(self.record) - set(record.keys())}")
+        record = self.map_fields(record, *args, **kwargs)
+        required_keys = set(record.keys())
+        required_keys.add('hash')
+        if set(self.fields) - required_keys:
+            raise ValueError(f"Missing fields: {set(self.fields) - required_keys}\n"
+                            f"{set(self.fields) = } - {required_keys = }")
+        # we add a timestamp to sort records
         if 'timestamp' in self.record:
             record['timestamp'] = dt.now()
         # here we appending the new record to the DataFrame. Because the dtypes are lost
@@ -230,26 +251,45 @@ class Data:
                                             ignore_index=True,
                                     )
 
-    def show(self, *args, color:object=Fore.CYAN, verbose:int=0, **kwargs) -> None:
+    def show(self, *args, color: object = Fore.CYAN, verbose: int = 1, **kwargs) -> None:
         """
         Display the current DataFrame in a tabular format.
         """
-        if self.ldf.empty:
+        # All very long texts must be wrapped
+        df = self.ldf.copy()
+        for column in df.columns:
+            # Ensure column is of string type and has non-null values
+            if df[column].dtype in ['object', 'string']:
+                # Use dropna to ignore missing values when calculating the max length
+                max_len = df[column].dropna().str.len().max()
+
+                # Ensure max_len is not None before comparing it to table_max_chars
+                if pd.notna(max_len) and max_len > sts.table_max_chars:
+                    df[column] = df[column].apply(lambda x: hlpp.wrap_text(x) if pd.notna(x) else x)
+
+        # This only shows the columns of the df that have at least one value in it
+        if df.empty:
             print("No data available.")
             return
-        # prep texts for better readabiltiy
-        df = self.ldf
-        df['content'] = df['content'].apply(lambda x: hlpp.wrap_text(x))
-        df['prompt'] = df['prompt'].apply(lambda x: hlpp.wrap_text(x))
-        # this only shows the columns of the df that have at least one value in it
+        if verbose >= 2:
+            # Handle Categorical columns separately
+            for col in df.select_dtypes(include='category').columns:
+                # Replace missing values in Categorical columns with the first category or an existing category
+                df[col] = df[col].cat.add_categories([""]).fillna("")
+
+            # Replace pd.NA in other columns with an empty string for compatibility with tabulate
+            df = df.fillna(value="")
+            df = df.to_dict(orient='records')
+        elif verbose:
+            df = df.dropna(axis=1, how='all').to_dict(orient='records')
         if verbose:
-            df = self.ldf.to_dict(orient='records')
-        else:
-            df = self.ldf.dropna(axis=1, how='all').to_dict(orient='records')
-        tbl = tb(df, headers="keys", tablefmt="grid")
-        tbl = '\n'.join([f"{color}{l}{Fore.RESET}"if i == 2 else l 
-                                                    for i, l in enumerate(tbl.split("\n"))])
-        print(tbl)
+            tbl = tb(df, headers="keys", tablefmt="grid", showindex=True)
+            # Colorize the table's header
+            tbl = '\n'.join([f"{color}{l}{Fore.RESET}" if i == 2 else l
+                             for i, l in enumerate(tbl.split("\n"))])
+            print(  f"\n{Fore.CYAN}Data.show(){Fore.RESET} with table "
+                    f"{Fore.CYAN}name: {Fore.RESET}{self.name}, "
+                    f"{Fore.CYAN}num_entries: {Fore.RESET}{len(self.ldf)}\n", tbl)
 
     def mk_history(self, *args, history:list=[], **kwargs) -> list[dict]:
         if not self.ldf['content'].empty and (self.ldf['content'].str.len() > 0).any():
@@ -278,5 +318,4 @@ class LabeledDataFrame(pd.DataFrame):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields = YmlParser(*args, **kwargs)
-        
+        self._fields = YmlParser(*args, **kwargs)

@@ -2,6 +2,10 @@
 rag_data.py
 Vector store enhanced Data. Uses Data indirectly via Chat.
 Handles RAG (Retrieval Augmented Generation) data for the agents.
+
+Run like: 
+se = WebSearch(name="TestSearchEngine", *args, **kwargs)
+print(f"ldf: \n{se.data.show()}")
 """
 import hashlib, json, os, re, time
 from tabulate import tabulate as tb
@@ -124,7 +128,7 @@ class VecDB(Data):
                                     ), *args, **kwargs,
                                 )
         # then we add the record to the storage
-        record = {k: record.get(k, None) for k, vs in self.fields.items()}
+        # record = {k: record.get(k, None) for k, vs in self.fields.items()}
         # we generate a hash to match records from self.vectors agains self.data
         record['name'], record['hash'] = self.name, self.hashify(normalized)
         super().append(record, *args, **kwargs)
@@ -191,35 +195,6 @@ class VecDB(Data):
         stats['time'] = f"{time.time() - start:.2f}"
         records = df.to_dict(orient='records')
         return {'records': records, 'stats': stats}
-
-    # def compare(self, query:str, strings:list, n:int=2):
-    #     """
-    #     Takes a query:string and a list of strings and finds the semantically closest
-    #     representation of the query:stirng inside the list of strings and their distances.
-    #     Example:
-    #     strings = ['Why is the sky blue?', 'How do airplanes fly?', 
-    #                 'What is the theory of relativity?', 'Why do we dream?', 
-    #                 'What causes earthquakes?'] 
-    #     query = 'Why is the sky blue?'
-
-    #     call like:
-    #     closest = self.stm.compare(query, strings, 2)
-        
-    #     returns:
-    #     closest: (['Why is the sky blue?', 'How do airplanes fly?'], 
-    #                 array([  0.        , 140.38395918]))
-    #     """
-        
-    #     embeddeds = self.embedds(strings)
-    #     top_nearest, distances = self.find_nearest(
-    #                                                 self.embedds([query]), 
-    #                                                 np.stack((
-    #                                                             embeddeds, 
-    #                                                             self.normalize(embeddeds),
-    #                                                             )),
-    #                                                 n,
-    #                                     )
-    #     return [s for i, s in enumerate(strings) if i in top_nearest], distances
 
     def find_nearest(self, v, n, *args, **kwargs):
         # Calculate cosine similarity: dot product of normalized vectors

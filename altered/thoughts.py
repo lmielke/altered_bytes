@@ -3,6 +3,9 @@ chat.py
 This class orchestrates the communication between the user and the AI assistant.
 It stores and manages the chat history and creates the chat message for the next prompt and
 receives the response from the AI LLM. 
+
+Run like: pipenv run python -m altered.pre_ollama_server
+
 """
 
 import os, re, sys, yaml
@@ -25,10 +28,10 @@ class Chat:
     def __init__(self, name:str, *args, **kwargs):
         # name of the chat can be used to locate/reference the saved chat
         self.name, self.chat_dir = self.get_chat_dir(name, *args, **kwargs)
+        self.assi = ModelConnect(*args, **kwargs)
         # initial user_promt provided by the user
         # prompt constructor for LLM interaction
         self.prompt = Prompt(*args, **kwargs)
-        self.assi = ModelConnect()
         self.response = Response(*args, **kwargs)
         # Data represents the chat data structure, where each line is a chat element
         self.data = Data(*args, name=self.name, data_dir=self.chat_dir, **kwargs)
@@ -92,15 +95,5 @@ class Chat:
     def show(self, *args, verbose:int=0, **kwargs):
         if verbose <=1:
             os.system('cls')
-        self.data.show(*args, **kwargs)
+        self.data.show(*args, verbose=verbose, **kwargs)
 
-
-from altered.data_vectorized import VecDB
-
-class VecChat(Chat):
-    
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Data represents the chat data structure, where each line is a chat element
-        self.data = VecDB(*args, **kwargs)

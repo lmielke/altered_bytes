@@ -4,7 +4,6 @@ prompt.py
 """
 import os
 from colorama import Fore, Style
-from altered.model_connect import ModelConnect
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
@@ -21,7 +20,6 @@ class Prompt:
         self.context = Context(*args, **kwargs)
         self.instructs = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
-        self.assi = ModelConnect()
         self.response = Response(*args, **kwargs)
         self.data = None
         self.warnings = {}
