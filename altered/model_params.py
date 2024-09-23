@@ -211,6 +211,8 @@ class ModelParams:
             print(f"File not found: {key_path}! {Fore.RED}Unable to connect to openAi.{Fore.RESET}")
         if not (key_path.endswith('.yml') or key_path.endswith('.yaml')):
             raise ValueError("The key file must be a YAML file")
+        # expanduser
+        key_path = os.path.expanduser(key_path)
         return key_path
 
     def get_services(self, *args, **kwargs) -> Dict:

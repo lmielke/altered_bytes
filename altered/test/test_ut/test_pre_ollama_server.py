@@ -28,8 +28,8 @@ class Test_Ollama_Server(unittest.TestCase):
         """
         Test the /ping endpoint and validate the 'pong' response.
         """
-        url = f"http://192.168.0.245:{self.server_port}/api/generates"
         url = f"localhost:{self.server_port}"
+        url = f"http://192.168.0.245:{self.server_port}"
         print(url)
         connection = http.client.HTTPConnection(url)
         headers = {"Content-Type": "application/json"}
