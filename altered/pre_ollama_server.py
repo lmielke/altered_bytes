@@ -50,7 +50,8 @@ class Endpoints:
         prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
-        responses.extend(self.agg_resps(ep, prompts, responses, *args, **kwargs)['responses'])
+        responses.extend(self.agg_resps(ep, *args, prompts=prompts, responses=responses,
+                                             **kwargs,)['responses'])
         return {'responses': responses}
 
     def create_repeats(self, prompts:str, repeats:int=1, *args, **kwargs) -> list:

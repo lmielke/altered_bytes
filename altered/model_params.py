@@ -205,6 +205,7 @@ class ModelParams:
         if match:
             key_path_elements[0] = os.environ.get(match.group(1))
             key_path = os.path.join(*key_path_elements)
+            key_path = os.path.expanduser(key_path)
         if not isinstance(key_path, str):
             raise ValueError("key_path must be a string")
         if not os.path.isfile(key_path):
@@ -212,7 +213,6 @@ class ModelParams:
         if not (key_path.endswith('.yml') or key_path.endswith('.yaml')):
             raise ValueError("The key file must be a YAML file")
         # expanduser
-        key_path = os.path.expanduser(key_path)
         return key_path
 
     def get_services(self, *args, **kwargs) -> Dict:
