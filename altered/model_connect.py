@@ -27,7 +27,7 @@ class ModelConnect:
                         }
 
     @staticmethod
-    def random_temp(self, lower:float=None, upper:float=None) -> float:
+    def random_temp(lower:float=None, upper:float=None) -> float:
         if lower is None:
             lower = 0.1
         if upper is None:
