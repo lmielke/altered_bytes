@@ -1,5 +1,5 @@
-
 """
+data.py
 This module defines the Data class, which facilitates the management of structured
 data in a tabular format. The Data class is designed to handle various data-related
 tasks, such as loading and saving data from/to disk, managing fields defined in a
@@ -25,7 +25,7 @@ Modules and Libraries Used:
 
 Related Documents:
 - python -m unittest altered.test.test_ut.test_data
-- test data: sts.project_dir/altered/resources/data/data_name/*_fields.yml
+- test data: sts.project_dir/altered/resources/data/data_name/*columns.yml
 """
 
 import csv, json, os, re, shutil, yaml
@@ -36,12 +36,11 @@ from datetime import datetime as dt
 from typing import List, Dict, Any, Optional
 from colorama import Fore, Style
 
+from altered.yml_parser import YmlParser
 import altered.settings as sts
 import altered.hlp_directories as hlp_dirs
 import altered.hlp_printing as hlpp
 
-default_fields = 'data__data_load_fields_default.yml'
-meta_identifier = r'(?:#\s*meta:\s+)(.*)\n'
 
 
 class Data:
@@ -51,6 +50,13 @@ class Data:
     and adding new records to the table.
     """
     data_file_ext = 'csv'
+    # default_data_dir handles where table data are stored and loaded
+    default_data_dir = os.path.join(sts.resources_dir, 'data')
+    # fields_path is the path to the fields file for the table creator
+    fields_path = os.path.join(default_data_dir, 'data_Data_load_fields_data.yml')
+    # default_fields_path is the path to the fields file for the table creator, if no 
+    # fields_path was provided
+    default_fields_path = os.path.join(default_data_dir, 'data_Data_load_fields_default.yml')
 
     def __init__(self, *args, name:str, **kwargs):
         """
@@ -63,26 +69,30 @@ class Data:
         self.name:str = name
         self.time_stamp:dt = dt.now()
         self.data_dir:Optional[str] = self.mk_data_dir(*args, **kwargs)
-        self._fields:Dict[str, Any] = {}
-        self.record:Dict[str, Any] = {}
         self.dtypes:Dict[str, Any] = {}
-        # the main data object is named like self.name so we can call it like self.[self.name]
-        # NOTE: this is a DataFrame constructor inheriting from pd.DataFrame
-        self.ldf = LabeledDataFrame(columns=[])
-        self.load_from_disk(*args, **kwargs)
         self.load_fields(*args, **kwargs)
+        # NOTE: construct the dataframe with loaded fields
+        self.ldf = pd.DataFrame(columns=[])
+        self.load_from_disk(*args, **kwargs)
+        # self.load_fields(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
-
-    @property
-    def fields(self, *args, **kwargs):
-        # print(f"{Fore.GREEN}Data.Fields:{Fore.RESET} {self._fields.keys() = }")
-        return self._fields
+    
+    def load_fields(self, *args, fields_paths:list=None, u_fields_paths:list=None, **kwargs):
+        # we add fields that come from upstream modules such as timestamp, hash ect.
+        if u_fields_paths:
+            fields_paths = u_fields_paths + [self.fields_path]
+        else:
+            fields_paths = fields_paths if fields_paths else [self.default_fields_path]
+            fields_paths += [self.fields_path]
+        self.fields = YmlParser(*args, fields_paths=fields_paths, **kwargs)
+        self.columns:dict = self.fields.fields['meta']
+        return self.columns
 
     @property
     def mfields(self, *args, **kwargs):
         _mfields = {}
-        for k, vs in self._fields.items():
+        for k, vs in self.columns.items():
             _mfields[vs.get('mapping_source', k)] = vs
         return _mfields
 
@@ -90,9 +100,8 @@ class Data:
         # some records have to be mapped to the table fiels, which is done
         # using the meta string from the fields.yml file
         _record = {}
-        for k, vs in self.fields.items():
-            mk = vs.get('mapping_source', k)
-            _record[k] = record[mk]
+        for k, vs in self.columns.items():
+            _record[k] = record.get(vs.get('mapping_source', k))
         return _record
 
 
@@ -106,30 +115,9 @@ class Data:
         Returns:
             str: Path to the data directory.
         """
-        data_dir = data_dir if data_dir else os.path.join(sts.data_dir, self.name)
+        data_dir = os.path.join(data_dir if data_dir else self.default_data_dir, self.name)
         os.makedirs(data_dir, exist_ok=True)
         return data_dir
-
-    def load_fields(self, *args, fields_path:Optional[str]=default_fields, **kwargs,
-        ) -> Dict[str, Any]:
-        """
-        Load field definitions from a YAML file.
-
-        Args:
-            fields_path (Optional[str]): Path to the fields_path YAML file.
-
-        Returns:
-            Dict[str, Any]: Loaded field definitions.
-        """
-        self.fields_path = os.path.join(sts.data_dir, fields_path)
-        with open(self.fields_path, 'r') as fields_file:
-            fields_content = fields_file.read()
-            for prop in re.findall(meta_identifier, fields_content):
-                _props = json.loads(prop.strip())
-                self._fields[_props['name']] = _props
-            fields_file.seek(0)
-            self.record = yaml.safe_load(fields_file)
-        return self.record
 
     def create_table(self, *args, **kwargs) -> None:
         """
@@ -138,27 +126,23 @@ class Data:
         """
         if not self.ldf.empty:
             return
-        self.dtypes = {field: properties['type'] for field, properties in self._fields.items()}
+        self.dtypes = {field: properties['type'] for field, properties in self.columns.items()}
         columns = {field: pd.Series(dtype=dtype) for field, dtype in self.dtypes.items()}
-        self.ldf = LabeledDataFrame(columns).astype(self.dtypes)
+        self.ldf = pd.DataFrame(columns).astype(self.dtypes)
 
     def add_init_record(self, *args, **kwargs) -> None:
         """
         Appends the initial record to the DataFrame. This is a meta record that is designed
         to contain information about the DataFrame and its content.
         """
-        init_record = {k: self.record[vs['name']] for k, vs in self._fields.items()}
-        init_record['timestamp'] = self.time_stamp
+        init_record = {k: self.fields.data[vs['name']] for k, vs in self.columns.items()}
+        # init_record['timestamp'] = self.time_stamp
         init_record['name'] = self.name
         # we dont use append here for future extentiabilty
-        self.ldf = LabeledDataFrame([init_record],
+        self.ldf = pd.DataFrame([init_record],
                         columns=self.ldf.columns).astype(self.dtypes)
         # we add labels and descriptions to the DataFrame. This can be used to send 
         # the DataFrame fields to a file or as Field Example to an LLM.
-        self.ldf._fields.add_labels( name='Default Fields', 
-                                                    labels=self.fields_path, 
-                                                    description="Default Fields",
-                                        )
 
     def save_to_disk(self, *args, verbose:int=0, **kwargs) -> None:
 
@@ -167,8 +151,10 @@ class Data:
 
         The filename is based on the current timestamp.
         """
+        print(f"{Fore.MAGENTA}Data.save_to_disk: {Fore.RESET}{self.data_dir}")
         data_file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.{self.data_file_ext}"
         file_path = os.path.join(self.data_dir, data_file_name)
+        print(f"{Fore.MAGENTA}Data.save_to_disk: {Fore.RESET}{file_path}")
         if verbose >= 1: 
             print(  f"{Fore.MAGENTA}Data.save_to_disk: "
                             f"Saving {self.name} to:{Fore.RESET} {file_path}"
@@ -225,6 +211,17 @@ class Data:
         """
         hlp_dirs.cleanup_data_dir(self.data_dir, max_files, exts, *args, **kwargs)
 
+    def validate_record(self, record:Dict[str, Any], *args, **kwargs) -> bool:
+        required_keys, columns = set(record), set(self.columns)
+        if columns - required_keys:
+            msg = f"{columns - required_keys}\n{columns = } - {required_keys = }"
+            raise ValueError(f"{Fore.RED}Missing fields:{Fore.RESET} {msg}")
+        if required_keys - columns:
+            msg = f"{required_keys - columns}\n{columns = } - {required_keys = }"
+            raise ValueError(f"{Fore.RED}Unknown fields:{Fore.RESET} {msg}")
+        return True
+
+
     def append(self, record:Dict[str, Any], *args, **kwargs) -> None:
         """
         Append a new record to the DataFrame.
@@ -233,14 +230,9 @@ class Data:
             record (Dict[str, Any]): The record to append.
         """
         record = self.map_fields(record, *args, **kwargs)
-        required_keys = set(record.keys())
-        required_keys.add('hash')
-        if set(self.fields) - required_keys:
-            raise ValueError(f"Missing fields: {set(self.fields) - required_keys}\n"
-                            f"{set(self.fields) = } - {required_keys = }")
-        # we add a timestamp to sort records
-        if 'timestamp' in self.record:
-            record['timestamp'] = dt.now()
+        record['timestamp'] = dt.now()
+        # # we add a timestamp to sort records
+        self.validate_record(record, *args, **kwargs)
         # here we appending the new record to the DataFrame. Because the dtypes are lost
         # Concatenate only if the new record_series is not empty or all-NA
         self.ldf =    pd.concat(
@@ -297,25 +289,6 @@ class Data:
             for i, row in self.ldf.iterrows():
                 if isinstance(row['content'], str):
                     history.append({'role':row['role'], 'content': row['content']})
-        return {'history': history if history else None}
-
-from altered.yml_parser import YmlParser
-
-class LabeledDataFrame(pd.DataFrame):
-    """
-    Allows to label the df columns with loaded labels from a YAML fields file.
-    labels can be added like:
-    df.fields.add_labels(name='Unittest', labels=fields_path.yml, description="Test DF")
-    Then the labels can be accessed like:
-    df.fields.describe() or simply df.fields()
-    also the output format can be specified like:
-    df.fields.describe(fmt='tbl/json/yml') 
-    """
-    
-    @property
-    def _constructor(self, *args, **kwargs):
-        return LabeledDataFrame
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._fields = YmlParser(*args, **kwargs)
+            else:
+                history = None
+        return history

@@ -1,8 +1,0 @@
-prompt_title: Unittest
-context:
-  history: null
-  rag_selection: null
-user_prompt:
-  question: null
-instruct:
-  role: You are a helpful assistant.

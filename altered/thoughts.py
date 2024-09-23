@@ -22,7 +22,8 @@ class Chat:
 
     exit_terms = {'/bye', '/quit'}
     roles = ('user', 'assistant')
-    chats_dir = os.path.join(sts.resources_dir, 'thoughts')
+    # default_data_dir handles where table data are stored and loaded
+    default_chats_dir = os.path.join(sts.resources_dir, 'search')
 
 
     def __init__(self, name:str, *args, **kwargs):
@@ -30,8 +31,10 @@ class Chat:
         self.name, self.chat_dir = self.get_chat_dir(name, *args, **kwargs)
         self.assi = ModelConnect(*args, **kwargs)
         # initial user_promt provided by the user
+        self.running = False
+        self.init_prompt = None
         # prompt constructor for LLM interaction
-        self.prompt = Prompt(*args, **kwargs)
+        self.prompt = Prompt(name, *args, **kwargs)
         self.response = Response(*args, **kwargs)
         # Data represents the chat data structure, where each line is a chat element
         self.data = Data(*args, name=self.name, data_dir=self.chat_dir, **kwargs)
@@ -40,34 +43,37 @@ class Chat:
         # First we create the inital user_promt to run the chat
         # the chat loop starts here
         # self.mk_data_record(running, *args, **kwargs)
-        self.running = True
+        self.prep_chat(*args, **kwargs)
         while self.running:
             self.running = self.next_chat_item(*args, **kwargs)
         # exit uses /bye or /quit
         self.data.save_to_disk(*args, **kwargs)
 
+    def prep_chat(self, *args, user_prompt:str, role:str='user', **kwargs):
+        self.running = True
+        self.init_prompt = {'role': role, 'content': user_prompt}
+
     def get_chat_dir(self, name:str, *args, **kwargs):
         name = re.sub(r'\W+', '_', name.lower())
-        chat_dir = os.path.join(self.chats_dir, name)
-        return name, chat_dir
+        return name, os.path.join(self.default_chats_dir, name)
 
     def next_chat_item(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
-        self.p = self.prompt(*args, context=self.data.mk_history(*args, **kwargs), **kwargs)
+        self.p = self.prompt(*args, context=self.mk_context(*args, **kwargs), **kwargs, )
         # response handles post model cleanup
         self.r = self.response(self.post(*args, **kwargs), *args, **kwargs)
         # we create the next record to update the chat
         for role in self.roles:
             self.data.append(self.mk_data_record(*args, role=role, **kwargs))
         self.show(*args, **kwargs)
-  
+
     def post(self, *args, depth:int=1, **kwargs):
         server_params = self.update_model_params(*args, **kwargs)
         # we post one or multiple user prompts to the AI model (depth == num of prompt reps)
         return self.assi.post([self.p for _ in range(depth)], *args, **server_params, )
 
     def mk_data_record(self, *args, role:str, user_prompt:str, **kwargs):
-        record = {k: self.r.get(k, None) for k, vs in self.data.fields.items()}
+        record = {c: str(self.r.get(c)) for c in self.data.columns}
         record.update({'role': role, 'name': self.name})
         # for role 'user' the prompt is displayed together with the answer/response
         if role == 'user':
@@ -91,6 +97,16 @@ class Chat:
                         }
         server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
         return server_params
+
+    def mk_context(self, *args, **kwargs):
+        context = {}
+        # we add the chat history to the context
+        history = self.data.mk_history(*args, **kwargs)
+        if history:
+            context['context_history'] = history
+        # we add the initial prompt to the context
+        context['init_prompt'] = self.init_prompt
+        return context
 
     def show(self, *args, verbose:int=0, **kwargs):
         if verbose <=1:

@@ -33,15 +33,21 @@ class Test_Ollama_Server(unittest.TestCase):
         print(url)
         connection = http.client.HTTPConnection(url)
         headers = {"Content-Type": "application/json"}
-        endpoint = 'unittest'
         endpoint = 'get_generates'
+        endpoint = 'ping'
+        endpoint = 'unittest'
 
         # Include network_up_time in the POST data
         network_up_time = time.time()
         payload = json.dumps({
                                 'network_up_time': network_up_time,
-                                'strategy': 'prompt_aggregations.max',
-                                'prompts': ['Why is the sky blue?', 'Why not?'],
+                                'strat_templates': ['agg_best'],
+                                'prompts': ['Why is the sky blue?',],
+                                'responses': [
+                                                'Because of Rayleigh scattering.',
+                                                'Because its not red.',
+                                                'I dont know.'
+                                                ],
                                 'keep_alive': 200,
                                 'stream': False,
                                 'model': 'llama3.1',

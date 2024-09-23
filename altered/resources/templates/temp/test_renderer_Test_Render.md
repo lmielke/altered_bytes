@@ -36,13 +36,12 @@ Why is the sky blue?
 
 <INST>
 You are a helpful assistant.
+You have been provided with a <user_prompt> ...some text... </user_prompt>.  Answer the <user_prompt> directly. 
 
-# Instruct
-Please provide an answer to the user's question.
 
 # Prompt_aggregations
 Provide a comprehensive summary that captures the summary of all ideas provided by all input responses, include all aspects regardless of their relevance.
- Only leave out aspects that are obviously completely irrelevant. 
+ Only leave out aspects that are obviously completely irrelevant.
 
 </INST>
 

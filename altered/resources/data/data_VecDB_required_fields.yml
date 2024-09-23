@@ -1,0 +1,9 @@
+# Contains the fields vector store needs to map the data to the vector space.
+
+# meta: {"name": "hash", "type": "string", "default": "", "example": "b45a295a547a0a82"}
+# The type of the search result.
+hash: null
+
+# meta: {"name": "tools", "type": "string", "default": "", "example": ["powershell", "python"]}
+# The type of the search result.
+tools: null

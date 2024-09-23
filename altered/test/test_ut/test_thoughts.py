@@ -15,8 +15,8 @@ verbose = 2
 class Test_Chat(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.test_data_dir = os.path.join(sts.resources_dir,)
-        cls.test_data_path = os.path.join(cls.test_data_dir, 'kwargs', 'thought__thought_run.yml')
+        cls.test_data_dir = sts.resources_dir
+        cls.test_data_path = os.path.join(cls.test_data_dir, 'io', 'thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -39,12 +39,13 @@ class Test_Chat(unittest.TestCase):
     def test_run(self, *args, **kwargs):
         chat = Chat(name='ut_chat', verbose=verbose)
         # we use YmlParser here to load the test_data kwargs from a YAML file
-        yml = YmlParser()
+        print(f"{self.test_data_path = }")
+        yml = YmlParser(fields_paths=[self.test_data_path])
         yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
         yml.data['verbose'] = verbose
         yml.data['fmt'] = 'json'
-        chat.run(*args, **yml.data, 
-                    example=os.path.join(self.test_data_dir, 'strategies', 'simple_answer.yml'))
+        del yml.data['fmt']
+        chat.run(*args, **yml.data)
 
 
 if __name__ == "__main__":

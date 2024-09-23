@@ -9,7 +9,7 @@ class Test_YmlParser(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 0
-        cls.test_data_path = os.path.join(sts.resources_dir, 'kwargs', 'chat_run.yml')
+        cls.test_data_path = os.path.join(sts.resources_dir, 'kwargs', 'strats_out_thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -24,26 +24,27 @@ class Test_YmlParser(unittest.TestCase):
             test_data = yaml.safe_load(f)
         return test_data
 
-    def test__constructor(self, *args, **kwargs):
-        # Create a DataFrame using the fields from the YAML file
-        yml_data = {field: [None] for field in self.test_data.keys()}
-        yml = YmlParser(yml_data)
-        self.assertIsInstance(yml, YmlParser)
-
     def test___init__(self, *args, **kwargs):
         # Test initialization of YmlParser using fields from the YAML file
         yml_data = {field: [None] for field in self.test_data.keys()}
-        yml = YmlParser(yml_data)
+        yml = YmlParser(fields_paths=[self.test_data_path])
 
     def test_add_description(self, *args, **kwargs):
         # Create a DataFrame using the fields from the YAML file
-        yml = YmlParser()
+        yml = YmlParser(fields_paths=[self.test_data_path])
 
         # Add descriptions
-        yml.add_labels(name='Unittest', labels=self.test_data_path, description="Test DataFrame")
+        yml.fields_text = ''
+        yml.load_fields(fields_paths=[self.test_data_path])
+        yml.add_labels(name='Unittest', description="Test DataFrame")
 
         # print(yml.describe(fmt='tbl'))
+        print('\njson')
         print(yml.describe(fmt='json'))
+        print('\nmarkdown')
+        print(yml.describe(fmt='markdown'))
+        print('\nyaml')
+        print(yml.describe(fmt='yaml'))
         print(f"{yml.data = }")
 
 if __name__ == "__main__":

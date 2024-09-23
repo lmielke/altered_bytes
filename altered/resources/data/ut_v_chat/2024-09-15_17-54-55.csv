@@ -1,2 +1,0 @@
-name,content,prompt,role,category,sub_category,source,tools,hash,model,timestamp
-ut_v_chat,,,user,,,,"VecDB(name=ut_v_chat, fields=fields_dict, )",7863b102080867bb,,2024-09-15 17:54:55.045581

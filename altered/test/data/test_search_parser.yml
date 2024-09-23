@@ -1,0 +1,6 @@
+# test_search_parser.yml
+
+urls:
+  - https://stackoverflow.com/questions/231767
+  - https://math.stackexchange.com/questions/733754
+  - https://spaceplace.nasa.gov/blue-sky/en/#:~:text=The%20Short%20Answer%3A,travels%20as%20shorter%2C%20smaller%20waves.ut

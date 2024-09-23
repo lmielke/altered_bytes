@@ -6,16 +6,18 @@ import altered.hlp_printing as hlpp
 import altered.settings as sts
 
 class Render:
-    fields = ['prompt_title', 'context', 'user_prompt', 'instruct']
+    fields = ['prompt_title', 'context', 'user_prompt', 'instructs']
     default_context_path = os.path.join(sts.resources_dir, 'kwargs', 
                                         'renderer_default_context.yml')
 
     def __init__(self, *args, **kwargs):
         self.env = Environment(loader=FileSystemLoader(sts.templates_dir))
-        self.context = self._load_context(*args, **kwargs)
         self.document = None
 
-    def _load_context(self, *args, context_path:str=None, **kwargs):
+    def _load_context(self, *args, context:dict=None, context_path:str=None, **kwargs):
+        msg = f"{Fore.RED}Neither context nor context_path have been provided.{Fore.RESET}"
+        if context is None and context_path is None: raise AttributeError(msg)
+        if context is not None: return context
         context_path = context_path if context_path else self.default_context_path
         try:
             with open(os.path.join(context_path), 'r') as file:
@@ -24,6 +26,7 @@ class Render:
             return {}
 
     def render(self, *args, template_name: str, context: dict=None, verbose:int=0, **kwargs):
+        self.context = self._load_context(*args, context=context, **kwargs)
         template = self.env.get_template(template_name)
         context = context if context else self.context
         if verbose >= 2: hlpp.dict_to_table('Render.render.context', context)

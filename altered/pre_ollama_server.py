@@ -13,51 +13,6 @@ from altered.prompt_instructs import Instructions
 from altered.renderer import Render
 
 
-class PromptStrategies:
-    strategy = 'prompt_aggregations'
-
-    def __init__(self, *args, **kwargs):
-        self.inst = Instructions(*args, **kwargs)
-        self.renderer = Render(*args, **kwargs)
-        self.pr_strategies = self.inst.get_strategy(strategy = self.strategy)
-
-    def load_strategies(self, strategy, *args, **kwargs):
-        """
-        Loads the service parameters from a YAML file. The file is expected to be 
-        located under 'resources/strategies/' relative to the script's directory.
-        """
-        params_dir = os.path.join(os.path.dirname(__file__), 'resources', 'strategies')
-        with open(os.path.join(params_dir, f"{strategy}.yml"), 'r') as file:
-            return yaml.safe_load(file)
-
-    def get_strategy(self, *args, strategy:str=None, **kwargs):
-        if strategy is None: return ''
-        if '.' in strategy:
-            strat_group, strat_name = strategy.split('.')
-        else:
-            strat_group, strat_name = strategy, 'max'
-        return self.pr_strategies.get(strat_group).get(strat_name), strat_name
-
-    def mk_agg_prompt(self, prompts:list, responses:list, *args, fmt:str='plain text', **kwargs) -> dict:
-        """
-        Generates a prompt based on the specified strategy.
-        """
-        strats, strat_name = self.get_strategy(*args, **kwargs)
-        sample_pairs = [
-                            f"Prompt {i+1}: {prompt}\nResponse {i+1}: {resp}"
-                            for i, (prompt, resp) in enumerate(zip(prompts, responses))
-        ]
-        samples_section = "<samples>\n" + "\n\n".join(sample_pairs) + "\n</samples>"
-        new_prompt = (
-                        f"\n## Below are {len(prompts)} samples of an LLM's Response.\n"
-                        f"{samples_section}\n"
-                        f"{' '.join(strats.values())}"
-                        f"\n{fmt}"
-        )
-        context = {'number_of': len(prompts)}
-        return self.renderer.render_from_string(new_prompt, context )
-
-
 class Endpoints:
 
     def __init__(self, *args, **kwargs):
@@ -67,8 +22,10 @@ class Endpoints:
                             }
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
         self.prompt_counter = defaultdict(int)
-        self.pr_strat = PromptStrategies(*args, **kwargs)
         self.olc = Client(host='http://localhost:11434')
+        # used for aggregations of responses
+        self.instructs = Instructions(*args, **kwargs)
+        self.renderer = Render(*args, **kwargs)
 
     def ping(self, *args, server:object, **kwargs) -> dict:
         """
@@ -88,35 +45,46 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
         responses = []
+        prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         responses.extend(self.agg_resps(ep, prompts, responses, *args, **kwargs)['responses'])
         return {'responses': responses}
 
-    def agg_resps(self, ep:str, prompts:list, responses:list, *args, 
-                                                        strategy:str=None, 
+    def create_repeats(self, prompts:str, repeats:int=1, *args, **kwargs) -> list:
+        if len(prompts) == 1 and repeats != 1:
+            return [prompts[0] for _ in range(repeats)]
+        else:
+            return prompts
+
+    def agg_resps(self, ep, *args, prompts:list, responses:list,
+                                                        strat_templates:str=None, 
                                                         **kwargs, ):
         """
         Aggregates muliple responses into a single response using the provided 
         aggregation strategy. Also a std is estimated.
         """
         aggs = []
-        if len(prompts) >= 2 and strategy is not None:
-            for strat in [strategy, f"{self.pr_strat.strategy}.std"]:
-                if strat.endswith('.std'):
-                    kwargs['fmt'] = 'json'
-                # creates the prompt for the aggregation
-                prompt = self.pr_strat.mk_agg_prompt(
-                                                    prompts, 
-                                                    [r.get('response') for r in responses], 
-                                                    *args, 
-                                                    strategy=strat, **kwargs,
-                    )
-                # here we prompt the model again
-                agg = self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs)
-                agg['strategy'] = strat
+        if len(responses) >= 2 and strat_templates is not None:
+            if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
+            for strat in strat_templates:
+                print(f"{Fore.CYAN}{strat}{Style.RESET_ALL}")
+                strats = self.instructs(    *args,
+                                            strat_templates=[strat],
+                                            prompts=prompts,
+                                            responses=responses,
+                                            **kwargs,
+                                        )
+                rendered = self.renderer.render(
+                                            template_name='instructs.md',
+                                            context = {'instructs': strats},
+                                            verbose=2,
+                                            )
+                agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
+                agg = {'rendered': rendered}
+                agg['strat_templates'] = strat_templates
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)
         return {'responses': aggs}
@@ -126,7 +94,8 @@ class Endpoints:
         Generates the JSON response for the /unittest request.
         """
         response = self.ping(*args, **kwargs)
-        response.update(self.pr_strat.get_strategy(*args, **kwargs))
+        # print(f"unittest: {kwargs = }")
+        # response['agg_test'] = self.agg_resps(*args, **kwargs)
         return {'responses': [response]}
 
     def _ollama(self, func:str, prompt:str, *args, **kwargs) -> dict:
@@ -155,6 +124,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
+        print(f"do_POST: {ep, payload = }")
         payload.update(getattr(self.service, ep)(ep, *args, server=self.server, **kwargs))
         # Update response with timing information and other server statistics
         payload.update(self.end_timing(ep, *args, **kwargs))

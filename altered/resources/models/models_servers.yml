@@ -135,7 +135,7 @@ defaults:
   get_embeddings:
     model: llama3.1
     server: while-ai_1
-  service_endpoint: get_embeddings
+  service_endpoint: get_generates
   keep_alive: 200
   port: 5555
 services:

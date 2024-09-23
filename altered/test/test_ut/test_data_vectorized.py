@@ -14,14 +14,16 @@ class Test_VecDB(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
-        cls.test_data_path = os.path.join(sts.test_data_dir, 'test_memory_data_load_fields.yml')
+        cls.test_file_name = 'test_memory_data_load_fields.yml'
+        cls.fields_path = os.path.join(sts.test_data_dir, cls.test_file_name)
+        cls.test_data_path = os.path.join(sts.test_data_dir, cls.test_file_name)
         cls.test_data = cls.mk_test_data(*args, **kwargs)
-        cls.name = 'Unittest_Test_Memory'
+        cls.name = 'UT_Test_VecDB'
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
         cls.d_vec = VecDB(
                                 name=cls.name,
-                                fields=cls.test_data,
-                                data_dir=os.path.join(sts.test_data_dir, cls.name),
+                                u_fields_paths=[cls.fields_path,],
+                                data_dir=sts.test_data_dir,
                                 verbose=cls.verbose,
                                 )
 
@@ -37,7 +39,7 @@ class Test_VecDB(unittest.TestCase):
 
     def test___init__(self, *args, **kwargs):
         # Test the initialization of the VecDB class
-        self.assertEqual(self.d_vec.name, 'Unittest_Test_Memory')
+        self.assertEqual(self.d_vec.name, self.name)
 
     def test_setup_storage(self, *args, **kwargs):
         expected = False
@@ -99,7 +101,7 @@ class Test_VecDB(unittest.TestCase):
         # Add these entries to data_vectorized
         for entry in test_contents:
             self.d_vec.append({'role': 'user', 'content': entry})
-        self.d_vec.show()
+        self.d_vec.show(verbose=2)
         # Query that is nearest to one of the test entries
         query = "Why is the sky blue?"
         # Retrieve similar entries
@@ -124,7 +126,7 @@ class Test_VecDB(unittest.TestCase):
                                     verbose=self.verbose,
                                     **kwargs,
                                     )
-        self.d_vec.show()
+        self.d_vec.show(verbose=2)
 
     def test_get_stats(self, *args, **kwargs):
         expected = False

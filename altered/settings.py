@@ -10,6 +10,10 @@ project_name = os.path.basename(project_dir)
 resources_dir = os.path.join(package_dir, "resources")
 # max number of files to store in the data directory before being deleted
 templates_dir = os.path.join(resources_dir, "templates")
+strats_dir_name = "strats"
+strats_dir = os.path.join(resources_dir, strats_dir_name)
+io_dir_name = "io"
+io_dir = os.path.join(resources_dir, io_dir_name)
 
 test_dir = os.path.join(package_dir, "test")
 test_data_dir = os.path.join(test_dir, "data")
@@ -39,7 +43,7 @@ abrev_dirs = {
                 "chat_logs",
 }
 
-table_max_chars = 80
+table_max_chars = 70
 
 # Task settings
 assembly_ixs = {0: 'low', 1: 'medium', 2: 'moderate', 4: 'high',}

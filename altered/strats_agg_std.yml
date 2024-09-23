@@ -1,0 +1,37 @@
+# strats_agg_std.yml
+# Aggregation strategy for estimating semantic deviation (std) between responses.
+
+# meta: {"name": "prefix", "type": "string", "default": "", "example": "Estimate the semantic deviation..."}
+# announces the strategy
+prefix: >
+    Estimate the semantic deviation between the provided responses (std).
+    STD here is an integer value (from 0 to 3) for the semantic deviation.
+    - 0: No deviation, responses are extremely similar or even identical.
+    - 1: Low deviation, responses are similar but differ in some details. 
+      For example, one answer might go deeper or explain additional aspects.
+    - 2: Moderate deviation, responses differ in several aspects. 
+      Some outliers might even differ in their overall topic.
+    - 3: High deviation, responses are very different, mostly describing
+      different unrelated topics.
+
+# meta: {"name": "default_example", "type": "string", "default": "", "example": ""}
+# contains the basic explanation of the strategy and the instructions
+default_example: >
+    # Question: What is AI?
+
+    # Provided answers
+    1. AI stands for Artificial Intelligence.
+    2. AI is the simulation of human intelligence by machines.
+    3. AI involves machine learning and deep learning.
+
+    # Prompt
+    Estimate the semantic deviation between the answers.
+
+    # Answer
+    {'responses_std': '2', 'reasoning': 'Responses differ in their emphasis on AI aspects.'}
+
+# meta: {"name": "postfix", "type": "string", "default": "", "example": "Respond with a json string..."}
+# contains the basic explanation of the strategy and the instructions
+postfix: >
+    Respond with a json string containing the std value and your reasoning! 
+    Example: {'responses_std': '1', 'reasoning': 'The responses ...'}

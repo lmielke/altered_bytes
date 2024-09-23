@@ -1,6 +1,5 @@
 """
 rag_data.py
-Vector store enhanced Data. Uses Data indirectly via Chat.
 Handles RAG (Retrieval Augmented Generation) data for the agents.
 
 Run like: 
@@ -13,16 +12,14 @@ from typing import Dict, Any, List, Union
 import pandas as pd
 import numpy as np
 from numpy.linalg import norm as np_norm
-
 from colorama import Fore, Style
 
 # needed for semantic chunking and query preparation
-from altered.thoughts import Chat
-# VecDB inherits from Chat
 from altered.data import Data
 # ModelConnect is needed to prompt the Model directly for embeddings
 from altered.model_connect import ModelConnect
 import altered.hlp_printing as hlpp
+import altered.settings as sts
 
 
 class VecDB(Data):
@@ -30,20 +27,36 @@ class VecDB(Data):
     VecDB stores content as vectors and retrieves similar content
     based on cosine similarity.
     """
-    service_endpoint = 'get_embeddings'
     mem_file_ext = 'npy'
+    # default_data_dir handles where table data are stored and loaded
+    default_data_dir = os.path.join(sts.resources_dir, 'vec_db')
+    # vec_fields_path is the path to the fields file for the table creator
+    vec_fields_path = os.path.join(sts.data_dir, "data_VecDB_required_fields.yml")
+    service_endpoint = 'get_embeddings'
 
 
-    def __init__(self, *args, name:str, **kwargs ):
+    def __init__(self, *args, name:str, u_fields_paths:list=[], **kwargs ):
         """Initializes the VecDB with the given model, setting up storage and server connection.
         Args:
             model (str): The model name for generating embeddings.
         """
-        super().__init__(*args, name=name, **kwargs)
+        u_fields_paths = self.load_vec_fields(*args, u_fields_paths=u_fields_paths, **kwargs)
+        super().__init__(*args, name=name, u_fields_paths=u_fields_paths, **kwargs, )
         self.dtype = np.float32
         self.assi = ModelConnect(*args, **kwargs)
         self.setup_storage(*args, **kwargs)
         self.ldf.set_index('hash', inplace=True, drop=False)
+
+    def load_vec_fields(self, *args, fields_paths:list=None, u_fields_paths:list=[], **kwargs):
+        """
+        Loads the fields for the VecDB from the given paths and extends it by
+        whatever fields come from upstram objects such as search_engine.py
+        these fielspaths will be used in Data to load the fields
+        """
+        
+        fields_paths = fields_paths if fields_paths is not None else [self.vec_fields_path]
+        fields_paths.extend(u_fields_paths)
+        return fields_paths
 
     def setup_storage(self, *args, embedd_size:int=4096, verbose:int=0, **kwargs):
         """
@@ -65,9 +78,8 @@ class VecDB(Data):
         # define self.vector
         embedding = np.array(self.embedds(self.name))
         normalized = self.normalize(embedding)
-        hashified = self.hashify(normalized)
         self.vectors = np.stack((embedding, normalized)).astype(self.dtype)[None, ...]
-        self.ldf.at[0, 'hash'] = hashified
+        self.ldf.at[0, 'hash'] = self.hashify(normalized)
         self.ldf.at[0, 'tools'] = str(self)
         if verbose:
             self.explain(self.vectors)

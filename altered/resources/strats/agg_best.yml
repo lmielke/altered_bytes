@@ -1,0 +1,43 @@
+# agg_best.yml
+# Aggregation strategy for best response from mulitple responses.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Best Answer ..."}
+# name of the strategy
+name: Best Answer/Best Text Aggregation
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    This strategy selects the __'best'__ text or answer from a given <sample> of texts. 
+    The task involves identifying the most thorough and well-rounded description
+    for a topic or selecting the best answer to its specific question or problem. 
+    The selected output should have the strongest supporting details and 
+    the most comprehensive coverage of the topic or __'best'__ answer the given problem.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to precede when soliving a task
+example: >
+    Example:
+    Assume the following prompt or statement, "What happens when foxes meet dogs?". 
+    We received the following responses.
+      - "Response 1: The quick brown fox jumps over the lazy dog."
+      - "Response 2: A fox swiftly leaps over a sleeping dog with grace and speed."
+      - "Response 3: The nimble fox hops over a lethargic dog."
+    Expected Output:
+      2: A fox swiftly leaps over a sleeping dog with grace and speed.
+      
+      In our example Text 2 is selected because it provides more detail and a more vivid 
+      description, which __'best'__ explains the interaction between the fox and the dog.
+
+# meta: {"name": "task", "type": "string", "default": "", "example": ""}
+# task to be performed
+task: >
+    Read and understand the following <sample> texts! Read the provided prompts or 
+    re-construct the prompt or problem statement based on the provided responses.
+    Then, based on the propmt or problem statement, select the text that __'best'__ addresses 
+    the inferred problem with detailed and insightful information!
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    From the provided responses select the one, that __'best'__ anwers the prompt !

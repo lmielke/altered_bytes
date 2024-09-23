@@ -8,6 +8,7 @@ from textwrap import wrap as tw
 from tabulate import tabulate as tb
 
 def wrap_text(text:str, *args, max_chars:int=sts.table_max_chars, **kwargs):
+    max_chars = normalize_max_chars(max_chars, text, *args, **kwargs)
     if type(text) == str and len(text) > max_chars:
         wrapped = ''
         for line in text.split('\n'):
@@ -64,7 +65,7 @@ def records_to_table(name:str, records:list, *args, **kwargs):
     colored_table_underline(tb(table, headers=headers), *args, **kwargs)
 
 
-def dict_to_table_v(name:str, d: dict, max_chars: int = 140, *args, **kwargs):
+def dict_to_table_v(name:str, d: dict, *args, **kwargs):
     """
     Prints the dictionary with keys as column headers and values as rows.
     Wraps long text using wrap_text function.
@@ -73,13 +74,13 @@ def dict_to_table_v(name:str, d: dict, max_chars: int = 140, *args, **kwargs):
     row = []  # The row of values
     for key, value in d.items():
         if isinstance(value, str):
-            row.append(wrap_text(value, max_chars=max_chars, *args, **kwargs))
+            row.append(wrap_text(value, *args, **kwargs))
         elif isinstance(value, dict):
             # If the value is another dictionary, format it for display
             row.append(
                 wrap_text(
                     '\n'.join([f"{Fore.CYAN}{k}{Fore.RESET}: {str(v)}" for k, v in value.items()]),
-                    max_chars=max_chars
+                    **kwargs,
                 )
             )
         elif isinstance(value, list):
@@ -87,7 +88,7 @@ def dict_to_table_v(name:str, d: dict, max_chars: int = 140, *args, **kwargs):
             row.append(
                 wrap_text(
                     '\n'.join([str(v) for v in value]),
-                    max_chars=max_chars
+                    **kwargs,
                 )
             )
         else:
@@ -107,3 +108,18 @@ def wrap_table(d:dict, *args, **kwargs):
         elif type(vs) == list:
             tbl_dict[kk] = wrap_text('\n'.join([str(v) for v in vs]))
     return tbl_dict
+
+def normalize_max_chars(max_chars:int, text, *args, **kwargs):
+    """
+    some strings contain very short texts
+    those texts can use a shorter max_chars than longer texts
+    so we re-compute max_chars to result in a minimum of 3 lines
+    """
+    if len(text) <= 50:
+        return max_chars // 4
+    elif len(text) <= 128:
+        return max_chars // 3
+    elif len(text) <= 400:
+        return max_chars // 2
+    else:
+        return int(max_chars * 1.3)

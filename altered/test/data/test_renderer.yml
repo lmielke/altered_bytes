@@ -16,8 +16,13 @@ user_prompt: Why is the sky blue?
 # a dictionary with instructions where key is header and value is text
 instruct:
   assi_role: You are a helpful assistant.
-  instruct: Please provide an answer to the user's question.
+  intro:  >
+    You have been provided with a <user_prompt> ...some text... </user_prompt>. 
+    Answer the <user_prompt> directly. 
   prompt_aggregations: >
       Provide a comprehensive summary that captures the summary of all ideas
       provided by all input responses, include all aspects regardless of their relevance.\n
-      Only leave out aspects that are obviously completely irrelevant. 
+      Only leave out aspects that are obviously completely irrelevant.
+  fmts: 
+    - json
+    - simple_answer.yml

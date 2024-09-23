@@ -1,0 +1,28 @@
+# data__data_load_fields_default.yml
+# Description: Contains the fields to define the structure of a short term memory object.
+
+# meta: {"name": "content", "type": "string", "default": "fields.source", "example": "nvidia-smi."}
+# the main content of the record. This can be text or image data.
+# if no content is provided, the source field must be filled.
+# every record has to contain either a source or a content field.
+content: null
+
+# meta: {"name": "prompt", "type": "string", "default": "", "example": "How do I monitor the performance of my nvidia gpu in powershell?"}
+# The prompt contains the entire prompt sent to the model. Its used for debugging purpose.
+# every record has to contain either a source or a prompt field.
+prompt: null
+
+# meta: {"name": "role", "type": "category", "default": "user", "example": "user"}
+# the main role sender of the record. This can be 'user', 'system', 'assistant'
+role: user
+
+# meta: {"name": "source", "type": "string", "default": "fields.content", "example": "https://stackoverflow.com/questions/68533863/running-nvidia-smi-from-windows-powershell"}
+# source of the content. This can be a URL, file, cmd or sql query.
+# if no source is provided, the content field must be filled.
+# every record has to contain either a source or a content field.
+source: null
+
+# meta: {"name": "model", "type": "category", "default": "llama3.1", "example": "llama3.1"}
+# model used to embedd the content. The query vector must also be embedded 
+# using the same model as the record to be retrieved.
+model: null

@@ -1,0 +1,11 @@
+# strats_out_qa.yml
+# The provided Q&A yml example string contains 2 fields (question, answer).
+
+# meta: {"name": "question", "type": "string", "default": "", "example": "Hello, Who are you?"}
+# question contains the question/problem statement that founds/initiates the thought/chat
+question: \{{ question }}
+
+# meta: {"name": "answer", "type": "string", "default": "", "example": "I am a helpful assistant. How can I help you today?"}
+# The answer field contains the model response
+answer: \{{ answer }}
+

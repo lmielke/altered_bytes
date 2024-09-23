@@ -5,17 +5,17 @@ import unittest
 
 # test package imports
 import altered.settings as sts
-
+from altered.renderer import Render
 from altered.prompt_instructs import Instructions
 
 class Test_Instructions(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.verbose = 0
-        cls.test_data_dir = os.path.join(sts.resources_dir, 'kwargs')
+        cls.verbose = 1
+        # The idea being that there is always an instructs strategy and a output strategy
+        cls.test_templates_names = ['agg_mean', 'qa_simple']
         cls.test_data = cls.mk_test_data(*args, **kwargs)
-        cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
-        cls.inst = Instructions()
+        cls.renderer = Render(*args, **kwargs)
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
@@ -29,64 +29,32 @@ class Test_Instructions(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        self.assertIn('json', self.inst.instructs_fmts.keys())
+        inst = Instructions()
 
-    # def test_user_prompt(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
+    def test___call__(self, *args, **kwargs):
+        instr1 = Instructions()
+        # test is using the qa template
+        strats = instr1(  strat_templates=self.test_templates_names,
+                        fmt='markdown',
+                        user_prompt='Why do horses neigh?',
+                        prompts=[
+                                    'Why is the sky blue?',
+                        ],
+                        responses=[
+                                    'The sky is blue because of Rayleigh scattering.',
+                                    'There are 100 billion stars in the Milky Way galaxy.',
+                                    'Airplanes fly because of Bernoullis...',
+                        ],
+                        )
 
-    # def test_data(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
+        # here we give the output of the __call__ test to renderer to veryfy the correctness
+        rendered = self.renderer.render(
+                                            template_name='instructs.md',
+                                            context = {'instructs': strats},
+                                            verbose=self.verbose,
+                                            )
+        print(f"render result: \n{rendered}")
 
-    # def test_get_user_prompt(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
-
-    def test_create_instruct_dict(self, *args, **kwargs):
-        data = self.inst.create_instruct_dict(   user_prompt='Hello World', 
-                                            instructs='Follow the white rabbit!'
-                )
-        print(f"{self.inst._data = }")
-
-    def test_get_response_template(self, *args, **kwargs):
-        data = self.inst.get_response_template(example=os.path.join(
-                                                                self.test_data_dir, 
-                                                                'thought__thought_run.yml'),
-                                                fmt='json'
-                )
-        print(f"{data = }")
-
-    def test_set_response_format(self, *args, **kwargs):
-        data = self.inst.get_response_template(example=os.path.join(
-                                                                self.test_data_dir, 
-                                                                'thought__thought_run.yml'),
-                                                fmt='json'
-                )
-        self.inst.set_response_format(data, fmt='json')
-        print(f"self.inst._data: {self.inst._data}")
-
-    def test_get_strategy(self, *args, **kwargs):
-        strategy = self.inst.get_strategy(strategy = 'prompt_aggregations')
-        print(f"\n{strategy = }\n")
-        strategy = self.inst.get_strategy(strategy = 'prompt_aggregations.max')
-        print(f"\nmax: {strategy = }\n")
-
-    # def test_load_prompt_params(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
 
 if __name__ == "__main__":
     unittest.main()

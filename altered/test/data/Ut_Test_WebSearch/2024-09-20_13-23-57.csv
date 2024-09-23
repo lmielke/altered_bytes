@@ -1,0 +1,205 @@
+hash,tools,name,kind,title,source,displayLink,snippet,pagemap,content,category,sub_category,timestamp
+b66a90b1862b20c1,"VecDB(name=Ut_Test_WebSearch, fields=fields_dict, )",Ut_Test_WebSearch,,,,,,,,,,
+ba53b2fd6e2af183,,Ut_Test_WebSearch,customsearch#result,GPU Monitor : r/msp,https://www.reddit.com/r/msp/comments/wwtxb8/gpu_monitor/,www.reddit.com,"Aug 25, 2022 ... Any recommendations for software that will centrally monitor GPU usage ... Performance Counters and PowerShell should do it. $GpuMemTotal ...","{'metatags': [{'og:image': 'https://share.redd.it/preview/post/wwtxb8', 'theme-color': '#000000', 'og:image:width': '1200', 'og:type': 'website', 'og:image:alt': 'An image containing a preview of the post', 'twitter:card': 'summary_large_image', 'twitter:title': 'r/msp on Reddit: GPU Monitor', 'og:site_name': 'Reddit', 'og:title': 'r/msp on Reddit: GPU Monitor', 'og:image:height': '630', 'msapplication-navbutton-color': '#000000', 'og:description': 'Posted by u/miketunes - 1 vote and 4 comments', 'twitter:image': 'https://share.redd.it/preview/post/wwtxb8', 'apple-mobile-web-app-status-bar-style': 'black', 'twitter:site': '@reddit', 'viewport': 'width=device-width, initial-scale=1, viewport-fit=cover', 'apple-mobile-web-app-capable': 'yes', 'og:ttl': '600', 'og:url': 'https://www.reddit.com/r/msp/comments/wwtxb8/gpu_monitor/'}], 'cse_image': [{'src': 'https://share.redd.it/preview/post/wwtxb8'}]}","Your request has been blocked due to a network policy.
+Try logging in or creating an account here to get back to browsing.
+If you're running a script or application, please register or sign in with your developer credentials here. Additionally make sure your User-Agent is not empty and is something unique and descriptive and try again. if you're supplying an alternate User-Agent string,
+try changing back to default as that can sometimes result in a block.
+You can read Reddit's Terms of Service here.
+if you think that we've incorrectly blocked you or you would like to discuss
+easier ways to get the data you want, please file a ticket here.
+when contacting us, please include your ip address which is: 95.90.247.106 and reddit account",,,2024-09-20 13:24:02.726425
+9f2c4829f341f7fa,,Ut_Test_WebSearch,customsearch#result,windows 10 - How to get GPU usage and GPU memory info of a ...,https://superuser.com/questions/1632758/how-to-get-gpu-usage-and-gpu-memory-info-of-a-process-by-powershell7,superuser.com,"Mar 12, 2021 ... Windows uses Performance Counters to track this type of thing. You can get the values in powershell via Get-Counter . Depending on your GPU ...","{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSQBHOzmsguX0IovEN9lMOKjERo5ZlVhvmLiG4wZDgVIZleYtLPxRKMxwj&s', 'width': '225', 'height': '225'}], 'qapage': [{'image': 'https://cdn.sstatic.net/Sites/superuser/Img/apple-touch-icon@2.png?v=e869e4459439', 'primaryimageofpage': 'https://cdn.sstatic.net/Sites/superuser/Img/apple-touch-icon@2.png?v=e869e4459439', 'name': 'How to get GPU usage and GPU memory info of a process by powershell7', 'description': ""I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information. In Windows Task Manager, it can show GPU memory. So, is t...""}], 'question': [{'image': 'https://cdn.sstatic.net/Sites/superuser/Img/apple-touch-icon.png?v=0ad5b7a83e49', 'upvotecount': '7', 'commentcount': '5', 'answercount': '1', 'name': 'How to get GPU usage and GPU memory info of a process by powershell7', 'datecreated': '2021-03-12T08:13:37', 'text': ""I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information. In Windows Task Manager, it can show GPU memory...."", 'url': 'Share'}], 'answer': [{'upvotecount': '7', 'commentcount': '1', 'text': 'Windows uses Performance Counters to track this type of thing. You can get the values in powershell via Get-Counter. Depending on your GPU and drivers, you may have more specific counters available...', 'datecreated': '2021-03-12T16:07:45', 'url': 'Share'}], 'person': [{'name': 'bin381'}, {'name': 'bin381'}, {'name': 'Cpt.Whale'}], 'metatags': [{'og:image': 'https://cdn.sstatic.net/Sites/superuser/Img/apple-touch-icon@2.png?v=e869e4459439', 'og:type': 'website', 'twitter:card': 'summary', 'twitter:title': 'How to get GPU usage and GPU memory info of a process by powershell7', 'og:site_name': 'Super User', 'twitter:domain': 'superuser.com', 'viewport': 'width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0', 'twitter:description': ""I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information.\nIn Windows Task Manager, it can show GPU memory.\nSo, is t..."", 'og:url': 'https://superuser.com/questions/1632758/how-to-get-gpu-usage-and-gpu-memory-info-of-a-process-by-powershell7'}], 'cse_image': [{'src': 'https://cdn.sstatic.net/Sites/superuser/Img/apple-touch-icon@2.png?v=e869e4459439'}]}","
+
+						Stack Exchange network consists of 183 Q&A communities including Stack Overflow, the largest, most trusted online community for developers to learn, share their knowledge, and build their careers.
+					
+
+Now available on Stack Overflow for Teams! AI features where you work: search, IDE, and chat.
+        
+
+            Ask questions, find answers and collaborate at work with Stack Overflow for Teams.
+            Explore Teams
+
+Teams
+Q&A for work
+Connect and share knowledge within a single location that is structured and easy to search.
+I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information.
+In Windows Task Manager, it can show GPU memory.
+So, is there a way to get those in powershell
+Windows uses Performance Counters to track this type of thing. You can get the values in powershell via Get-Counter. Depending on your GPU and drivers, you may have more specific counters available, but these examples should always be available:
+I found these counter names by running Get-Counter -ListSet 'GPU*', and taking the Counter values from there. It looks like GPU engine usage is broken down into 4 types:
+I'm just summing engtype_3D in the example, since it is the only one with usage on my system. These values all match up with what displays in windows Task Manager, so it should be accurate enough.
+To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+
+Site design / logo © 2024 Stack Exchange Inc; 
+user contributions licensed under 
+CC BY-SA
+. 
+rev 2024.9.18.15452
+
+Use precise geolocation data. Actively scan device characteristics for identification. Understand audiences through statistics or combinations of data from different sources. Store and/or access information on a device. Develop and improve services. Create profiles to personalise content. Measure content performance. Use limited data to select content. Measure advertising performance. Use limited data to select advertising. Create profiles for personalised advertising. Use profiles to select personalised advertising. Use profiles to select personalised content. 
+        List of Partners (vendors)
+        
+Get-Process
+Get-CimInstance Win32_Process
+Get-WmiObject Win32_VideoController
+Get-Counter
+# Example to get GPU usage counters for a specific process:
+$p = Get-Process dwm
+((Get-Counter ""\GPU Process Memory(pid_$($p.id)*)\Local Usage"").CounterSamples | where CookedValue).CookedValue | 
+    foreach {Write-Output ""Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB""}
+((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |
+    foreach {Write-Output ""Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%""}
+
+# Outputs:
+Process dwm GPU Process Memory 259.36 MB
+Process dwm GPU Engine Usage 0.47%
+
+
+# Example to get total GPU usage counters:
+$GpuMemTotal = (((Get-Counter ""\GPU Process Memory(*)\Local Usage"").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+    Write-Output ""Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB""
+$GpuUseTotal = (((Get-Counter ""\GPU Engine(*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+    Write-Output ""Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%""
+
+# Outputs:
+Total GPU Process Memory Local Usage: 511.36 MB
+Total GPU Engine Usage: 0.77%
+
+# Example to get GPU usage counters for a specific process:
+$p = Get-Process dwm
+((Get-Counter ""\GPU Process Memory(pid_$($p.id)*)\Local Usage"").CounterSamples | where CookedValue).CookedValue | 
+    foreach {Write-Output ""Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB""}
+((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |
+    foreach {Write-Output ""Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%""}
+
+# Outputs:
+Process dwm GPU Process Memory 259.36 MB
+Process dwm GPU Engine Usage 0.47%
+
+
+# Example to get total GPU usage counters:
+$GpuMemTotal = (((Get-Counter ""\GPU Process Memory(*)\Local Usage"").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+    Write-Output ""Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB""
+$GpuUseTotal = (((Get-Counter ""\GPU Engine(*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+    Write-Output ""Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%""
+
+# Outputs:
+Total GPU Process Memory Local Usage: 511.36 MB
+Total GPU Engine Usage: 0.77%
+
+Get-Counter -ListSet 'GPU*'
+Counter
+engtype_3D
+engtype_VideoDecode
+engtype_Copy
+engtype_VideoProcessing
+
+engtype_3D
+engtype_VideoDecode
+engtype_Copy
+engtype_VideoProcessing
+
+engtype_3D
+Get-Counter
+Get-Counter",,,2024-09-20 13:24:04.100359
+1eec022a847d8d7c,,Ut_Test_WebSearch,customsearch#result,powershell - Run power shell command to pickup GPU usage by ...,https://stackoverflow.com/questions/69969284/run-power-shell-command-to-pickup-gpu-usage-by-process-on-c-sharp,stackoverflow.com,"Nov 15, 2021 ... Here the full code to pickup the GPU usage from your app or any process, put inside a timer fire this every one second.","{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYl7zuT3cw_BBRAyhdQEbQuBgqdNHXKHIYKL8S8ly8x9L_XA9sdwSmiHs&s', 'width': '225', 'height': '225'}], 'qapage': [{'image': 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded', 'primaryimageofpage': 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded', 'name': 'Run power shell command to pickup GPU usage by process on c#', 'description': 'I try to pickup GPU usage of my c# app but there is no way i can doit and make that wrk with NVDIA, AMD, or Intel. Trough powershell is possible to obtain that info, example: $p = Get-Process My...'}], 'question': [{'image': 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png?v=c78bd457575a', 'upvotecount': '1', 'commentcount': '6', 'answercount': '1', 'name': 'Run power shell command to pickup GPU usage by process on c#', 'datecreated': '2021-11-15T03:49:25', 'text': 'I try to pickup GPU usage of my c# app but there is no way i can doit and make that wrk with NVDIA, AMD, or Intel. Trough powershell is possible to obtain that info, example: $p = Get-Process...', 'url': 'Share'}], 'answer': [{'upvotecount': '0', 'text': 'Here the full code to pickup the GPU usage from your app or any process, put inside a timer fire this every one second. Work with Intel, Nvidia, AMD. System.Windows.Threading.DispatcherTimer...', 'datecreated': '2021-11-22T06:43:35', 'url': 'Share'}], 'person': [{'name': 'MrBi'}, {'name': 'MrBi'}], 'metatags': [{'og:image': 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded', 'og:type': 'website', 'twitter:card': 'summary', 'twitter:title': 'Run power shell command to pickup GPU usage by process on c#', 'og:site_name': 'Stack Overflow', 'twitter:domain': 'stackoverflow.com', 'viewport': 'width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0', 'twitter:description': 'I try to pickup GPU usage of my c# app but there is no way i can doit and make that wrk with NVDIA, AMD, or Intel.\nTrough powershell is possible to obtain that info, example:\n   $p = Get-Process My...', 'og:url': 'https://stackoverflow.com/questions/69969284/run-power-shell-command-to-pickup-gpu-usage-by-process-on-c-sharp'}], 'cse_image': [{'src': 'https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded'}]}","
+
+                                        Communities for your favorite technologies.  Explore all Collectives
+
+
+Now available on Stack Overflow for Teams! AI features where you work: search, IDE, and chat.
+        
+
+            Ask questions, find answers and collaborate at work with Stack Overflow for Teams.
+            Explore Teams
+
+Find centralized, trusted content and collaborate around the technologies you use most.
+Teams
+Q&A for work
+Connect and share knowledge within a single location that is structured and easy to search.
+Get early access and see previews of new features.
+I try to pickup GPU usage of my c# app but there is no way i can doit and make that wrk with NVDIA, AMD, or Intel.
+Trough powershell is possible to obtain that info, example:
+This show the gpu usage and work like a charm on any graphic card.
+How can pickup in asyncronous way the result?
+Of curse async in order not create blocking thread.
+Here the full code to pickup the GPU usage from your app or any process, put inside a timer fire this every one second. Work with Intel, Nvidia, AMD.
+The script gpu.ps:
+Script for global gpu , cpu etc, take a lok on:
+https://superuser.com/questions/1632758/how-to-get-gpu-usage-and-gpu-memory-info-of-a-process-by-powershell7
+Reminder: Answers generated by artificial intelligence tools are not allowed on Stack Overflow. Learn more
+Thanks for contributing an answer to Stack Overflow!
+But avoid …
+To learn more, see our tips on writing great answers.
+Required, but never shown
+Required, but never shown
+
+                                                By clicking “Post Your Answer”, you agree to our terms of service and acknowledge you have read our privacy policy.
+
+To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+
+Site design / logo © 2024 Stack Exchange Inc; 
+user contributions licensed under 
+CC BY-SA
+. 
+rev 2024.9.18.15452
+
+Use precise geolocation data. Actively scan device characteristics for identification. Understand audiences through statistics or combinations of data from different sources. Store and/or access information on a device. Develop and improve services. Create profiles to personalise content. Measure content performance. Use limited data to select content. Measure advertising performance. Use limited data to select advertising. Create profiles for personalised advertising. Use profiles to select personalised advertising. Use profiles to select personalised content. 
+        List of Partners (vendors)
+        
+   $p = Get-Process MyAPP; ((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |foreach {Write-Output ""$([math]::Round($_,1))%""}
+
+   $p = Get-Process MyAPP; ((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |foreach {Write-Output ""$([math]::Round($_,1))%""}
+
+  PowerShell ps = PowerShell.Create();
+  ps.AddScript(System.IO.File.ReadAllText(@""e:\gpu.ps""));  //the script.
+  var gpu = ps.BeginInvoke();
+  gpuinfobox.Text = gpu.ToString();  //of curse this not work!
+
+  PowerShell ps = PowerShell.Create();
+  ps.AddScript(System.IO.File.ReadAllText(@""e:\gpu.ps""));  //the script.
+  var gpu = ps.BeginInvoke();
+  gpuinfobox.Text = gpu.ToString();  //of curse this not work!
+
+    System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+    dispatcherTimer.Tick += DispatcherTimer_Tick;
+    dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0,1000);
+    dispatcherTimer.Start();
+
+
+async  private void DispatcherTimer_Tick(object sender, EventArgs e)
+ {
+    PowerShell ps = PowerShell.Create();
+    ps.AddScript(System.IO.File.ReadAllText(@""e:\gpu.ps""));
+    var task = Task<PSDataCollection<PSObject>>.Factory.FromAsync(ps.BeginInvoke(), ps.EndInvoke);
+    var objs = await task;
+    if (objs.Count > 0)
+    {
+        var result = objs[0].ToString();
+        TextBox.Text  =  string.IsNullOrEmpty(result) ? null : result;
+    }
+ }
+
+    System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+    dispatcherTimer.Tick += DispatcherTimer_Tick;
+    dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0,1000);
+    dispatcherTimer.Start();
+
+
+async  private void DispatcherTimer_Tick(object sender, EventArgs e)
+ {
+    PowerShell ps = PowerShell.Create();
+    ps.AddScript(System.IO.File.ReadAllText(@""e:\gpu.ps""));
+    var task = Task<PSDataCollection<PSObject>>.Factory.FromAsync(ps.BeginInvoke(), ps.EndInvoke);
+    var objs = await task;
+    if (objs.Count > 0)
+    {
+        var result = objs[0].ToString();
+        TextBox.Text  =  string.IsNullOrEmpty(result) ? null : result;
+    }
+ }
+
+$p = Get-Process YourApp; ((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |foreach {Write-Output ""$([math]::Round($_,1))%""}
+
+$p = Get-Process YourApp; ((Get-Counter ""\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage"").CounterSamples | where CookedValue).CookedValue |foreach {Write-Output ""$([math]::Round($_,1))%""}
+",,,2024-09-20 13:24:05.418510

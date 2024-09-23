@@ -7,6 +7,7 @@ from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
+from altered.model_connect import ModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
@@ -21,32 +22,46 @@ class Prompt:
         self.instructs = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
         self.response = Response(*args, **kwargs)
+        self.assi = ModelConnect(*args, **kwargs)
         self.data = None
         self.warnings = {}
 
     def __call__(self, *args, **kwargs):
-        self.context(*args, **kwargs)
-        self.instructs(*args, **kwargs)
-        return self.mk_prompt(*args, **kwargs)
+        print(f"Prompt.__call__: {kwargs = }")
+        self.mk_prompt(*args, **kwargs)
+        return self.render_prompt(*args, **kwargs)
 
 
-    def mk_prompt(self, *args, context:dict={}, **kwargs):
+    def mk_prompt(self, *args, **kwargs):
         """
         Constructs the final prompt as to be send to the AI model.
         """
-        self.context = { 
+        self.context_dict = { 
                             'prompt_title': 'LLM Prompt',
-                            'context': self.context.data,
-                            'user_prompt': self.instructs.user_prompt, 
-                            'instruct': self.instructs.data,
-        } 
+                            'context': self.get_context(*args, **kwargs),
+                            'instructs': self.get_instructs(*args, **kwargs),
+                        }
+
+    def render_prompt(self, *args, context:dict=None, **kwargs):
+        print(f"Prompt.render_prompt: {context = }")
+        print(f"Prompt.render_prompt: {self.context_dict = }")
         data = self.renderer.render(*args, 
                                                     template_name='prompt.md', 
-                                                    context=self.context, 
+                                                    context=self.context_dict, 
                                                     **kwargs,
                     )
         hlpp.pretty_prompt(data, *args, **kwargs)
         return data
+
+    def get_context(self, *args, **kwargs):
+        context_dict = self.context(*args, **kwargs)
+        return context_dict
+
+    def get_instructs(self, *args, **kwargs):
+        instructs = self.instructs(*args, **kwargs)
+        return instructs
+
+
 
 
 class Response:

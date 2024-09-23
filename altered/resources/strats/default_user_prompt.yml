@@ -1,0 +1,19 @@
+# default.yml
+# If no strategy was provided some default outputs are requested
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Best Answer ..."}
+# name of the strategy
+name: To Do
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    You were provided with a <user_prompt> or question in the text above. 
+    Use all available sources of information from <context> and <user_propmt> to 
+    prepare a high quality response.
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    Answer the <user_propmpt> directly! Do not add any conversational comments!
+    Do not explain your reasoning.

@@ -1,123 +1,65 @@
 """
-prompt.py
+prompt_instructs.py
 
 """
 import os, yaml
 import altered.settings as sts
 from colorama import Fore, Style
-
+import altered.prompt_strategies as Strats
+from altered.prompt_user_prompt import UserPrompt
 from altered.yml_parser import YmlParser
 
+
 class Instructions:
+    default_strats = ['default_user_prompt', 'answer_simple']
 
-    fmts = {'json', 'markdown', 'yaml', 'yml', 'plain'}
-    strategy_dir = os.path.join(sts.resources_dir, 'strategies')
-
-
-    def __init__(self, *args, instructs:str=None, **kwargs):
-        self.instructs_fmts = self.load_prompt_params('prompt_formats', *args, **kwargs)
-        self.instruction_params = self.load_prompt_params('prompt_intros', *args, **kwargs)
-        self._data = instructs if instructs is not None else {}
+    def __init__(self, *args, **kwargs):
+        pass
 
     def __call__(self, *args, **kwargs):
-        self.get_user_prompt(*args, **kwargs)
-        self.create_instruct_dict(*args, **kwargs)
-        self.get_strategy(*args, **kwargs)
-        self.set_response_format(self.get_response_template(*args, **kwargs), *args, **kwargs)
-        return self
+        s_names = self.get_strats_names(*args, **kwargs)
+        strat_context = self.run_strats(s_names.get('strat'), *args, **kwargs)
+        strat_io = self.run_io(s_names.get('io'), *args, **kwargs)
+        user_prompt_context = self.get_user_prompt(*args, **kwargs)
+        self.check_context(s_names, user_prompt_context, *args, **kwargs)
+        return self.mk_context(strat_context, user_prompt_context, strat_io, *args, **kwargs)
 
-    @property
-    def user_prompt(self, *args, **kwargs):
-        return self._user_prompt
+    def mk_context(self, strat_context, user_prompt_context, strat_io, *args, **kwargs):
+        return {'strats': strat_context, 'user_prompt': user_prompt_context, 'io': strat_io,}
 
-    @property
-    def data(self, *args, **kwargs):
-        return self._data
+    def get_strats_names(self, *args, strat_templates:list=None, fmt:str=None, **kwargs):
+        # we are calling the strat
+        strat_templates = strat_templates or self.default_strats
+        strat_templates = strat_templates if fmt is not None else strat_templates[:1]
+        s_names = {}
+        for s_name in strat_templates:
+            method, _ = s_name.split('_', 1)
+            if os.path.exists(os.path.join(sts.strats_dir, f'{s_name}.yml')):
+                s_names['strat'] = {'method': method, 's_name': s_name}
+            elif os.path.exists(os.path.join(sts.io_dir, f'{s_name}.yml')):
+                s_names['io'] = {'method': method, 's_name': s_name}
+        return s_names
 
-    def get_user_prompt(self, *args, user_prompt:str='', **kwargs) -> str:
-        if not user_prompt:
-            print(
-                    f"{Fore.YELLOW} \nWant to add a user_prompt"
-                    f" to the next prompt ? {Fore.RESET}"
-                    )
-            self._user_prompt = input(f"You: ").strip()
-        else:
-            self._user_prompt = user_prompt
-        return self._user_prompt
+    def run_strats(self, s_name:dict, *args, **kwargs):
+        if s_name is None:
+            return
+        strat = getattr(Strats, s_name['method'].capitalize())(*args, **kwargs)\
+                                                        (s_name['s_name'], *args, **kwargs)
+        return strat
 
-    def create_instruct_dict(self, *args, user_prompt:str='', instructs:str='', **kwags):
-        msg = (
-                f"{Fore.RED}ERROR in Instructions.create_instruct_dict: "
-                f"Provide either self._user_prompt or instructs! {Fore.RESET}"
-                )
-        assert user_prompt or instructs, msg
-        # depending on the inputs the prompt is constructed with user_prompt and instructs
-        if user_prompt and not instructs:
-            # this should instruct the model to respond to the user_prompt directly
-            instructs = self.instruction_params.get('msg_and_not_instructs_prefix', '')
-        elif user_prompt and instructs:
-            # in this case the user_prompt is only additional context to the prompt
-            # the model should respond to the instructs and not the user_prompt
-            prefix = self.instruction_params.get('msg_and_instructs_prefix', '')
-            instructs = f"{prefix}\n\n{instructs}"
-        self._data = {'Your Task': instructs}
+    def run_io(self, s_name:dict, *args, fmt:str='markdown', **kwargs):
+        if s_name is None:
+            return
+        template_path = os.path.join(sts.io_dir, f'{s_name["s_name"]}.yml')
+        io = YmlParser(*args, fields_paths=[template_path], **kwargs).describe(fmt=fmt)
+        return io.strip()
 
-    def get_response_template(self, *args, example:str=None, fmt:str=None, **kwargs):
-        """
-        Uses a file name (example) to derrive the disired response format.
-        Formats can be 'json', 'markdown', or 'yaml'.
-        Also loads the example as replacement for 'default_template'
-        """
-        if example is None: return
-        extention = os.path.splitext(example)[1][1:]
-        if extention not in self.fmts: return
-        if not os.path.isfile(example):
-            raise ValueError(f"Error: File '{example}' not found.")
-        yml = YmlParser(*args, **kwargs)
-        yml.add_labels(name='Prompt Fields', labels=example, description="None")
-        return yml.describe(fmt='json' if not fmt else fmt)
+    def get_user_prompt(self, *args, **kwargs):
+        user_prompt = UserPrompt(*args, **kwargs)(*args, **kwargs)
+        return user_prompt
 
-    def set_response_format(self, response_template:str=None, *args, fmt:str='plain', **kwargs):
-        """
-        Formats can be 'json', 'markdown', or 'yaml'.
-        The corresponding strategy yaml file starts with the fmt name.
-        """
-        if not fmt:
-            fmt = 'plain'
-        elif fmt and (fmt not in self.fmts):
-            raise ValueError(f"Error: Invalid fmt '{fmt}' provided.")
-        # we add instructions for the response fmts to the prompt
-        # Example: 'json_response_prefix' contains the instruct prefix if the fmt is 'json'
-        # expected from the model (markdown, json, yaml)
-        self._data['fmts'], fmt_str = '', self.instructs_fmts[fmt]
-        for name in ['prefix', 'default_template', 'postfix',]:
-            if response_template and name == 'default_template':
-                self._data['fmts'] += fmt_str['template_intro']
-                self._data['fmts'] += f"{response_template}"
-            else:
-                self._data['fmts'] += fmt_str[f'{name}']
-
-    def load_prompt_params(self, file_name, *args, **kwargs):
-        params_path = os.path.join(sts.resources_dir, 'strategies', f"{file_name}.yml")
-        with open(params_path, 'r') as f: 
-            return yaml.safe_load(f)
-
-    def get_strategy(self, *args, strategy:str=None, **kwargs):
-        if strategy is None: return ''
-        if '.' in strategy:
-            strat_group, strat_name = strategy.split('.')
-        else:
-            strat_group = strategy
-        with open(os.path.join(self.strategy_dir, f"{strat_group}.yml"), 'r') as f:
-            strat = yaml.safe_load(f)
-        if '.' in strategy:
-            strat = strat.get(strat_name)
-            if strat is None:
-                strat = (
-                    f"{Fore.RED}ERROR in Instructions.get_strategy: "
-                    f"Entry '{strat_name}' not found in stategies/'{strat_group}.yml' {Fore.RESET}"
-                      )
-                print(strat)
-        instruction = {strat_group: strat}
-        self._data.update(instruction)
-        return instruction
+    def check_context(self, s_names:dict, user_prompt_context:dict, *args, **kwargs):
+        if s_names.get('strat').get('method') == 'default' and \
+                                            user_prompt_context.get('user_prompt') is None:
+            msg = f"{Fore.RED}ERROR:{Fore.RESET} default strat requires a user_prompt"
+            raise ValueError(msg)

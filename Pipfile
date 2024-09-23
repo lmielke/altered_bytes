@@ -17,6 +17,7 @@ numpy = "*"
 altered = {editable = true, path = "."}
 pandas = "*"
 beautifulsoup4 = "*"
+playwright = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

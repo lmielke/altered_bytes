@@ -226,8 +226,6 @@ class ModelParams:
         for service, params in services.items():
             if 'key_path' in params.keys():
                 key_path = self.unpack_path_alias(params['key_path'])
-                print(f"Loading key file: {key_path}")
-
                 if not os.path.isfile(key_path):
                     raise FileNotFoundError(f"Key file not found: {key_path}")
                 with open(key_path, 'r') as file:

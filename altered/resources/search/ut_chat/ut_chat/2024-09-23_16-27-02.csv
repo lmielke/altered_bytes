@@ -1,0 +1,66 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+"Hello, Who are you?",next line,user,None,llama3.1,ut_chat,None,None,2024-09-23 16:27:03.596910
+"{
+  ""question"": ""Hello, Who are you?"",
+  ""answer"": ""I am a helpful assistant. How can I help you today?""
+}","
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Relevant available information for you to better understand the problem.
+2. User Prompt '<user_prompt>': The recent user Question or Instruction.
+3. Instructions '<INST>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<context>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</context>
+
+
+<user_prompt>
+
+
+# 2. User Prompt
+The user wrote:
+    Hello, Who are you?
+
+</user_prompt>
+
+
+<INST>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <user_prompt> or question in the text above.  Use all available sources of information from <context> and <user_propmt> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+Please respond in JSON format.
+
+
+### Response Layout:
+The following is a JSON template to be used for the expected LLM response. For clarity, comments have been added between the lines. 
+
+<response_template>
+
+# question contains the question/problem statement that founds/initiates the thought/chat
+{""question"": ""Hello, Who are you?""},
+
+# meta: {""name"": ""answer"", ""type"": ""string"", ""default"": """", ""example"": ""I am a helpful assistant. How can I help you today?""}
+# The answer field contains the model response
+{""answer"": ""I am a helpful assistant. How can I help you today?""},
+
+</response_template>
+
+Return all '<reponse_template>' entries combined into a single JSON string.
+
+</INST>
+
+",assistant,None,llama3.1,ut_chat,None,None,2024-09-23 16:27:03.596910

@@ -1,0 +1,21 @@
+# data__data_load_fields_data.yml
+# Description: Contains the fields that must be there in every data objec.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "gpu_monitoring"}
+# name of the table/data set that the record belongs to
+name: null
+
+# meta: {"name": "category", "type": "category", "default": "", "example": "it"}
+# category of the record. This can be used to group records together.
+# Examples: physics, biology, chemistry
+category: null
+
+# meta: {"name": "sub_category", "type": "category", "default": "", "example": "hardware"}
+# sub_category of the record. This can be used to group records together.
+# Examples: for category physics the sub_category can be quantum mechanics, optics, ...
+sub_category: null
+
+# meta: {"name": "timestamp", "type": "datetime64[ns]", "default": null, "example": "2024-09-27_07-23-37"}
+# timestamp of the record. This is used to determine the temporaryal order of the records.
+# Generated Field, always set to null
+timestamp: null
