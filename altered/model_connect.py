@@ -26,7 +26,7 @@ class ModelConnect:
                         'total_server_time': 0.0,
                         }
 
-
+    @staticmethod
     def random_temp(self, lower:float=None, upper:float=None) -> float:
         if lower is None:
             lower = 0.1
@@ -61,7 +61,7 @@ class ModelConnect:
             # for embeddings we want the temperature to be low to be more deterministic
             if service_endpoint == 'get_embeddings':
                 temperature = temperature if temperature is not None else 0.
-        temperature = temperature if temperature is not None else self.random_temp(0.1, 0.5)
+        temperature = temperature if temperature is not None else ModelConnect.random_temp(0.1, 0.5)
         context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
         return message, name, stream, temperature, context_len, num_predict, strat_templates, repeats, service_endpoint

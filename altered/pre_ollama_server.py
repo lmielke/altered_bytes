@@ -6,11 +6,13 @@ from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from ollama import Client
 from colorama import Fore, Style
+import random as rd
 
 import altered.model_params as msts
 import altered.settings as sts
 from altered.prompt_instructs import Instructions
 from altered.renderer import Render
+from altered.model_connect import ModelConnect
 
 
 class Endpoints:
@@ -45,13 +47,14 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, options:dict={}, **kwargs) -> dict:
         responses = []
         prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
         for prompt in prompts:
-            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+            options['temperature'] = ModelConnect.random_temp(0.2, 0.5)
+            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, options=options, **kwargs))
         responses.extend(self.agg_resps(ep, *args, prompts=prompts, responses=responses,
-                                             **kwargs,))
+                                             options=options, **kwargs,))
         return {'responses': responses}
 
     def create_repeats(self, prompts:str, repeats:int=1, *args, **kwargs) -> list:
