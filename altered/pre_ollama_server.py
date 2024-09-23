@@ -86,9 +86,10 @@ class Endpoints:
                                             )
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
                 agg['strat_templates'] = strat_templates
+                print(f"{Fore.RED}agg_response loop:{Fore.RESET} {agg['strat_templates'] = }")
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)
-        return {'responses': aggs}
+        return aggs
 
     def unittest(self, *args, repeats, **kwargs) -> dict:
         """
