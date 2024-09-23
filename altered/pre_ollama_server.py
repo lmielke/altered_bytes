@@ -94,10 +94,11 @@ class Endpoints:
                 aggs.append(agg)
         return {'responses': aggs}
 
-    def unittest(self, *args, **kwargs) -> dict:
+    def unittest(self, *args, repeats, **kwargs) -> dict:
         """
         Generates the JSON response for the /unittest request.
         """
+        print(f"unittest: {repeats = }")
         response = self.ping(*args, **kwargs)
         # print(f"unittest: {kwargs = }")
         # response['agg_test'] = self.agg_resps(*args, **kwargs)
