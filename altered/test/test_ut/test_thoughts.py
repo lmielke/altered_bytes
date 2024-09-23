@@ -45,7 +45,7 @@ class Test_Chat(unittest.TestCase):
         yml.data['verbose'] = verbose
         yml.data['fmt'] = 'json'
         del yml.data['fmt']
-        chat.run(*args, **yml.data)
+        chat.run(*args, **yml.data, repeats=3,)
 
 
 if __name__ == "__main__":

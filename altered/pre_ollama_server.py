@@ -47,7 +47,10 @@ class Endpoints:
 
     def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
         responses = []
+        print(f"{Fore.CYAN}{len(prompts) = }{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{repeats = }{Style.RESET_ALL}")
         prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
+        print(f"{Fore.BLUE}{len(prompts) = }{Style.RESET_ALL}")
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         responses.extend(self.agg_resps(ep, *args, prompts=prompts, responses=responses,
@@ -68,6 +71,7 @@ class Endpoints:
         aggregation strategy. Also a std is estimated.
         """
         aggs = []
+        print(f"{Fore.CYAN}{len(responses) = }, {strat_templates = }{Style.RESET_ALL}")
         if len(responses) >= 2 and strat_templates is not None:
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
