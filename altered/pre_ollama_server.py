@@ -81,7 +81,7 @@ class Endpoints:
                 rendered = self.renderer.render(
                                             template_name='instructs.md',
                                             context = {'instructs': strats},
-                                            verbose=2,
+                                            verbose=3,
                                             )
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
                 agg = {'rendered': rendered}
