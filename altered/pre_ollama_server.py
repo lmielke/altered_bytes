@@ -71,7 +71,7 @@ class Endpoints:
         aggregation strategy. Also a std is estimated.
         """
         aggs = []
-        print(f"{Fore.CYAN}{len(responses) = }, {strat_templates = }{Style.RESET_ALL}")
+        responses = [r.get('response') for r in responses]
         if len(responses) >= 2 and strat_templates is not None:
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:

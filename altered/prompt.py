@@ -87,6 +87,7 @@ class Response:
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
             print(f"{Fore.RED}extract {i}{Fore.RESET}: {result.get('response') = }")
+            print(f"{Fore.RED}template {i}{Fore.RESET}: {result.get('strat_templates') = }")
             if result.get('strat_templates') == strat_templates:
                 record.update(result)
                 break
