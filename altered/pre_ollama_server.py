@@ -88,7 +88,6 @@ class Endpoints:
                                             verbose=3,
                                             )
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                agg = {'rendered': rendered}
                 agg['strat_templates'] = strat_templates
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)

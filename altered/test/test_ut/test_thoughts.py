@@ -44,8 +44,9 @@ class Test_Chat(unittest.TestCase):
         yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
         yml.data['verbose'] = verbose
         yml.data['fmt'] = 'json'
+        yml.data['repeats'] = 3
         del yml.data['fmt']
-        chat.run(*args, **yml.data, repeats=3,)
+        chat.run(*args, **yml.data,)
 
 
 if __name__ == "__main__":

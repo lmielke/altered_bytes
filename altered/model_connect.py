@@ -91,6 +91,7 @@ class ModelConnect:
                 context['stream'] = stream
                 context['strat_templates'] = strat_templates
                 context['repeats'] = repeats
+        print(f"{Fore.YELLOW}context:{Fore.RESET} {context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 

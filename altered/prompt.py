@@ -11,7 +11,7 @@ from altered.model_connect import ModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
-default_aggreg = 'prompt_aggregations.best'
+default_aggreg = ['agg_mean']
 
 
 class Prompt:
@@ -72,8 +72,8 @@ class Response:
     def __call__(self, *args, **kwargs):
         return self.extract(self.validate(*args, **kwargs), *args, **kwargs)
 
-    def extract(self, r:dict, *args, depth:int=1, strategy:str=None, **kwargs) -> dict:
-        strategy = default_aggreg if depth != 1 and strategy is None else strategy
+    def extract(self, r:dict, *args, repeats:int=1, strat_templates:str=None, **kwargs) -> dict:
+        strat_templates = default_aggreg if repeats != 1 and strat_templates is None else strat_templates
         # r comes as a dictionary with 'results' containing a list of dictionaries
         if not r.get('responses') or type(r.get('responses')) != list:
             raise ValueError(f"Error: No valid responses returned from the AI model.")
@@ -86,13 +86,14 @@ class Response:
                     }
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
-            if result.get('strategy') == strategy:
+            print(f"{Fore.RED}extract {i}{Fore.RESET}: {result.get('response') = }")
+            if result.get('strat_templates') == strat_templates:
                 record.update(result)
                 break
         else:
             # if we did not find the aggregation result, we take the last result in r
             # in case there was only a single result, the single result is the last result
-            record = record.update(result)
+            record.update(result)
         record['content'] = record.get('response').strip()
         return record
 

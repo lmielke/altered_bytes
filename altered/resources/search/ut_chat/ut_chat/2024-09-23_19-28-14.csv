@@ -1,0 +1,46 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+"Hello, Who are you?",next line,user,None,llama3.1,ut_chat,None,None,2024-09-23 19:28:16.004310
+"I am an artificial intelligence language model, designed to assist and communicate with humans. I don't have a personal identity or existence, but rather exist as a program running on computer servers. My purpose is to provide information, answer questions, and engage in conversations based on the input I receive. How can I help you?","
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Relevant available information for you to better understand the problem.
+2. User Prompt '<user_prompt>': The recent user Question or Instruction.
+3. Instructions '<INST>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<context>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</context>
+
+
+<user_prompt>
+
+
+# 2. User Prompt
+Hello, Who are you?
+
+</user_prompt>
+
+
+<INST>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <user_prompt> or question in the text above.  Use all available sources of information from <context> and <user_propmt> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+
+</INST>
+
+",assistant,None,llama3.1,ut_chat,None,None,2024-09-23 19:28:16.004310

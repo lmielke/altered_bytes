@@ -67,10 +67,10 @@ class Chat:
             self.data.append(self.mk_data_record(*args, role=role, **kwargs))
         self.show(*args, **kwargs)
 
-    def post(self, *args, depth:int=1, **kwargs):
+    def post(self, *args, **kwargs):
         server_params = self.update_model_params(*args, **kwargs)
-        # we post one or multiple user prompts to the AI model (depth == num of prompt reps)
-        return self.assi.post([self.p for _ in range(depth)], *args, **server_params, )
+        # we post one or multiple user prompts to the AI model (repeats == num of prompt reps)
+        return self.assi.post([self.p], *args, **server_params, )
 
     def mk_data_record(self, *args, role:str, user_prompt:str, **kwargs):
         record = {c: str(self.r.get(c)) for c in self.data.columns}
@@ -83,17 +83,18 @@ class Chat:
             record['prompt'] = self.p
         return record
 
-    def update_model_params(self, *args, alias:str=None, num_predict:int=None, depth:int=1,
-                            strategy:str=None, verbose:int=0, **kwargs,
+    def update_model_params(self, *args, alias:str=None, num_predict:int=None, repeats:int=1,
+                            strat_templates:str=None, verbose:int=0, **kwargs,
         ):
         # Construct model parameters specific to this Chat (see ModelConnect.get_params())
-        strategy = default_aggreg if depth != 1 and strategy is None else strategy
+        strat_templates =  ['agg_mean'] if repeats != 1 and strat_templates is None else strat_templates
         server_params = {
                             'service_endpoint': 'get_generates',
                             'alias': alias,
                             'num_predict': num_predict,
                             'verbose': verbose,
-                            'strategy': strategy
+                            'strat_templates': strat_templates,
+                            'repeats': repeats,
                         }
         server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
         return server_params
