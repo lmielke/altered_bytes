@@ -47,10 +47,7 @@ class Endpoints:
 
     def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
         responses = []
-        print(f"{Fore.CYAN}{len(prompts) = }{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{repeats = }{Style.RESET_ALL}")
         prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
-        print(f"{Fore.BLUE}{len(prompts) = }{Style.RESET_ALL}")
         for prompt in prompts:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         responses.extend(self.agg_resps(ep, *args, prompts=prompts, responses=responses,
@@ -72,10 +69,10 @@ class Endpoints:
         """
         aggs = []
         responses = [r.get('response') for r in responses]
+        print(f"agg_response: {strat_templates = }")
         if len(responses) >= 2 and strat_templates is not None:
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
-                print(f"{Fore.CYAN}{strat}{Style.RESET_ALL}")
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,
@@ -97,9 +94,7 @@ class Endpoints:
         """
         Generates the JSON response for the /unittest request.
         """
-        print(f"unittest: {repeats = }")
         response = self.ping(*args, **kwargs)
-        # print(f"unittest: {kwargs = }")
         # response['agg_test'] = self.agg_resps(*args, **kwargs)
         return {'responses': [response]}
 
@@ -129,7 +124,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
-        print(f"do_POST: {ep, payload = }")
         payload.update(getattr(self.service, ep)(ep, *args, server=self.server, **kwargs))
         # Update response with timing information and other server statistics
         payload.update(self.end_timing(ep, *args, **kwargs))
