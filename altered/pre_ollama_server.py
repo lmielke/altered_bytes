@@ -103,6 +103,7 @@ class Endpoints:
                     print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
                 agg['strat_templates'] = strat_templates
+                agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)
         return aggs
