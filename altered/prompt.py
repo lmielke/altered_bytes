@@ -98,6 +98,7 @@ class Response:
             # in case there was only a single result, the single result is the last result
             record.update(result)
         record['content'] = record.get('response').strip()
+        record['content'] += record.get('strat_templates').strip()
         return record
 
     @staticmethod
