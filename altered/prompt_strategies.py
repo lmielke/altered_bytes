@@ -126,7 +126,11 @@ class Agg(Strategy):
         
         samples = []
         for i, response in enumerate(responses):
-            samples.append(f"Response {i+1}:\n{response}")
+            samples.append(
+                            f"\n\t__START OF SAMPLE {i+1}__\n"
+                            f"Response {i+1}:\n{response}"
+                            f"\n\t__END OF SAMPLE {i+1}__\n"
+                            )
         return f"\nPrompt: {prompts[0]}\n\n" + '\n'.join(samples)
 
     def mk_sample_no_prompt(self, *args, responses:list, **kwargs):

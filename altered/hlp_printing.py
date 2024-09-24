@@ -27,7 +27,10 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
                 .replace('rag_db_matches>', f"{Fore.GREEN}rag_db_matches{Fore.RESET}>")
                 .replace('user_prompt>', f"{Fore.YELLOW}user_prompt{Fore.RESET}>")
                 .replace('previous_responses>', f"{Fore.CYAN}previous_responses{Fore.RESET}>")
+                .replace('sample>', f"{Fore.MAGENTA}sample{Fore.RESET}>")
                 .replace('INST>', f"{Fore.CYAN}INST{Fore.RESET}>")
+                .replace('__START', f"{Style.DIM}{Fore.WHITE}__START{Style.RESET_ALL}{Fore.RESET}")
+                .replace('__END', f"{Style.DIM}{Fore.WHITE}__END{Style.RESET_ALL}{Fore.RESET}")
         )
     if verbose >= 2:
         print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")

@@ -47,11 +47,11 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
         responses = []
-        prompts = self.create_repeats(prompts, *args, **kwargs)
         for prompt in prompts:
-            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+            for repeat in range(repeats):
+                responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         # aggreations (i.e. min, max, mean) are appended to the end of responses
         responses.extend(self.aggate_responses(ep, *args, 
                                                     prompts=prompts, 
@@ -60,16 +60,6 @@ class Endpoints:
                             )
         )
         return {'responses': responses}
-
-    def create_repeats(self, prompts:str, *args, repeats:int=1, **kwargs) -> list:
-        """
-        The repeat mechanism allowes to pass a prompt to a model for num_repeats times.
-        However, it only allows for a single prompt to be repeated.
-        """
-        if len(prompts) == 1 and repeats != 1:
-            return [prompts[0] for _ in range(repeats)]
-        else:
-            return prompts
 
     def aggate_responses(self, ep, *args, prompts:list, responses:list,
                                                         strat_templates:str=None, 
@@ -102,7 +92,7 @@ class Endpoints:
                 if verbose >= 2:
                     print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                agg['prompt'] = f"Used strategy_template: {strat}\n\n" + rendered
+                agg['prompt'] = f"Used strategy_template: {strat}\n" + rendered
                 agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)

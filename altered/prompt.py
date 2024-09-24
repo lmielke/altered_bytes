@@ -78,13 +78,12 @@ class Response:
         # we create the output record 
         record = {
                         'user_prompt': r.get('user_prompt'),
-                        'prompt': r.get('prompt'),
                         'role': 'assistant',
                         'model': r.get('model'),
                     }
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
-            if result.get('strat_templates') is not None:
+            if result.get('strat_template') is not None:
                 if strat_templates[0] == result.get('strat_template'):
                     record.update(result)
                     break
@@ -93,13 +92,8 @@ class Response:
             # in case there was only a single result, the single result is the last result
             record.update(result)
         record['content'] = record.get('response').strip()
-        if record.get('strat_templates'):
-            record['prompt'] = (
-                                f"Strategy Template: \n"
-                                f"{record.get('strat_template')}\n"
-                                f"Templates: {record.get('strat_templates')}"
-                            )
         return record
+
 
     @staticmethod
     def validate(r:dict, *args, **kwargs) -> dict:
