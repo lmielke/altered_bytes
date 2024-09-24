@@ -81,7 +81,7 @@ class Chat:
             record['content'] = user_prompt
             record['prompt'] = hlpp.pretty_prompt(self.p)
         elif role == 'assistant':
-            record['prompt'] = record['prompt']
+            record['prompt'] = hlpp.pretty_prompt(record['prompt'])
         return record
 
     def update_model_params(self, *args, alias:str=None, num_predict:int=None, repeats:int=1,

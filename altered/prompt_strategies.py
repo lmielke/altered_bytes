@@ -102,8 +102,10 @@ class Agg(Strategy):
         sample_pairs = []
         for i, (prompt, resp) in enumerate(zip(prompts, responses)):
             sample_pairs.append(
+                                    f"\n\t__START OF SAMPLE {i+1}__\n"
                                     f"Prompt {i+1}: {prompt}\n"
                                     f"Response {i+1}: {resp}"
+                                    f"\n\t__END OF SAMPLE {i+1}__\n"
                                 )
         return '\n\n'.join(sample_pairs)
 
