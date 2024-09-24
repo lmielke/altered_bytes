@@ -12,6 +12,7 @@ import os, re, sys, yaml
 from tabulate import tabulate as tb
 from colorama import Fore, Style
 
+import altered.hlp_printing as hlpp
 import altered.settings as sts
 from altered.model_connect import ModelConnect
 from altered.prompt import Prompt, Response
@@ -78,9 +79,9 @@ class Chat:
         # for role 'user' the prompt is displayed together with the answer/response
         if role == 'user':
             record['content'] = user_prompt
-            record['prompt'] = 'next line'
+            record['prompt'] = hlpp.pretty_prompt(self.p)
         elif role == 'assistant':
-            record['prompt'] = self.p
+            record['prompt'] = record['prompt']
         return record
 
     def update_model_params(self, *args, alias:str=None, num_predict:int=None, repeats:int=1,

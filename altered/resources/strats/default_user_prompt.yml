@@ -9,7 +9,7 @@ name: To Do
 # description of the strategy
 description: >
     You were provided with a <user_prompt> or question in the text above. 
-    Use all available sources of information from <context> and <user_propmt> to 
+    Use all available sources of information from <context> and <user_prompt> to 
     prepare a high quality response.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}

@@ -43,8 +43,6 @@ class Prompt:
                         }
 
     def render_prompt(self, *args, context:dict=None, **kwargs):
-        print(f"Prompt.render_prompt: {context = }")
-        print(f"Prompt.render_prompt: {self.context_dict = }")
         data = self.renderer.render(*args, 
                                                     template_name='prompt.md', 
                                                     context=self.context_dict, 
@@ -74,7 +72,6 @@ class Response:
 
     def extract(self, r:dict, *args, repeats:int=1, strat_templates:str=None, **kwargs) -> dict:
         strat_templates = [default_aggreg] if repeats != 1 and strat_templates is None else strat_templates
-        print(f"{Fore.RED}Response.extract:{Fore.RESET} {strat_templates = }")
         # r comes as a dictionary with 'results' containing a list of dictionaries
         if not r.get('responses') or type(r.get('responses')) != list:
             raise ValueError(f"Error: No valid responses returned from the AI model.")
@@ -87,10 +84,8 @@ class Response:
                     }
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
-            print(f"{Fore.RED}extract {i}{Fore.RESET}: {result.get('response') = }")
-            print(f"{Fore.RED}template {i}{Fore.RESET}: {result.get('strat_templates') = }")
             if result.get('strat_templates') is not None:
-                if strat_templates[0] == result.get('strat_templates')[0]:
+                if strat_templates[0] == result.get('strat_template'):
                     record.update(result)
                     break
         else:
@@ -98,7 +93,12 @@ class Response:
             # in case there was only a single result, the single result is the last result
             record.update(result)
         record['content'] = record.get('response').strip()
-        record['content'] += f"{record.get('strat_templates')}"
+        if record.get('strat_templates'):
+            record['prompt'] = (
+                                f"Strategy Template: \n"
+                                f"{record.get('strat_template')}\n"
+                                f"Templates: {record.get('strat_templates')}"
+                            )
         return record
 
     @staticmethod

@@ -1,0 +1,52 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<context>': Relevant available information for you to better understand the problem.
+2. User Prompt '<user_prompt>': The recent user Question or Instruction.
+3. Instructions '<INST>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<context>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</context>
+
+
+<user_prompt>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</user_prompt>
+
+
+<INST>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <user_prompt> or question in the text above.  Use all available sources of information from <context> and <user_propmt> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+
+</INST>
+
+",user,None,llama3.1,ut_chat,None,None,2024-09-24 15:54:29.909276
+"To monitor your GPU's performance, you can use various tools and methods. Here's a balanced summary of the key points from all responses:
+
+You can start by using built-in monitoring tools, such as Task Manager on Windows or Activity Monitor on macOS, to check your GPU usage and temperature. Additionally, you can install software like GPU-Z, HWiNFO, or AIDA64 to monitor GPU performance and temperatures.
+
+Most GPUs have a built-in monitoring system that allows you to track their performance.","Strategy Template: 
+agg_mean
+Templates: ['agg_mean', 'agg_std']",assistant,None,llama3.1,ut_chat,None,None,2024-09-24 15:54:29.924266

@@ -1,0 +1,50 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <user_propmt> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+
+</[36mINST[39m>
+
+",user,None,llama3.1,ut_chat,None,None,2024-09-24 15:57:40.425051
+"To monitor your GPU's performance, you can use various tools and methods. Here are some steps to help you get started:
+
+1. **Use built-in monitoring tools**: Most modern GPUs have built-in monitoring tools that allow you to track their performance in real-time. You can usually access these tools by right-clicking on the desktop or taskbar and selecting ""NVIDIA Control Panel"" (for NVIDIA GPUs) or ""AMD Radeon Settings"" (for AMD GPUs). These tools provide detailed information about your","Strategy Template: 
+agg_mean
+Templates: ['agg_mean', 'agg_std']",assistant,None,llama3.1,ut_chat,None,None,2024-09-24 15:57:40.431951
