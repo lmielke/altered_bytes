@@ -24,12 +24,12 @@ class Chat:
     exit_terms = {'/bye', '/quit'}
     roles = ('user', 'assistant')
     # default_data_dir handles where table data are stored and loaded
-    default_chats_dir = os.path.join(sts.resources_dir, 'search')
+    default_chats_dir = os.path.join(sts.resources_dir, 'data')
 
 
     def __init__(self, name:str, *args, **kwargs):
         # name of the chat can be used to locate/reference the saved chat
-        self.name, self.chat_dir = self.get_chat_dir(name, *args, **kwargs)
+        self.name = re.sub(r'\W+', '_', name.lower())
         self.assi = ModelConnect(*args, **kwargs)
         # initial user_promt provided by the user
         self.running = False
@@ -38,7 +38,7 @@ class Chat:
         self.prompt = Prompt(name, *args, **kwargs)
         self.response = Response(*args, **kwargs)
         # Data represents the chat data structure, where each line is a chat element
-        self.data = Data(*args, name=self.name, data_dir=self.chat_dir, **kwargs)
+        self.data = Data(*args, name=self.name, **kwargs)
 
     def run(self, *args, **kwargs):
         # First we create the inital user_promt to run the chat
@@ -48,15 +48,18 @@ class Chat:
         while self.running:
             self.running = self.next_chat_item(*args, **kwargs)
         # exit uses /bye or /quit
+        print(f"{Fore.YELLOW}Chat ended{Fore.RESET}")
         self.data.save_to_disk(*args, **kwargs)
 
     def prep_chat(self, *args, user_prompt:str, role:str='user', **kwargs):
         self.running = True
         self.init_prompt = {'role': role, 'content': user_prompt}
 
-    def get_chat_dir(self, name:str, *args, **kwargs):
-        name = re.sub(r'\W+', '_', name.lower())
-        return name, os.path.join(self.default_chats_dir, name)
+    # def get_chat_dir(self, name:str, *args, data_dir:str=None, **kwargs):
+    #     name = re.sub(r'\W+', '_', name.lower())
+    #     print(f"{Fore.YELLOW}name: {Fore.RESET}{name}, {data_dir = }")
+    #     chats_dir = data_dir if data_dir is not None else self.default_chats_dir
+    #     return name, os.path.join(chats_dir, name)
 
     def next_chat_item(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt

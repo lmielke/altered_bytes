@@ -42,13 +42,10 @@ Answer in plain text with no comments and no surrounding text!
 
 </[36mINST[39m>
 
-",user,None,llama3.1,ut_chat,None,None,2024-09-24 16:25:15.236020
-"To monitor your GPU's performance, you can use various tools and methods. Here are some steps to help you:
+",user,None,llama3.1,ut_chat,None,None,2024-09-24 16:48:37.614114
+"To monitor your GPU's performance, you can use various tools and methods. Here are some steps:
 
-1. **Use built-in monitoring tools**: Most GPUs have built-in monitoring tools that can be accessed through the motherboard or GPU settings in your computer BIOS.
-2. **Check GPU usage**: Use the Task Manager (Windows) or Activity Monitor (Mac) to see how much of your CPU and GPU resources are being used by individual programs.
-3. **Use GPU monitoring software**:","Used strategy_template: agg_mean
-
+1. **Use built-in monitoring tools**: Most GPUs have built-in monitoring tools that allow you to track their performance in real-time. For NVIDIA GPUs, you can use the NVIDIA Control Panel or GeForce Experience to monitor temperature, clock speed, memory usage, and more. For AMD GPUs, you can use the AMD Radeon Settings app. On Windows, you can also press Ctrl+Alt+Del to","Used strategy_template: agg_mean
 
 
 # 3. Instructions (INST)
@@ -73,12 +70,11 @@ Read and understand the following <[35msample[39m> texts! Read the provided pr
 
 
 ## Input Data
-### Answers and prompts:
-Below is the <[35msample[39m> of 3 of an LLM`s responses intended to answer 3 prompts.
+### Answers to a single prompt:
+Below is the <[35msample[39m> of 3 of an LLM`s responses intended to answer the same single prompt.
 <[35msample[39m>
 
-	[2m[37m__START[0m[39m OF SAMPLE 1__
-Prompt 1: 
+Prompt: 
 # LLM Prompt
 This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
 The LLM prompt consists of 3 blocks.
@@ -121,117 +117,35 @@ Answer in plain text with no comments and no surrounding text!
 </[36mINST[39m>
 
 
-Response 1: To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
 
-1. **Use built-in monitoring tools**: Most GPUs have built-in monitoring tools that can be accessed through the motherboard or GPU settings in your computer BIOS.
-2. **Use software utilities**: There are many free and paid software utilities available that can monitor your GPU's performance, such as:
-	* GPU-Z: A lightweight utility that provides detailed information about your GPU's specifications and temperature
+
+	[2m[37m__START[0m[39m OF SAMPLE 1__
+Response 1:
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
+
+1. **Use built-in monitoring tools**: Most GPUs have built-in monitoring tools that allow you to track their performance in real-time. For NVIDIA GPUs, you can use the NVIDIA Control Panel or GeForce Experience to monitor temperature, clock speed, memory usage, and more. For AMD GPUs, you can use the AMD Radeon Settings app.
+
+2. **Use third-party software**: There are
 	[2m[37m__END[0m[39m OF SAMPLE 1__
 
 
-
 	[2m[37m__START[0m[39m OF SAMPLE 2__
-Prompt 2: 
-# LLM Prompt
-This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
-The LLM prompt consists of 3 blocks.
-1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
-2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
-3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+Response 2:
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps:
 
-
-<[34mcontext[39m>
-
-
-# 1. Context Information
-Here you find all available context information possibly relevant for this prompt.
-</[34mcontext[39m>
-
-
-<[33muser_prompt[39m>
-
-
-# 2. User Prompt
-How do I monitor my GPUs performance?
-
-</[33muser_prompt[39m>
-
-
-<[36mINST[39m>
-
-
-# 3. Instructions (INST)
-
-## To Do
-You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
-
-
-
-## Response Layout and Format
-
-Answer in plain text with no comments and no surrounding text!
-
-</[36mINST[39m>
-
-
-Response 2: To monitor your GPU's performance, you can use various tools and methods. Here are some steps to help you:
-
-1. **Check GPU usage**: Use the Task Manager (Windows) or Activity Monitor (Mac) to see how much of your CPU and GPU resources are being used by individual programs.
-2. **Use GPU monitoring software**:
-	* **GPU-Z**: A lightweight tool that provides detailed information about your GPU, including its temperature, clock speed, and memory usage.
-	* **
+1. **Use built-in system information**: Most operating systems (Windows, macOS, Linux) have a built-in way to display system information, including GPU details. For example:
+	* Windows: Press the Windows key + R, type ""msinfo32"" and press Enter.
+	* macOS: Click on Apple menu > About This Mac > System Report.
+	* Linux: Type ""l
 	[2m[37m__END[0m[39m OF SAMPLE 2__
 
 
-
 	[2m[37m__START[0m[39m OF SAMPLE 3__
-Prompt 3: 
-# LLM Prompt
-This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
-The LLM prompt consists of 3 blocks.
-1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
-2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
-3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+Response 3:
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
 
-
-<[34mcontext[39m>
-
-
-# 1. Context Information
-Here you find all available context information possibly relevant for this prompt.
-</[34mcontext[39m>
-
-
-<[33muser_prompt[39m>
-
-
-# 2. User Prompt
-How do I monitor my GPUs performance?
-
-</[33muser_prompt[39m>
-
-
-<[36mINST[39m>
-
-
-# 3. Instructions (INST)
-
-## To Do
-You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
-
-
-
-## Response Layout and Format
-
-Answer in plain text with no comments and no surrounding text!
-
-</[36mINST[39m>
-
-
-Response 3: To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
-
-1. **Use the built-in graphics monitoring tool**: Most modern GPUs come with a built-in monitoring tool that allows you to track their performance in real-time. This tool is usually accessible through the NVIDIA Control Panel (for GeForce cards) or AMD Radeon Settings (for Radeon cards).
-2. **Use third-party software**: There are many third-party tools available that can help you monitor your
+1. **Use built-in monitoring tools**: Most GPUs have a built-in monitoring tool that allows you to track their performance in real-time. For example, on Windows, you can press Ctrl+Alt+Del to open the Task Manager, which will show you the GPU usage and temperature.
+2. **Use third-party software**: There are many third-party software tools available that can monitor
 	[2m[37m__END[0m[39m OF SAMPLE 3__
 
 </[35msample[39m>
@@ -244,4 +158,4 @@ From the provided responses, create a weighted summary that incorporates key poi
 ## Response Layout and Format
 
 Answer in plain text with no comments and no surrounding text!
-",assistant,None,llama3.1,ut_chat,None,None,2024-09-24 16:25:15.251567
+",assistant,None,llama3.1,ut_chat,None,None,2024-09-24 16:48:37.629748

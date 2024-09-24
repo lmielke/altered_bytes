@@ -116,7 +116,6 @@ class Data:
             str: Path to the data directory.
         """
         data_dir = os.path.join(data_dir if data_dir else self.default_data_dir, self.name)
-        os.makedirs(data_dir, exist_ok=True)
         return data_dir
 
     def create_table(self, *args, **kwargs) -> None:
@@ -151,14 +150,13 @@ class Data:
 
         The filename is based on the current timestamp.
         """
-        print(f"{Fore.MAGENTA}Data.save_to_disk: {Fore.RESET}{self.data_dir}")
+        os.makedirs(self.data_dir, exist_ok=True)
         data_file_name = f"{self.time_stamp.strftime(sts.time_strf)[:-7]}.{self.data_file_ext}"
         file_path = os.path.join(self.data_dir, data_file_name)
-        print(f"{Fore.MAGENTA}Data.save_to_disk: {Fore.RESET}{file_path}")
         if verbose >= 1: 
             print(  f"{Fore.MAGENTA}Data.save_to_disk: "
-                            f"Saving {self.name} to:{Fore.RESET} {file_path}"
-                            )
+                    f"Saving {self.name} to:{Fore.RESET} {file_path}"
+            )
         self.ldf.to_csv(file_path, index=False)
         self.cleanup_data_dir(*args, verbose=verbose, **kwargs)
         return file_path

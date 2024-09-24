@@ -15,8 +15,8 @@ verbose = 2
 class Test_Chat(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.test_data_dir = sts.resources_dir
-        cls.test_data_path = os.path.join(cls.test_data_dir, 'io', 'thought__thought_run.yml')
+        cls.test_data_dir = sts.test_data_dir
+        cls.test_io_path = os.path.join(sts.resources_dir, 'io', 'thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -33,15 +33,13 @@ class Test_Chat(unittest.TestCase):
 
     def test___init__(self, *args, **kwargs):
         chat = Chat(name='ut_chat')
-        print(chat.data.show())
-        print(f"{chat.data.fields = }")
 
     def test_run(self, *args, **kwargs):
-        chat = Chat(name='ut_chat', verbose=verbose)
+        chat = Chat(name='ut_chat', verbose=verbose, data_dir=self.test_data_dir)
         # we use YmlParser here to load the test_data kwargs from a YAML file
-        print(f"{self.test_data_path = }")
-        yml = YmlParser(fields_paths=[self.test_data_path])
-        yml.add_labels(name='Unittest', labels=self.test_data_path, description="run chat")
+        print(f"{self.test_io_path = }")
+        yml = YmlParser(fields_paths=[self.test_io_path])
+        yml.add_labels(name='Unittest', labels=self.test_io_path, description="run chat")
         yml.data['verbose'] = verbose
         yml.data['fmt'] = 'json'
         yml.data['repeats'] = 3

@@ -27,7 +27,6 @@ class Prompt:
         self.warnings = {}
 
     def __call__(self, *args, **kwargs):
-        print(f"Prompt.__call__: {kwargs = }")
         self.mk_prompt(*args, **kwargs)
         return self.render_prompt(*args, **kwargs)
 
