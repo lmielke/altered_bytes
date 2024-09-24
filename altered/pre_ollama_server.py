@@ -12,7 +12,6 @@ import altered.model_params as msts
 import altered.settings as sts
 from altered.prompt_instructs import Instructions
 from altered.renderer import Render
-from altered.model_connect import ModelConnect
 
 
 class Endpoints:
@@ -22,6 +21,7 @@ class Endpoints:
                                 'get_generates': 'generate', 
                                 'get_embeddings': 'embeddings', 
                             }
+        # used to filter the kwargs for the ollama client
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
         self.prompt_counter = defaultdict(int)
         self.olc = Client(host='http://localhost:11434')
@@ -47,33 +47,45 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, options:dict={}, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, **kwargs) -> dict:
         responses = []
-        prompts = self.create_repeats(prompts, repeats, *args, **kwargs)
+        prompts = self.create_repeats(prompts, *args, **kwargs)
         for prompt in prompts:
-            options['temperature'] = ModelConnect.random_temp(0.2, 0.5)
-            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, options=options, **kwargs))
-        responses.extend(self.agg_resps(ep, *args, prompts=prompts, responses=responses,
-                                             options=options, **kwargs,))
+            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+        # aggreations (i.e. min, max, mean) are appended to the end of responses
+        responses.extend(self.aggate_responses(ep, *args, 
+                                                    prompts=prompts, 
+                                                    responses=responses,
+                                                    **kwargs,
+                            )
+        )
         return {'responses': responses}
 
-    def create_repeats(self, prompts:str, repeats:int=1, *args, **kwargs) -> list:
+    def create_repeats(self, prompts:str, *args, repeats:int=1, **kwargs) -> list:
+        """
+        The repeat mechanism allowes to pass a prompt to a model for num_repeats times.
+        However, it only allows for a single prompt to be repeated.
+        """
         if len(prompts) == 1 and repeats != 1:
             return [prompts[0] for _ in range(repeats)]
         else:
             return prompts
 
-    def agg_resps(self, ep, *args, prompts:list, responses:list,
+    def aggate_responses(self, ep, *args, prompts:list, responses:list,
                                                         strat_templates:str=None, 
+                                                        verbose:int=0,
                                                         **kwargs, ):
         """
         Aggregates muliple responses into a single response using the provided 
-        aggregation strategy. Also a std is estimated.
+        aggregation strategy. If the aggreation condition applies a std is always estimated
+        and appended to the end.
         """
         aggs = []
         responses = [r.get('response') for r in responses]
-        print(f"agg_response: {strat_templates = }")
         if len(responses) >= 2 and strat_templates is not None:
+            # during aggregation we do not want higher response diversity
+            kwargs['options']['temperature'] = 0.0
+            # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
                 strats = self.instructs(    *args,
@@ -87,9 +99,10 @@ class Endpoints:
                                             context = {'instructs': strats},
                                             verbose=3,
                                             )
+                if verbose >= 2:
+                    print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
                 agg['strat_templates'] = strat_templates
-                print(f"{Fore.RED}agg_response loop:{Fore.RESET} {agg['strat_templates'] = }")
                 agg['fmt'] = kwargs.get('fmt')
                 aggs.append(agg)
         return aggs
@@ -99,7 +112,7 @@ class Endpoints:
         Generates the JSON response for the /unittest request.
         """
         response = self.ping(*args, **kwargs)
-        # response['agg_test'] = self.agg_resps(*args, **kwargs)
+        # response['agg_test'] = self.aggate_responses(*args, **kwargs)
         return {'responses': [response]}
 
     def _ollama(self, func:str, prompt:str, *args, **kwargs) -> dict:

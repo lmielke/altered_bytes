@@ -6,6 +6,7 @@ from openai import OpenAI
 import json, re, requests, time
 from colorama import Fore, Style
 import random as rd
+import math
 
 class ModelConnect:
     """
@@ -27,13 +28,14 @@ class ModelConnect:
                         }
 
     @staticmethod
-    def random_temp(lower:float=None, upper:float=None) -> float:
-        if lower is None:
-            lower = 0.1
-        if upper is None:
-            upper = 0.6
+    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1) -> float:
+        if temp is not None:
+            return temp
+        bias = math.log(scale, 1000)
+        lower = (0.1 + bias) if lower is None else (lower + bias)
+        upper = (0.1 + bias) if upper is None else (upper + bias)
         rd_temp = min(max(lower, rd.random()), upper)
-        print(f"{Fore.YELLOW}Warning {Fore.RESET}random temperature set: {rd_temp:.2f}")
+        print(f"{Fore.YELLOW}Warning: {Fore.RESET}temp: {rd_temp:.2f}, {bias = }, {scale = }")
         return rd_temp
 
     def get_params(self, message:[str, list], *args, service_endpoint:str,
@@ -60,17 +62,20 @@ class ModelConnect:
                 message = [str(message)]
             # for embeddings we want the temperature to be low to be more deterministic
             if service_endpoint == 'get_embeddings':
-                temperature = temperature if temperature is not None else 0.
-        temperature = temperature if temperature is not None else ModelConnect.random_temp(0.1, 0.5)
-        context_len = max(self.min_context_len, min(len(message) // 3, int(context_length)))
+                temperature = 0.
+        # repeats refers to the number of times the prompt is repeated
+        # we increase the temperature for repeats > 1 to get more diverse responses
+        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats)
+        # we estimate the context length based on the message length
+        num_ctx = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         message = self.to_msgs(message) if name.startswith('gpt') else message
-        return message, name, stream, temperature, context_len, num_predict, strat_templates, repeats, service_endpoint
+        return message, name, stream, temperature, num_ctx, num_predict, strat_templates, repeats, service_endpoint
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        messages, name, stream, temperature, context_len, num_predict, strat_templates, repeats, service_endpoint = \
+        messages, name, stream, temperature, num_ctx, num_predict, strat_templates, repeats, service_endpoint = \
                                             self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
@@ -81,7 +86,7 @@ class ModelConnect:
         else:
             context['prompts'] = messages
             context['options'] = {  'temperature': temperature,
-                                    'num_ctx': context_len,
+                                    'num_ctx': num_ctx,
                                 }
             if num_predict is not None: 
                 context['options']['num_predict'] = num_predict
