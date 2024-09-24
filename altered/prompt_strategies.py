@@ -75,11 +75,11 @@ class Agg(Strategy):
             self.strats['inputs_header'] = f"Texts to aggregate:"
         if len(kwargs['prompts']) == 1:
             self.strats['inputs'] = self.mk_sample_single_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += f"intended to answer the same single prompt."
+            self.strats['inputs_intro'] += f"intending to answer the same single prompt."
             self.strats['inputs_header'] = f"Answers to a single prompt:"
         elif len(kwargs['prompts']) > 1:
             self.strats['inputs'] = self.mk_sample_multi_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += f"intended to answer {num_responses} prompts."
+            self.strats['inputs_intro'] += f"intending to answer {num_responses} prompts."
             self.strats['inputs_header'] = f"Answers and prompts:"
         else:
             self.strats['inputs'] = self.mk_sample_no_prompt(*args, **kwargs)
@@ -126,8 +126,8 @@ class Agg(Strategy):
         samples = []
         for i, response in enumerate(responses):
             samples.append(
-                            f"\n__SAMPLE {i+1}__\n\n"
-                            f"Response {i+1}:\n{response}"
+                            f"\n__RESPONSE SAMPLE {i+1}__\n"
+                            f"{response}"
                             )
         return f"\nPrompt: {prompts[0]}\n\n" + '\n'.join(samples)
 
@@ -149,8 +149,8 @@ class Agg(Strategy):
         samples = []
         for i, response in enumerate(responses):
             samples.append(
-                            f"\n__SAMPLE {i+1}__\n\n"
-                            f"Response {i+1}:\n{response}"
+                            f"\n__RESPONSE SAMPLE {i+1}__\n"
+                            f"{response}"
                             )
         return '\n'.join(samples)
 

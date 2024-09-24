@@ -30,6 +30,8 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
                 .replace('sample>', f"{Fore.MAGENTA}sample{Fore.RESET}>")
                 .replace('INST>', f"{Fore.CYAN}INST{Fore.RESET}>")
                 .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Fore.RESET}")
+                .replace('____RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Fore.RESET}")
+                .replace('Strategy Prompt', f"{Fore.YELLOW}Strategy Prompt{Fore.RESET}")
         )
     if verbose >= 2:
         print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")
