@@ -62,7 +62,7 @@ class Endpoints:
         return {'responses': responses}
 
     def aggate_responses(self, ep, *args, prompts:list, responses:list,
-                                                        strat_templates:str=None, 
+                                                        strat_templates:str=None,
                                                         verbose:int=0,
                                                         **kwargs, ):
         """
@@ -75,7 +75,6 @@ class Endpoints:
         if len(responses) >= 2 and strat_templates is not None:
             # during aggregation we do not want higher response diversity
             kwargs['options']['temperature'] = 0.0
-            kwargs['num_predict'] = kwargs['options']['num_predict']
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
@@ -134,6 +133,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
+        print(f"{Fore.YELLOW}do_Post in:{Fore.RESET} {kwargs = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep

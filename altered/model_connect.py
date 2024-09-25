@@ -94,14 +94,15 @@ class ModelConnect:
                                     'temperature': temperature,
                                     'num_ctx': num_ctx,
                                 }
-            if service_endpoint != 'get_embeddings':
-                context['repeats'] = repeats
-            elif service_endpoint == 'get_generates':
+            if context.get('service_endpoint') == 'get_generates':
                 if num_predict is not None: 
                     context['options']['num_predict'] = num_predict
+                    # num_predict is also used by pre_ollama_server, so we add it here to
+                    context['num_predict'] = num_predict
                 context['strat_templates'] = strat_templates
-                context['format'] = fmt
+                context['fmt'] = fmt
                 context['stream'] = False
+                context['repeats'] = repeats
         print(f"{Fore.YELLOW}context:{Fore.RESET} \n{context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context
