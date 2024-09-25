@@ -53,6 +53,7 @@ class Endpoints:
         responses = []
         for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
+                print(f"{Fore.GREEN}get_generates:{Fore.RESET} {prompt[:100] = }, {repeat = }")
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
                 print(f"{Fore.CYAN}\n{i} get_generates:{Fore.RESET} \n{responses[-1]}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
@@ -143,7 +144,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
-        print(f"{Fore.YELLOW}do_Post in:{Fore.RESET} {kwargs.get('verbose') = }")
+        print(f"{Fore.RED}do_Post in:{Fore.RESET} {kwargs.get('verbose') = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
