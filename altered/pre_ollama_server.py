@@ -114,7 +114,7 @@ class Endpoints:
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
-        print(f"{Fore.YELLOW}_ollama call with params:{Fore.RESET} \n{params}")
+        print(f"{Fore.YELLOW}_ollama {func} call with params:{Fore.RESET} \n{params}")
         r = getattr(self.olc, func)(prompt=prompt, **params)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
