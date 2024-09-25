@@ -94,28 +94,29 @@ class CleanWebSearch(WebSearch):
         super().__init__(*args, **kwargs)
         self.assi = ModelConnect(*args, **kwargs)
 
-    def __call__(self, *args, name:str=None, fmt:str=None, strategy:str=None, **kwargs):
+    def __call__(self, *args, name:str=None, fmt:str=None, repeats:str=None, **kwargs):
         se_results, search_query = super().__call__(*args, **kwargs)
-        cleaned = self.cleaning(se_results, search_query, *args, **kwargs)
+        cleaned = self.cleaning(se_results, search_query, *args, repeats=repeats, **kwargs)
         print(f"{Fore.YELLOW = } {Fore.RESET = }")
-        if strategy is not None and 'prompt_aggregations' in strategy:
-            print(f"{Fore.GREEN}Aggregating Cleaned Search Results: {Fore.RESET}: {strategy = }")
+        if repeats is not None and 'prompt_aggregations' in repeats:
+            print(f"{Fore.GREEN}Aggregating Cleaned Search Results: {Fore.RESET}: {repeats = }")
             # the second last record contains the aggregation
             se_results[0]['content'] = cleaned[-2].get('response').strip()
             se_results = [se_results[0]]
         else:
-            print(f"{Fore.GREEN}Looping Cleaned Search Results: {Fore.RESET}: {strategy = }")
+            print(f"{Fore.GREEN}Looping Cleaned Search Results: {Fore.RESET}: {repeats = }")
             for i, clean in enumerate(cleaned):
                 _clean = clean.get('response').strip()
                 se_results[i]['content'] = _clean
         return se_results, search_query
     
-    def cleaning(self, se_results:dict, search_query:str, *args, alias='l3:8b_1', **kwargs):
+    def cleaning(self, se_results:dict, search_query:str, *args, repeats:dict=None, alias='l3:8b_1', **kwargs):
         contents = []
         for i, result in enumerate(se_results):
             contents.append(self.cleaning_prompt(result.get('content'), search_query))
         # we use the ModelConnect object to post the contents to the AI model
-        r = self.assi.post(contents, *args, alias=alias, **kwargs )
+        if repeats is None: repeats = {'num': 1, 'agg': 'agg_mean'}
+        r = self.assi.post(contents, *args, alias=alias, repeats=repeats, **kwargs )
         return r.get('responses')
 
 

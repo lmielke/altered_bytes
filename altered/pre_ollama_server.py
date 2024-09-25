@@ -48,7 +48,8 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs
+        ) -> dict:
         responses = []
         for prompt in prompts:
             for repeat in range(repeats['num']):
@@ -80,7 +81,7 @@ class Endpoints:
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
-                print(f"{Fore.RED}Aggregating using \n{kwargs = }{Fore.RESET}")
+                print(f"{Fore.RED}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,
@@ -109,7 +110,7 @@ class Endpoints:
         # response['agg_test'] = self.aggate_responses(*args, **kwargs)
         return {'responses': [response]}
 
-    def _ollama(self, func:str, prompt:str, *args, fmt:str=None, **kwargs) -> dict:
+    def _ollama(self, func:str, prompt:str, *args, fmt:str=None, verbose:int=0,**kwargs) -> dict:
         """
         Generates the JSON response for the /_ollama request.
         """
@@ -121,8 +122,9 @@ class Endpoints:
         # here we finally call ollama server
         r = getattr(self.olc, func)(prompt=prompt, **params)
         self.prompt_counter[func] += 1
-        print(f"{Fore.YELLOW}_ollama '{func}' params:{Fore.RESET} {params}")
-        print(self.prompt_counter)
+        if verbose:
+            print(f"{Fore.YELLOW}_ollama '{func}' params:{Fore.RESET} {params}")
+            print(self.prompt_counter)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
 

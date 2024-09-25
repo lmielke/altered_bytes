@@ -44,7 +44,6 @@ class ModelConnect:
                                                         context_length:int,
                                                         temperature:float=None,
                                                         num_predict:int=None,
-                                                        strat_templates:str=None,
                                                         repeats:int=sts.repeats,
                                                         fmt:str='markdown',
                                                         **kwargs,
@@ -70,14 +69,14 @@ class ModelConnect:
         # we estimate the context length based on the message length
         num_ctx = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         messages = self.to_msgs(message) if name.startswith('gpt') else message
-        return fmt, messages, name, temperature, num_ctx, num_predict, strat_templates,\
+        return fmt, messages, name, temperature, num_ctx, num_predict,\
                      repeats, service_endpoint
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        fmt, messages, name, temperature, num_ctx, num_predict, strat_templates,\
+        fmt, messages, name, temperature, num_ctx, num_predict,\
         repeats, service_endpoint = \
                      self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
@@ -100,7 +99,6 @@ class ModelConnect:
                     context['options']['num_predict'] = num_predict
                     # num_predict is also used by pre_ollama_server, so we add it here to
                     context['num_predict'] = num_predict
-                context['strat_templates'] = strat_templates
                 context['fmt'] = fmt
                 context['stream'] = False
                 context['repeats'] = repeats
