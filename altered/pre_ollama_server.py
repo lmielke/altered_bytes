@@ -23,7 +23,7 @@ class Endpoints:
                             }
         # used to filter the kwargs for the ollama client
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
-        self.prompt_counter = defaultdict(int)
+        self.api_counter = defaultdict(int)
         self.olc = Client(host='http://localhost:11434')
         # used for aggregations of responses
         self.instructs = Instructions(*args, **kwargs)
@@ -114,8 +114,10 @@ class Endpoints:
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
-        print(f"{Fore.YELLOW}_ollama {func} call with params:{Fore.RESET} \n{params}")
         r = getattr(self.olc, func)(prompt=prompt, **params)
+        self.prompt_counter[func] += 1
+        print(f"{Fore.YELLOW}_ollama '{func}' params:{Fore.RESET} {params}")
+        print(self.prompt_counter)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
 
@@ -151,8 +153,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_error(404, f"Not a valid endpoint: '/{ep}'")
             return
         else:
-            self.service.prompt_counter[ep] += 1
-        return ep, {'prompt_counter': self.service.prompt_counter}
+            self.service.api_counter[ep] += 1
+            self.prompt_counter = defaultdict(int)
+        return ep, {'api_counter': self.service.api_counter}
 
     def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
         """
@@ -185,7 +188,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         time.sleep(0.01)
         print(
                     f"\nService {ep} responded successfully. "
-                    f"\n\tprompt_counter = {self.service.prompt_counter}, "
+                    f"\n\tprompt_counter = {self.service.api_counter}, "
                     f"\n\ttotal_server_time = {time.time() - self.server_time:.2f}"
                     )
         return {
