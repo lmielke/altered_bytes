@@ -11,7 +11,7 @@ from altered.yml_parser import YmlParser
 
 class Strategy:
 
-    fmts = {'json', 'yaml', 'yml', 'markdown'}
+    fmts = {'json': '# ...', 'yaml': '# ...', 'yml': '# ...', 'markdown': '> ...'}
     s_types = {'outputs', 'instructs'}
     s_type, s_name = None, None
     jinja_var = r'(^\w+)(?::\s*\\)(\{\{ \w+ \}\})(\s*$)'
@@ -38,6 +38,7 @@ class Strategy:
                                                 'meta': loader.fields.get('meta'),
                                                 'data': loader.data,
                                             }
+        self.strats['fmt_comment'] = f'''"{self.fmts.get(fmt, '# ...')}"'''
 
     def mk_context(self, *args, fmt:str=None, **kwargs):
         if fmt is not None:

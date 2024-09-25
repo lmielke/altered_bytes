@@ -81,15 +81,10 @@ class Chat:
             record['prompt'] = hlpp.pretty_prompt(record['prompt'])
         return record
 
-    def mk_model_params(self, *args, repeats:int=1, 
-                                    strat_templates:str=None, verbose:int=0, **kwargs,
-        ):
+    def mk_model_params(self, *args, repeats:dict=None, verbose:int=0, **kwargs, ):
         # Construct model parameters specific to this Chat (see ModelConnect.get_params())
-        strat_templates =  ['agg_mean'] if repeats != 1 and strat_templates is None \
-                                        else strat_templates
         server_params = {
                             'service_endpoint': 'get_generates',
-                            'strat_templates': strat_templates,
                             'repeats': repeats,
                         }
         ignore_fields = {'context',}

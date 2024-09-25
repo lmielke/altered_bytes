@@ -33,13 +33,13 @@ class Test_Prompt(unittest.TestCase):
 
     def test___call__(self, *args, **kwargs):
         _context = {
-                    # 'context_search_query': 'list comprehensions in Python',
+                    'context_search_query': 'list comprehensions in Python',
                     # 'strategy': 'prompt_aggregations.mean',
-                    'context_search_results': [
-                                        {'url': 'https://www.stackoverflow.com/some_topic', 'content': 'Search Query is None because this is unittest'},
-                                        {'url': 'https://www.stackexchange.com/some_other_topic', 'content': 'List comprehensions in Python'},
-                                        {'url': 'https://www.python.org/some_topic', 'content': 'Python list comprehensions'},
-                    ],
+                    # 'context_search_results': [
+                    #                     {'source': 'https://www.stackoverflow.com/some_topic', 'content': 'Search Query is None because this is unittest'},
+                    #                     {'source': 'https://www.stackexchange.com/some_other_topic', 'content': 'List comprehensions in Python'},
+                    #                     {'source': 'https://www.python.org/some_topic', 'content': 'Python list comprehensions'},
+                    # ],
                     'context_history': [
                             {'role': 'user', 'content': 'Hello, how can you help me today?'},
                             {'role': 'assistant', 'content': 'Id be happy to assist you. What kind of help do you need?'},
@@ -62,8 +62,8 @@ class Test_Prompt(unittest.TestCase):
                                 'Airplanes fly because of Bernoullis...',
                     ],
                     }
-        strat = Prompt(name='ut_Test_Prompt',)(**_context, fmt='json', alias='l3:8b_1')
-        print(strat)
+        prompt = Prompt(name='ut_Test_Prompt',)(**_context, fmt='json', alias='l3:8b_1')
+        print(prompt.data)
 
 
 

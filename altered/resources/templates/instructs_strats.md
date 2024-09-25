@@ -25,7 +25,7 @@
 ## Response Layout and Format
 {% if instructs.io %}
 ### Response Layout:
-The following is a {{ instructs.strats.fmt.upper() }} template to be used for the expected LLM response. For clarity, comments have been added between the lines. 
+The following is a {{ instructs.strats.fmt.upper() }} template to be used for the expected LLM response. For clarity, comments {{ instructs.strats.fmt_comment }} have been added between the lines.
 
 <response_template>
 
@@ -33,9 +33,9 @@ The following is a {{ instructs.strats.fmt.upper() }} template to be used for th
 
 </response_template>
 
-Return all entries shown in '<reponse_template>' combined into a single {{ instructs.strats.fmt.upper() }} string. Your response should be shorter then {{ instructs.default_max_words }} words.
+Return all entries shown in '<reponse_template>' combined into a single {{ instructs.strats.fmt.upper() }} string. Your response should be shorter than {{ instructs.default_max_words }} words. Do NOT include comments {{ instructs.strats.fmt_comment }} or surrounding text!
 {% elif instructs.strats.fmt %}
-Answer using {{ instructs.strats.fmt.upper() }} with no comments and no surrounding text!
+Answer using {{ instructs.strats.fmt.upper() }} Do not include comments or surrounding text!
 {% else %}
-Answer in plain text with no comments and no surrounding text!
+Answer in plain text! Do not include conversational text!
 {% endif%}

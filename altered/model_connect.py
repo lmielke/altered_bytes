@@ -1,6 +1,7 @@
 # assistant.py
 
 import altered.model_params as msts
+import altered.settings as sts
 from typing import Dict, Union, Tuple
 from openai import OpenAI
 import json, re, requests, time
@@ -44,7 +45,7 @@ class ModelConnect:
                                                         temperature:float=None,
                                                         num_predict:int=None,
                                                         strat_templates:str=None,
-                                                        repeats:int=1,
+                                                        repeats:int=sts.repeats,
                                                         fmt:str='markdown',
                                                         **kwargs,
         ) -> dict:
@@ -65,7 +66,7 @@ class ModelConnect:
                 temperature = 0.
         # repeats refers to the number of times the prompt is repeated
         # we increase the temperature for repeats > 1 to get more diverse responses
-        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats)
+        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats['num'])
         # we estimate the context length based on the message length
         num_ctx = max(self.min_context_len, min(len(message) // 3, int(context_length)))
         messages = self.to_msgs(message) if name.startswith('gpt') else message

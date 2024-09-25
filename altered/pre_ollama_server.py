@@ -48,15 +48,16 @@ class Endpoints:
             responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, repeats:int=1, **kwargs) -> dict:
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs) -> dict:
         responses = []
         for prompt in prompts:
-            for repeat in range(repeats):
+            for repeat in range(repeats['num']):
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         # aggreations (i.e. min, max, mean) are appended to the end of responses
         responses.extend(self.aggate_responses(ep, *args, 
                                                     prompts=prompts, 
                                                     responses=responses,
+                                                    strat_templates=[repeats['agg']],
                                                     **kwargs,
                             )
         )

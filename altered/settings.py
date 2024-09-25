@@ -50,3 +50,7 @@ assembly_ixs = {0: 'low', 1: 'medium', 2: 'moderate', 4: 'high',}
 
 default_config_path = os.path.join(resources_dir, 'models', 'models_servers.yml')
 models_config_path = os.path.join(resources_dir, 'models/models_servers.yml')
+
+
+# server params
+repeats = {'num': 1, 'agg': None}

@@ -28,12 +28,13 @@ class Instructions:
                             num_predict:int=None,
                             **kwargs,
         ):
-        return {
+        context = {
                     'strats': strat_context, 
                     'user_prompt': user_prompt_context, 
                     'io': strat_io,
-                    'default_max_words': num_predict // 4,
                 }
+        if num_predict is not None: context['default_max_words'] = num_predict // 4
+        return context
 
     def get_strats_names(self, *args, strat_templates:list=None, fmt:str=None, **kwargs):
         # we are calling the strat

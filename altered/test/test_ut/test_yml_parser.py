@@ -9,7 +9,7 @@ class Test_YmlParser(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 0
-        cls.test_data_path = os.path.join(sts.resources_dir, 'kwargs', 'strats_out_thought__thought_run.yml')
+        cls.test_data_path = os.path.join(sts.resources_dir, 'io', 'thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 

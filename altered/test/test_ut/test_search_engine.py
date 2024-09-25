@@ -5,7 +5,7 @@ import time
 # Assuming sts is correctly defined in altered.settings
 import altered.settings as sts
 from altered.search_engine import WebSearch  # Import WebSearch class
-from altered.data_vectorized import VecDB  # Assuming VecDB is also defined
+
 
 class Test_WebSearch(unittest.TestCase):
     @classmethod

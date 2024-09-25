@@ -231,7 +231,7 @@ class YmlParser:
                     # Convert JSON-like string to Python dictionary
                     json_obj = eval(line.strip(","))
                     for key, value in json_obj.items():
-                        markdown_str += f"# {key}\n{value}\n\n"
+                        markdown_str += f"# {key.capitalize()}\n{value}\n\n"
                 except:
                     pass  # Handle any malformed JSON-like strings
         return markdown_str.strip()
