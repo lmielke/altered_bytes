@@ -97,7 +97,7 @@ class Endpoints:
                 if verbose >= 2:
                     print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                print(f"{Fore.BLUE}\n{i} aggregate_responses:{Fore.RESET} \n{agg.get('response')}")
+                print(f"{Fore.BLUE}\naggregate_responses:{Fore.RESET} \n{agg.get('response')}")
                 agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
                 agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
