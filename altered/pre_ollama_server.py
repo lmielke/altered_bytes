@@ -51,9 +51,10 @@ class Endpoints:
     def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs
         ) -> dict:
         responses = []
-        for prompt in prompts:
+        for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+                print(f"{Fore.CYAN}\n{i} get_generates:{Fore.RESET} \n{responses[-1].get('response')}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
         responses.extend(self.aggate_responses(ep, *args, 
                                                     prompts=prompts, 
@@ -96,6 +97,7 @@ class Endpoints:
                 if verbose >= 2:
                     print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
+                print(f"{Fore.BLUE}\n{i} aggregate_responses:{Fore.RESET} \n{agg.get('response')}")
                 agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
                 agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
