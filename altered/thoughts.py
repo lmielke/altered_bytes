@@ -55,12 +55,6 @@ class Chat:
         self.running = True
         self.init_prompt = {'role': role, 'content': user_prompt}
 
-    # def get_chat_dir(self, name:str, *args, data_dir:str=None, **kwargs):
-    #     name = re.sub(r'\W+', '_', name.lower())
-    #     print(f"{Fore.YELLOW}name: {Fore.RESET}{name}, {data_dir = }")
-    #     chats_dir = data_dir if data_dir is not None else self.default_chats_dir
-    #     return name, os.path.join(chats_dir, name)
-
     def next_chat_item(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, context=self.mk_context(*args, **kwargs), **kwargs, )
@@ -72,7 +66,7 @@ class Chat:
         self.show(*args, **kwargs)
 
     def post(self, *args, **kwargs):
-        server_params = self.update_model_params(*args, **kwargs)
+        server_params = self.mk_model_params(*args, **kwargs)
         # we post one or multiple user prompts to the AI model (repeats == num of prompt reps)
         return self.assi.post([self.p], *args, **server_params, )
 
@@ -87,20 +81,19 @@ class Chat:
             record['prompt'] = hlpp.pretty_prompt(record['prompt'])
         return record
 
-    def update_model_params(self, *args, alias:str=None, num_predict:int=None, repeats:int=1,
-                            strat_templates:str=None, verbose:int=0, **kwargs,
+    def mk_model_params(self, *args, repeats:int=1, 
+                                    strat_templates:str=None, verbose:int=0, **kwargs,
         ):
         # Construct model parameters specific to this Chat (see ModelConnect.get_params())
-        strat_templates =  ['agg_mean'] if repeats != 1 and strat_templates is None else strat_templates
+        strat_templates =  ['agg_mean'] if repeats != 1 and strat_templates is None \
+                                        else strat_templates
         server_params = {
                             'service_endpoint': 'get_generates',
-                            'alias': alias,
-                            'num_predict': num_predict,
-                            'verbose': verbose,
                             'strat_templates': strat_templates,
                             'repeats': repeats,
                         }
-        server_params.update({k:vs for k, vs in kwargs.items() if not k in {'context',}})
+        ignore_fields = {'context',}
+        server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})
         return server_params
 
     def mk_context(self, *args, **kwargs):

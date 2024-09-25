@@ -10,16 +10,16 @@ user_prompt: How do I monitor my GPUs performance?
 alias: l3:8b_1
 
 # meta: {"name": "num_predict", "type": "string", "default": "", "example": 100}
-# num_predict is the maximal response lenght expected from the model
-num_predict: 100
+# num_predict is the max number of tokens to be generated for the response
+num_predict: 500
 
 # meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
 # fmt is the response format expected from the model (markdown, json, yaml)
-fmt: markdown
+fmt: json
 
 # meta: {"name": "repeats", "type": "int", "default": "", "example": 1}
 # repeats is a prompt repeat counter (model is prompted multiple times to improve the response)
-repeats: 1
+repeats: 3
 
 # meta: {"name": "verbose", "type": "int", "default": 0, "example": 3}
 # verbose is a internal technical field to control the verbosity of the computation

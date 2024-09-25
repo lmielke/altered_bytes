@@ -17,9 +17,10 @@ default_aggreg = 'agg_mean'
 class Prompt:
 
 
-    def __init__(self, *args, **kwargs):
-        self.context = Context(*args, **kwargs)
-        self.instructs = Instructions(*args, **kwargs)
+    def __init__(self, name, *args, **kwargs):
+        self.name = name
+        self.context = Context(name, *args, **kwargs)
+        self.instructs = Instructions(name, *args, **kwargs)
         self.renderer = Render(*args, **kwargs)
         self.response = Response(*args, **kwargs)
         self.assi = ModelConnect(*args, **kwargs)
@@ -36,7 +37,7 @@ class Prompt:
         Constructs the final prompt as to be send to the AI model.
         """
         self.context_dict = { 
-                            'prompt_title': 'LLM Prompt',
+                            'prompt_title': f"Prompt for {self.name}",
                             'context': self.get_context(*args, **kwargs),
                             'instructs': self.get_instructs(*args, **kwargs),
                         }

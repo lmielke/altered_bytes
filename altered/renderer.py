@@ -15,9 +15,9 @@ class Render:
         self.document = None
 
     def _load_context(self, *args, context:dict=None, context_path:str=None, **kwargs):
+        if context is not None: return context
         msg = f"{Fore.RED}Neither context nor context_path have been provided.{Fore.RESET}"
         if context is None and context_path is None: raise AttributeError(msg)
-        if context is not None: return context
         context_path = context_path if context_path else self.default_context_path
         try:
             with open(os.path.join(context_path), 'r') as file:

@@ -13,6 +13,7 @@
 ## Input Data
 ### {{ instructs.strats.inputs_header }}
 {{ instructs.strats.inputs_intro }}
+
 <sample>
 {{ instructs.strats.inputs }}
 </sample>
@@ -32,9 +33,9 @@ The following is a {{ instructs.strats.fmt.upper() }} template to be used for th
 
 </response_template>
 
-Return all entries shown in '<reponse_template>' combined into a single {{ instructs.strats.fmt.upper() }} string.
+Return all entries shown in '<reponse_template>' combined into a single {{ instructs.strats.fmt.upper() }} string. Your response should be shorter then {{ instructs.default_max_words }} words.
 {% elif instructs.strats.fmt %}
-Answer using plain {{ instructs.strats.fmt.upper() }} with no comments and no surrounding text!
+Answer using {{ instructs.strats.fmt.upper() }} with no comments and no surrounding text!
 {% else %}
 Answer in plain text with no comments and no surrounding text!
 {% endif%}

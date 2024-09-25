@@ -51,6 +51,7 @@ class Default(Strategy):
 class Agg(Strategy):
 
     s_name:str = 'agg'
+    agg_tag = '<sample>'
     """
     Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
     instruction.
@@ -66,7 +67,7 @@ class Agg(Strategy):
         """
         num_responses = len(kwargs['responses'])
         self.strats['inputs_intro'] = (
-                            f"Below is the <sample> of {num_responses} "
+                            f"Below is the {self.agg_tag} of {num_responses} "
                             f"of an LLM`s responses "
                         )
         if not kwargs.get('prompts'):

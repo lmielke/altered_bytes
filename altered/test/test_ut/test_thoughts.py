@@ -40,10 +40,6 @@ class Test_Chat(unittest.TestCase):
         print(f"{self.test_io_path = }")
         yml = YmlParser(fields_paths=[self.test_io_path])
         yml.add_labels(name='Unittest', labels=self.test_io_path, description="run chat")
-        yml.data['verbose'] = verbose
-        yml.data['fmt'] = 'json'
-        yml.data['repeats'] = 3
-        del yml.data['fmt']
         chat.run(*args, **yml.data,)
 
 

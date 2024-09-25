@@ -1,0 +1,150 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+
+</[36mINST[39m>
+
+",user,None,llama3.1,ut_chat,None,None,2024-09-24 17:31:53.497842
+"To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
+
+1. **Use built-in monitoring tools**: Most modern GPUs have built-in monitoring tools that allow you to track their performance in real-time. For example, NVIDIA provides the GeForce Experience app, which includes a monitoring tool called ""GPU Monitor"" that shows GPU usage, temperature, and memory usage. Additionally, AMD offers the ""AMD Radeon Settings"" app for Windows and Linux.
+2.","[33mStrategy Prompt[39m using agg_mean:
+
+
+# 3. Instructions (INST)
+
+## Weighted Mean Aggregation
+This strategy generates a weighted average summary from a given <[35msample[39m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary  that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - Response 1: ""The quick brown fox jumps over the lazy dog.""
+  - Response 2: ""A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - Response 3: ""The nimble fox hops over a lethargic dog.""
+Expected Output:
+  ""Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
+  The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
+  the speed of the fox more than the other descriptions.""
+  
+  This output gives more weight to common themes, like the fox leaping, while incorporating 
+  details from all the responses, balancing frequent mentions with unique contributions.
+
+## Objective
+Read and understand the following <[35msample[39m> texts! Read the provided prompts or  re-construct the prompt or problem statement based on the provided responses. Then, create a weighted average summary that synthesizes key points from all the responses,  giving more emphasis to frequently mentioned themes, while still incorporating unique contributions  where they add value. The summary should reflect the overall balance of common and unique points.
+
+
+## Input Data
+### Answers to a single prompt:
+Below is the <[35msample[39m> of 3 of an LLM`s responses intending to answer the same single prompt.
+<[35msample[39m>
+
+Prompt: 
+# LLM Prompt
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+
+</[36mINST[39m>
+
+
+
+
+__RESPONSE SAMPLE 1__
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
+
+1. **Use built-in monitoring tools**: Most modern GPUs have built-in monitoring tools that allow you to track their performance in real-time. For example, NVIDIA provides the GeForce Experience app, which includes a monitoring tool called ""GPU Monitor"" that shows GPU usage, temperature, and memory usage.
+2. **Use third-party software**: There are many third-party software options available that can
+
+__RESPONSE SAMPLE 2__
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
+
+1. **Use built-in monitoring tools**: Most GPUs have a built-in monitoring tool that allows you to track their performance in real-time. For example, NVIDIA provides the ""NVIDIA System Monitor"" for Windows and macOS, while AMD offers the ""AMD Radeon Settings"" app.
+2. **Use third-party software**: There are many third-party software options available that can monitor your GPU
+
+__RESPONSE SAMPLE 3__
+To monitor your GPU's performance, you can use various tools and methods. Here are some steps you can follow:
+
+1. **Use built-in monitoring tools**: Most GPUs have built-in monitoring tools that allow you to track their performance in real-time. For example, NVIDIA provides the ""NVSMI"" (NVIDIA System Management Interface) tool for Windows, while AMD offers the ""Radeon Settings"" app for Windows and Linux.
+2. **Use third-party software**: There are many third-party
+</[35msample[39m>
+
+## Your Task
+From the provided responses, create a weighted summary that incorporates key points from  all responses. Pay more attention to common themes or ideas mentioned by multiple responses,  while ensuring that unique details from each response are included where relevant.
+
+
+
+## Response Layout and Format
+
+Answer in plain text with no comments and no surrounding text!
+",assistant,None,llama3.1,ut_chat,None,None,2024-09-24 17:31:53.497842

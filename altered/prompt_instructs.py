@@ -13,8 +13,8 @@ from altered.yml_parser import YmlParser
 class Instructions:
     default_strats = ['default_user_prompt', 'answer_simple']
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, name, *args, **kwargs):
+        self.name = name
 
     def __call__(self, *args, **kwargs):
         s_names = self.get_strats_names(*args, **kwargs)
@@ -24,8 +24,16 @@ class Instructions:
         self.check_context(s_names, user_prompt_context, *args, **kwargs)
         return self.mk_context(strat_context, user_prompt_context, strat_io, *args, **kwargs)
 
-    def mk_context(self, strat_context, user_prompt_context, strat_io, *args, **kwargs):
-        return {'strats': strat_context, 'user_prompt': user_prompt_context, 'io': strat_io,}
+    def mk_context(self, strat_context, user_prompt_context, strat_io, *args,
+                            num_predict:int=None,
+                            **kwargs,
+        ):
+        return {
+                    'strats': strat_context, 
+                    'user_prompt': user_prompt_context, 
+                    'io': strat_io,
+                    'default_max_words': num_predict // 4,
+                }
 
     def get_strats_names(self, *args, strat_templates:list=None, fmt:str=None, **kwargs):
         # we are calling the strat
