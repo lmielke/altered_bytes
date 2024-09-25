@@ -54,7 +54,7 @@ class Endpoints:
         for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
-                print(f"{Fore.CYAN}\n{i} get_generates:{Fore.RESET} \n{responses[-1].get('response')}")
+                print(f"{Fore.CYAN}\n{i} get_generates:{Fore.RESET} \n{responses[-1]}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
         responses.extend(self.aggate_responses(ep, *args, 
                                                     prompts=prompts, 

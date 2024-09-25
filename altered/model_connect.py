@@ -72,7 +72,7 @@ class ModelConnect:
         return fmt, messages, name, temperature, num_ctx, num_predict,\
                      repeats, service_endpoint
 
-    def prep_context(self, *args, name:str, **kwargs, ) -> dict:
+    def prep_context(self, *args, name:str, verbose:int=0, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
@@ -81,7 +81,7 @@ class ModelConnect:
                      self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
-        context = {'model': name,}
+        context = {'model': name, 'verbose': verbose}
         if name.startswith('gpt'):
             context['messages'] = messages
             context['temperature'] = temperature
