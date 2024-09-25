@@ -75,6 +75,7 @@ class Endpoints:
         if len(responses) >= 2 and strat_templates is not None:
             # during aggregation we do not want higher response diversity
             kwargs['options']['temperature'] = 0.0
+            kwargs['num_predict'] = kwargs['options']['num_predict']
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
@@ -113,6 +114,7 @@ class Endpoints:
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
+        print(f"{Fore.YELLOW}_ollama call with params:{Fore.RESET} \n{params}")
         r = getattr(self.olc, func)(prompt=prompt, **params)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r

@@ -68,7 +68,7 @@ class Chat:
     def post(self, *args, **kwargs):
         server_params = self.mk_model_params(*args, **kwargs)
         # we post one or multiple user prompts to the AI model (repeats == num of prompt reps)
-        return self.assi.post([self.p], *args, **server_params, )
+        return self.assi.post([self.p.data], *args, **server_params, )
 
     def mk_data_record(self, *args, role:str, user_prompt:str, **kwargs):
         record = {c: str(self.r.get(c)) for c in self.data.columns}
@@ -76,7 +76,7 @@ class Chat:
         # for role 'user' the prompt is displayed together with the answer/response
         if role == 'user':
             record['content'] = user_prompt
-            record['prompt'] = hlpp.pretty_prompt(self.p)
+            record['prompt'] = hlpp.pretty_prompt(self.p.data)
         elif role == 'assistant':
             record['prompt'] = hlpp.pretty_prompt(record['prompt'])
         return record

@@ -19,44 +19,42 @@ class Prompt:
 
     def __init__(self, name, *args, **kwargs):
         self.name = name
-        self.context = Context(name, *args, **kwargs)
-        self.instructs = Instructions(name, *args, **kwargs)
-        self.renderer = Render(*args, **kwargs)
-        self.response = Response(*args, **kwargs)
-        self.assi = ModelConnect(*args, **kwargs)
+        self.C = Context(name, *args, **kwargs)
+        self.I = Instructions(name, *args, **kwargs)
+        self.RD = Render(*args, **kwargs)
         self.data = None
         self.warnings = {}
 
     def __call__(self, *args, **kwargs):
         self.mk_prompt(*args, **kwargs)
-        return self.render_prompt(*args, **kwargs)
+        self.render_prompt(*args, **kwargs)
+        return self
 
 
     def mk_prompt(self, *args, **kwargs):
         """
         Constructs the final prompt as to be send to the AI model.
         """
-        self.context_dict = { 
+        self.context = { 
                             'prompt_title': f"Prompt for {self.name}",
                             'context': self.get_context(*args, **kwargs),
                             'instructs': self.get_instructs(*args, **kwargs),
                         }
 
     def render_prompt(self, *args, context:dict=None, **kwargs):
-        data = self.renderer.render(*args, 
+        self.data = self.RD.render(*args, 
                                                     template_name='prompt.md', 
-                                                    context=self.context_dict, 
+                                                    context=self.context, 
                                                     **kwargs,
                     )
-        hlpp.pretty_prompt(data, *args, **kwargs)
-        return data
+        hlpp.pretty_prompt(self.data, *args, **kwargs)
 
     def get_context(self, *args, **kwargs):
-        context_dict = self.context(*args, **kwargs)
+        context_dict = self.C(*args, **kwargs)
         return context_dict
 
     def get_instructs(self, *args, **kwargs):
-        instructs = self.instructs(*args, **kwargs)
+        instructs = self.I(*args, **kwargs)
         return instructs
 
 

@@ -41,11 +41,11 @@ class ModelConnect:
     def get_params(self, message:[str, list], *args, service_endpoint:str,
                                                         name:str,
                                                         context_length:int,
-                                                        stream:str=False,
                                                         temperature:float=None,
                                                         num_predict:int=None,
                                                         strat_templates:str=None,
                                                         repeats:int=1,
+                                                        fmt:str='markdown',
                                                         **kwargs,
         ) -> dict:
         # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
@@ -68,15 +68,17 @@ class ModelConnect:
         temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats)
         # we estimate the context length based on the message length
         num_ctx = max(self.min_context_len, min(len(message) // 3, int(context_length)))
-        message = self.to_msgs(message) if name.startswith('gpt') else message
-        return message, name, stream, temperature, num_ctx, num_predict, strat_templates, repeats, service_endpoint
+        messages = self.to_msgs(message) if name.startswith('gpt') else message
+        return fmt, messages, name, temperature, num_ctx, num_predict, strat_templates,\
+                     repeats, service_endpoint
 
     def prep_context(self, *args, name:str, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
-        messages, name, stream, temperature, num_ctx, num_predict, strat_templates, repeats, service_endpoint = \
-                                            self.get_params(*args, name=name, **kwargs)
+        fmt, messages, name, temperature, num_ctx, num_predict, strat_templates,\
+        repeats, service_endpoint = \
+                     self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
         context = {'model': name,}
@@ -84,19 +86,23 @@ class ModelConnect:
             context['messages'] = messages
             context['temperature'] = temperature
         else:
+            context['service_endpoint'] = msts.config.defaults.get('service_endpoint') \
+                                            if service_endpoint is None else service_endpoint
             context['prompts'] = messages
-            context['options'] = {  'temperature': temperature,
+            context['keep_alive'] = msts.config.defaults.get('keep_alive')
+            context['options'] = {  
+                                    'temperature': temperature,
                                     'num_ctx': num_ctx,
                                 }
-            if num_predict is not None: 
-                context['options']['num_predict'] = num_predict
-            context['keep_alive'] = msts.config.defaults.get('keep_alive')
-            context['service_endpoint'] = msts.config.defaults.get('service_endpoint') if service_endpoint is None else service_endpoint
             if service_endpoint != 'get_embeddings':
-                context['stream'] = stream
-                context['strat_templates'] = strat_templates
                 context['repeats'] = repeats
-        print(f"{Fore.YELLOW}context:{Fore.RESET} {context}")
+            elif service_endpoint == 'get_generates':
+                if num_predict is not None: 
+                    context['options']['num_predict'] = num_predict
+                context['strat_templates'] = strat_templates
+                context['format'] = fmt
+                context['stream'] = False
+        print(f"{Fore.YELLOW}context:{Fore.RESET} \n{context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 

@@ -1,0 +1,65 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a JSON template to be used for the expected LLM response. For clarity, comments have been added between the lines. 
+
+<response_template>
+
+# The answer field contains the model response
+{""answer"": ""I am a helpful assistant. How can I help you today?""},
+
+</response_template>
+
+Return all entries shown in '<reponse_template>' combined into a single JSON string. Your response should be shorter then 125 words.
+
+</[36mINST[39m>
+
+",user,None,llama3.1,ut_chat,None,None,2024-09-25 11:40:56.260591
+"<response_template>
+{""answer"": ""To monitor your GPU's performance, you can use various tools and methods. In the context information section, I've found that some popular options include:
+- NVIDIA System Monitor (for NVIDIA GPUs)
+- AMD Ryzen Master (for AMD GPUs)
+- GPU-Z (a comprehensive graphics card utility)
+
+You can also check your system's Event Viewer or System Log for any GPU-related errors or warnings.
+
+If you need more specific guidance, please provide details about your GPU model and system configuration.""}
+</response_template>",None,assistant,None,llama3.1,ut_chat,None,None,2024-09-25 11:40:56.260591
