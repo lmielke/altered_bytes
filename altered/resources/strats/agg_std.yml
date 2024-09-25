@@ -33,8 +33,9 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    Read and understand the following <sample> texts! Read the provided prompts or 
-    re-construct the prompt or problem statement based on the provided responses.
+    Read and understand the following <sample> texts! Then, read and understand the provided 
+    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
+    based on the provided responses.
     Then, calculate the standard deviation of similarity between the texts, providing a 
     score from 0 (virtually identical) to 6 (no commonalities), along with a short justification 
     explaining the reasoning behind the chosen score. The output should be a JSON string in the 

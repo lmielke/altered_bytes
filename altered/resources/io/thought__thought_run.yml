@@ -25,4 +25,4 @@ repeats:
 
 # meta: {"name": "verbose", "type": "int", "default": 0, "example": 3}
 # verbose is a internal technical field to control the verbosity of the computation
-verbose: 3
+verbose: 2

@@ -102,7 +102,7 @@ class ModelConnect:
                 context['fmt'] = fmt
                 context['stream'] = False
                 context['repeats'] = repeats
-        print(f"{Fore.YELLOW}context:{Fore.RESET} \n{context}")
+        # print(f"{Fore.YELLOW}ModelConnect.prep_context.context:{Fore.RESET} \n{context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 

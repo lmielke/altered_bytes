@@ -51,8 +51,7 @@ class Default(Strategy):
 
 class Agg(Strategy):
 
-    s_name:str = 'agg'
-    agg_tag = '<sample>'
+    strat_tag = 'sample'
     """
     Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
     instruction.
@@ -67,13 +66,19 @@ class Agg(Strategy):
         Generates aggregation prompt based on the specified strategy.
         """
         num_responses = len(kwargs['responses'])
+        self.strats['strat_tag'] = self.strat_tag
         self.strats['inputs_intro'] = (
-                            f"Below is the {self.agg_tag} of {num_responses} "
+                            f"Below is the {self.strat_tag} of {num_responses} "
                             f"of an LLM`s responses "
                         )
         if not kwargs.get('prompts'):
             self.strats['inputs'] = self.mk_sample_no_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += f"that need to be aggregated."
+            self.strats['inputs_intro'] += (
+                        f"that need to be aggregated. "
+                        f"Note, that there is no prompt associated with these responses. "
+                        f"Therefore you have to infer the prompt from other information, "
+                        f"i.e. the responses, name or search query."
+                                            )
             self.strats['inputs_header'] = f"Texts to aggregate:"
         if len(kwargs['prompts']) == 1:
             self.strats['inputs'] = self.mk_sample_single_prompt(*args, **kwargs)
@@ -151,10 +156,39 @@ class Agg(Strategy):
         samples = []
         for i, response in enumerate(responses):
             samples.append(
-                            f"\n__RESPONSE SAMPLE {i+1}__\n"
+                            f"\n__TEXT SAMPLE {i+1}__\n"
                             f"{response}"
                             )
         return '\n'.join(samples)
 
-        
 
+class Reduce(Strategy):
+
+    strat_tag = 'de_noise_text'
+    """
+    Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
+    instruction.
+    Aggregation refers to condensing multiple prompts into a single prompt.
+    """
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        return self.mk_prompt_reduce_instruct(*args, **kwargs)
+
+    def mk_prompt_reduce_instruct(self, *args, responses:list, user_prompt:str=None, search_query:str=None, **kwargs) -> dict:
+        """
+        Generates aggregation prompt based on the specified strategy.
+        """
+        resp = responses[0]
+        headers = ''
+        if user_prompt:
+            headers += f"user_prompt: {user_prompt}\n"
+            response = 'Response:\n' + resp
+        if search_query:
+            headers += f"search_query: {search_query}\n"
+            response = 'Search Result:\n' + resp
+        if not user_prompt and not search_query:
+            response = resp
+        self.strats['strat_tag'] = self.strat_tag
+        self.strats['inputs'] = f"{headers}\n" + response
+        self.strats['inputs_header'] = f"Text to clean:"
+        return self.strats

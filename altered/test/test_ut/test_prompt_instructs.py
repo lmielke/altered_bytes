@@ -2,6 +2,7 @@
 
 import os, re, shutil, sys, time, yaml
 import unittest
+from colorama import Fore, Style
 
 # test package imports
 import altered.settings as sts
@@ -29,14 +30,14 @@ class Test_Instructions(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        inst = Instructions()
+        inst = Instructions(name='Test_Instructions')
 
     def test___call__(self, *args, **kwargs):
-        instr1 = Instructions()
+        instr1 = Instructions(name='Test_Instructions')
         # test is using the qa template
         strats = instr1(  strat_templates=self.test_templates_names,
                         fmt='markdown',
-                        user_prompt='Why do horses neigh?',
+                        # user_prompt='Why do horses neigh?',
                         prompts=[
                                     'Why is the sky blue?',
                         ],
@@ -53,7 +54,28 @@ class Test_Instructions(unittest.TestCase):
                                             context = {'instructs': strats},
                                             verbose=self.verbose,
                                             )
-        print(f"render result: \n{rendered}")
+        print(f"{Fore.YELLOW}render result {self.test_templates_names = }{Fore.RESET}: \n{rendered}")
+
+
+        with open(os.path.join(sts.test_data_dir, 'test_search_engine_cleaned.yml'), 'r') as f:
+            out = yaml.safe_load(f)
+
+        instr2 = Instructions(name='Test_Instructions')
+        # test is using the qa template
+        strats = instr2(  strat_templates=['reduce_text', 'qa_simple'],
+                        # user_prompt='Why do horses neigh?',
+                        user_prompt=out.get('user_prompt'),
+                        search_query=out.get('search_query'),
+                        responses=[out.get('content'),],
+                        )
+
+        # here we give the output of the __call__ test to renderer to veryfy the correctness
+        rendered = self.renderer.render(
+                                            template_name='instructs.md',
+                                            context = {'instructs': strats},
+                                            verbose=self.verbose,
+                                            )
+        print(f"{Fore.CYAN}\n\nrender result {self.test_templates_names = }{Fore.RESET}: \n{rendered}")
 
 
 if __name__ == "__main__":

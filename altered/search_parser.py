@@ -33,6 +33,7 @@ class Parser:
         """
         Fetches content from a URL using requests.
         """
+        print(f"{Fore.YELLOW}\tRequests, {Fore.RESET}Fetching content from {url}")
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()
         return self.extract_content(response.content)
@@ -41,6 +42,7 @@ class Parser:
         """
         Fetches content from a URL using Playwright to render JavaScript.
         """
+        print(f"{Fore.YELLOW}\tPlaywright, {Fore.RESET}Fetching content from {url}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
@@ -51,7 +53,7 @@ class Parser:
 
             return self.extract_content(content)
 
-    def extract_content(self, html_content: str) -> str:
+    def extract_content(self, html_content: str, *args, **kwargs) -> str:
         """
         Extracts both paragraph text and code snippets from the HTML content.
         """
@@ -63,7 +65,7 @@ class Parser:
 
         # Combine the paragraphs and code blocks
         combined_content = '\n'.join(paragraphs + code_blocks)
-
+        combined_content = self.clean_text(combined_content, *args, **kwargs)
         return combined_content if combined_content else "No readable content found."
 
     def parse_urls(self, urls: dict, max_workers: int = 5, use_playwright: bool = True, *args, **kwargs) -> dict:
@@ -73,12 +75,31 @@ class Parser:
         def process_url(url):
             return url, self.parse_site(url, use_playwright=use_playwright, *args, **kwargs)
 
-        print(f"{Fore.YELLOW}Parsing {len(urls)} URLs in parallel...{Fore.RESET}")
         url_contents = {}
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(process_url, url): url for url in urls}
             for future in as_completed(future_to_url):
                 url, parsed_content = future.result()
                 url_contents[url] = parsed_content
-
         return url_contents
+
+    def clean_text(self, text: str, *args, **kwargs) -> str:
+        """
+        Cleans the text by removing extra whitespace and newlines.
+        """
+        clean_terms = {'Cookie duration', 'Data collected and processed', 'use cookies',
+                        'Content presented to you on this service',
+                        'Information regarding which advertising',
+                        'Advertising presented to you',
+                        'Cookies, device or similar online',
+                        'Uses other forms of storage',
+                        }
+        cleaned = []
+        for line in text.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            if any(term in line for term in clean_terms):
+                continue
+            cleaned.append(line)
+        return '\n'.join(cleaned)

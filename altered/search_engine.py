@@ -27,6 +27,7 @@ class WebSearch:
         self.api_key = mpg.services.get('google_se').get('api_key')
         self.cse_id = mpg.services.get('google_se').get('cse_id')
         self.g_url = mpg.services.get('google_se').get('url')
+        print(f"{Fore.YELLOW}{name} Initializing WebSearch: {Fore.RESET} {self.default_data_dir = }")
         self.search_results = VecDB(*args, 
                     name=name, 
                     u_fields_paths=[self.search_fields_path], 
@@ -84,64 +85,3 @@ class WebSearch:
         for result in r:
             self.search_results.append(result, *args, **kwargs)
         self.search_results.save_to_disk(*args, **kwargs)
-
-
-from altered.model_connect import ModelConnect
-
-class CleanWebSearch(WebSearch):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.assi = ModelConnect(*args, **kwargs)
-
-    def __call__(self, *args, name:str=None, fmt:str=None, repeats:str=None, **kwargs):
-        se_results, search_query = super().__call__(*args, **kwargs)
-        cleaned = self.cleaning(se_results, search_query, *args, repeats=repeats, **kwargs)
-        print(f"{Fore.YELLOW = } {Fore.RESET = }")
-        if repeats is not None and 'prompt_aggregations' in repeats:
-            print(f"{Fore.GREEN}Aggregating Cleaned Search Results: {Fore.RESET}: {repeats = }")
-            # the second last record contains the aggregation
-            se_results[0]['content'] = cleaned[-2].get('response').strip()
-            se_results = [se_results[0]]
-        else:
-            print(f"{Fore.GREEN}Looping Cleaned Search Results: {Fore.RESET}: {repeats = }")
-            for i, clean in enumerate(cleaned):
-                _clean = clean.get('response').strip()
-                se_results[i]['content'] = _clean
-        return se_results, search_query
-    
-    def cleaning(self, se_results:dict, search_query:str, *args, repeats:dict=None, alias='l3:8b_1', **kwargs):
-        contents = []
-        for i, result in enumerate(se_results):
-            contents.append(self.cleaning_prompt(result.get('content'), search_query))
-        # we use the ModelConnect object to post the contents to the AI model
-        if repeats is None: repeats = {'num': 1, 'agg': 'agg_mean'}
-        r = self.assi.post(contents, *args, alias=alias, repeats=repeats, **kwargs )
-        return r.get('responses')
-
-
-
-    def cleaning_prompt(self, content:str, search_query:str, *args, **kwargs):
-        return f"""
-        <results>
-
-        {content}
-
-        </results>
-
-
-
-        <INST>
-        The <content> tag above contains search results from a Google search using the 
-        
-        search term: "{search_query}"
-        
-        The egerly parsed results text now contains a lot of unwanted information. 
-        (i.e. ads, cookie data, storage data, etc.)
-        Your task is to clean the results text and signifficantly reduce the text size. Do 
-        only include text of high and medium relevace to search term.
-        
-        Return the cleaned results as nicely formatted 'markdown' text using English language. 
-        Do not add any additional information! Do not add comments to your answer!
-        </INST>
-        """

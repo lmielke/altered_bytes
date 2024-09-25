@@ -12,7 +12,7 @@ class Render:
 
     def __init__(self, *args, **kwargs):
         self.env = Environment(loader=FileSystemLoader(sts.templates_dir))
-        self.document = None
+        self.document:str = None
 
     def _load_context(self, *args, context:dict=None, context_path:str=None, **kwargs):
         if context is not None: return context
@@ -29,9 +29,10 @@ class Render:
         self.context = self._load_context(*args, context=context, **kwargs)
         template = self.env.get_template(template_name)
         context = context if context else self.context
-        if verbose >= 2: hlpp.dict_to_table('Render.render.context', context)
+        if verbose >= 3: hlpp.dict_to_table('Render.render.context', context)
         # we sort the keys to make sure the fields are in the correct order
         self.document = template.render({k: context.get(k) for k in self.fields})
+        self.document = Render.render_from_string(self.document, context, *args, **kwargs)
         self.document = self.correct_ansi_codes(self.document, *args, **kwargs)
         return self.document
 
@@ -52,7 +53,8 @@ class Render:
         with open(os.path.join(sts.templates_dir, 'temp', output_file), 'w') as file:
             file.write(self.document)
 
-    def render_from_string(self, template_str:str, context:dict, *args, **kwargs) -> str:
+    @staticmethod
+    def render_from_string(template_str:str, context:dict, *args, **kwargs) -> str:
         """
         Render a template from a string using the provided context.
 

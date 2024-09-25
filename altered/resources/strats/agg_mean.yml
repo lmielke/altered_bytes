@@ -34,8 +34,9 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    Read and understand the following <sample> texts! Read the provided prompts or 
-    re-construct the prompt or problem statement based on the provided responses.
+    Read and understand the following <sample> texts! Then, read and understand the provided 
+    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
+    based on the provided responses.
     Then, create a weighted average summary that synthesizes key points from all the responses, 
     giving more emphasis to frequently mentioned themes, while still incorporating unique contributions 
     where they add value. The summary should reflect the overall balance of common and unique points.

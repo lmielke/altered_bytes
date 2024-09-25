@@ -32,10 +32,12 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    Read and understand the following <sample> texts! Read the provided prompts or 
-    re-construct the prompt or problem statement based on the provided responses.
+    Read and understand the following <sample> texts! Then, read and understand the provided 
+    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
+    based on the provided responses.
     Then, based on the propmt or problem statement, select the text that __'best'__ addresses 
-    the inferred problem with detailed and insightful information!
+    the inferred problem with detailed and insightful information! You may add one single 
+    aspect provided by one of the other responses, if it further improves the selected text.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed

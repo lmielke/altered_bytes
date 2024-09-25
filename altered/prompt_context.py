@@ -3,7 +3,7 @@ prompt.py
 
 """
 
-from altered.search_engine import WebSearch, CleanWebSearch
+from altered.search_engine_cleaned import CleanWebSearch
 
 class Context:
 

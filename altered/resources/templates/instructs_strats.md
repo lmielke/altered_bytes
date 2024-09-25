@@ -14,9 +14,9 @@
 ### {{ instructs.strats.inputs_header }}
 {{ instructs.strats.inputs_intro }}
 
-<sample>
+<{{ instructs.strats.strat_tag }}>
 {{ instructs.strats.inputs }}
-</sample>
+</{{ instructs.strats.strat_tag }}>
 
 ## Your Task
 {{ instructs.strats.method.data.your_task }}
@@ -35,7 +35,7 @@ The following is a {{ instructs.strats.fmt.upper() }} template to be used for th
 
 Return all entries shown in '<reponse_template>' combined into a single {{ instructs.strats.fmt.upper() }} string. Your response should be shorter than {{ instructs.default_max_words }} words. Do NOT include comments {{ instructs.strats.fmt_comment }} or surrounding text!
 {% elif instructs.strats.fmt %}
-Answer using {{ instructs.strats.fmt.upper() }} Do not include comments or surrounding text!
+Answer using {{ instructs.strats.fmt.upper() }}! Do not include comments or surrounding text!
 {% else %}
 Answer in plain text! Do not include conversational text!
 {% endif%}

@@ -32,8 +32,9 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    Read and understand the following <sample> texts! Read the provided prompts or 
-    re-construct the prompt or problem statement based on the provided responses.
+    Read and understand the following <sample> texts! Then, read and understand the provided 
+    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
+    based on the provided responses.
     Then, create an extensive summarization that incorporates all relevant details 
     from each text, ensuring that no significant point is left out. The summary should 
     cover both common themes and unique contributions from the texts.
