@@ -141,6 +141,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
+        print(f"{Fore.YELLOW}do_Post in:{Fore.RESET} {kwargs.get('verbose') = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep

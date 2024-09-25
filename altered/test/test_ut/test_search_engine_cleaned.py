@@ -38,6 +38,7 @@ class Test_CleanWebSearch(unittest.TestCase):
     def test___call__(self, *args, **kwargs):
         test_data = self.test_data.copy()
         del test_data['content']
+        print(f"test__call__.test_data: \n{test_data}")
         search = CleanWebSearch(**test_data)
         results, search_query = search.__call__(**test_data)
         print(f"\n\n\n{Fore.GREEN}test___call__.search_query:{Fore.RESET} {search_query}")

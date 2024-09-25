@@ -2,26 +2,7 @@
 content: >
     The first
     argument is the index of the\nelement before which to insert, so a.insert(0, x) inserts at
-    the front of\nthe list, and a.insert(len(a), x) is equivalent to a.append(x).\nRemove the
-    first item from the list whose value is equal to x.  It raises a\nValueError if there is no
-    such item.\nRemove the item at the given position in the list, and return it.  If no
-    index\nis specified, a.pop() removes and returns the last item in the list.\nIt raises an
-    IndexError if the list is empty or the index is\noutside the list range.\nRemove all items
-    from the list.  Equivalent to del a[:].\nReturn zero-based index in the list of the first
-    item whose value is equal to x.\nRaises a ValueError if there is no such item.\nThe
-    optional arguments start and end are interpreted as in the slice\nnotation and are used to
-    limit the search to a particular subsequence of\nthe list.  The returned index is computed
-    relative to the beginning of the full\nsequence rather than the start argument.\nReturn the
-    number of times x appears in the list.\nSort the items of the list in place (the arguments
-    can be used for sort\ncustomization, see sorted() for their explanation).\nReverse the
-    elements of the list in place.\nReturn a shallow copy of the list.  Equivalent to a[:].\nAn
-    example that uses most of the list methods:\nYou might have noticed that methods like
-    insert, remove or sort that\nonly modify the list have no return value printed – they
-    return the default\nNone. [1]  This is a design principle for all mutable data structures
-    in\nPython.\nAnother thing you might notice is that not all data can be sorted
-    or\ncompared.  For instance, [None, \'hello\', 10] doesn’t sort because\nintegers can’t be
-    compared to strings and None can’t be compared to\nother types.  Also, there are some types
-
+    the front of\nthe list, and a.insert(len(a), x) is equivalent to a.append(x).
 fmt: markdown
 user_prompt: What are list comprehensions in Python?
 search_query: Python list comprehensions
