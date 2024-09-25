@@ -154,7 +154,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             return
         else:
             self.service.api_counter[ep] += 1
-            self.prompt_counter = defaultdict(int)
+            self.service.prompt_counter = defaultdict(int)
         return ep, {'api_counter': self.service.api_counter}
 
     def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
