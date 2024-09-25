@@ -23,6 +23,7 @@ class Endpoints:
                             }
         # used to filter the kwargs for the ollama client
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
+        self.ollama_formats = {'json', }
         self.api_counter = defaultdict(int)
         self.olc = Client(host='http://localhost:11434')
         # used for aggregations of responses
@@ -114,7 +115,7 @@ class Endpoints:
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
         # fmt will only be delivered for get_generates func
-        if fmt is not None:
+        if fmt in self.ollama_formats:
             params['format'] = fmt
         # here we finally call ollama server
         r = getattr(self.olc, func)(prompt=prompt, **params)
@@ -159,7 +160,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         else:
             self.service.api_counter[ep] += 1
             self.service.prompt_counter = defaultdict(int)
-        return ep, {'api_counter': self.service.api_counter}
+        return ep, {
+                    'api_counter': self.service.api_counter, 
+                    'prompt_counter': self.service.prompt_counter
+                    }
 
     def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
         """

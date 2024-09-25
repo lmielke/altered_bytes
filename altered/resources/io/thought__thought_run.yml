@@ -15,7 +15,7 @@ num_predict: 500
 
 # meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
 # fmt is the response format expected from the model (markdown, json, yaml)
-fmt: json
+fmt: markdown
 
 # meta: {"name": "repeats", "type": "int", "default": "", "example": 1}
 # repeats is a prompt repeat counter (model is prompted multiple times to improve the response)
