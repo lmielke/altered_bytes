@@ -107,12 +107,13 @@ class Endpoints:
         # response['agg_test'] = self.aggate_responses(*args, **kwargs)
         return {'responses': [response]}
 
-    def _ollama(self, func:str, prompt:str, *args, **kwargs) -> dict:
+    def _ollama(self, func:str, prompt:str, *args, fmt:str, **kwargs) -> dict:
         """
         Generates the JSON response for the /_ollama request.
         """
         # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
+        params['format'] = fmt
         r = getattr(self.olc, func)(prompt=prompt, **params)
         self.prompt_counter[func] += 1
         print(f"{Fore.YELLOW}_ollama '{func}' params:{Fore.RESET} {params}")
