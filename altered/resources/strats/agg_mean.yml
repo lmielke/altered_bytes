@@ -44,6 +44,6 @@ task: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    From the provided responses, create a weighted summary that incorporates key points from 
+    Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporates key points from 
     all responses. Pay more attention to common themes or ideas mentioned by multiple responses, 
     while ensuring that unique details from each response are included where relevant.

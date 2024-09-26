@@ -44,7 +44,7 @@ task: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    From the provided responses, calculate a standard deviation score between 0 and 6 to 
+    Using the provided RESPONSE SAMPLE`s, calculate a standard deviation score between 0 and 6 to 
     reflect the degree of similarity or variance. Include a brief justification for the score, 
     explaining how much the responses have in common or differ. The output should be in the 
     format: {'std': <int>, 'reasoning': '<justification_str>'}.

@@ -42,7 +42,7 @@ task: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    From the provided responses, create an extensive summary that combines all 
+    Using the provided RESPONSE SAMPLE`s, create an extensive summary that combines all 
     relevant details, making sure to include both shared ideas and specific nuances 
     from each text. The final output should be a comprehensive synthesis that reflects 
     the full range of information presented.

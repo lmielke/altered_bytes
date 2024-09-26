@@ -39,5 +39,5 @@ task: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    From the provided responses, extract the minimal common information that is shared 
+    Using the provided RESPONSE SAMPLE`s, extract the minimal common information that is shared 
     across all the responses and present a distilled, core summary.

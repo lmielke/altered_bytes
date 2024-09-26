@@ -42,4 +42,4 @@ task: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    From the provided responses select the one, that __'best'__ anwers the prompt !
+    Using the provided RESPONSE SAMPLE`s select the one, that __'best'__ anwers the prompt !
