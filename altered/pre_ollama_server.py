@@ -53,9 +53,9 @@ class Endpoints:
         responses = []
         for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
-                print(f"\n{Fore.CYAN}{repeat = }get_generates in:{Fore.RESET} {prompt[:100] = }, {repeat = }")
+                print(f"\n\n{Fore.CYAN}get_generates in: {repeat}. prompt:{Fore.RESET} {prompt[:80] = }, {repeat = }")
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
-                print(f"{Fore.CYAN}{repeat} get_generates out:{Fore.RESET} responses[-1]\n{responses[-1]}")
+                print(f"\n{Fore.CYAN}get_generates out:{Fore.RESET} responses[-1]\n{responses[-1]}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
         responses.extend(self.aggate_responses(ep, *args, 
                                                     prompts=prompts, 
@@ -83,7 +83,7 @@ class Endpoints:
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for i, strat in enumerate(strat_templates):
-                print(f"\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
+                print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,
@@ -96,9 +96,9 @@ class Endpoints:
                                             verbose=3,
                                             )
                 if verbose >= 2:
-                    print(f"{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
+                    print(f"\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                print(f"{Fore.BLUE}aggregate_responses:{Fore.RESET} out: \n{agg.get('response')}")
+                print(f"\n{Fore.BLUE}aggregate_responses:{Fore.RESET} out: \n{agg.get('response')}")
                 agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
                 agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
