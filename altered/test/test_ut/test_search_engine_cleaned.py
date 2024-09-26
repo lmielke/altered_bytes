@@ -40,9 +40,10 @@ class Test_CleanWebSearch(unittest.TestCase):
         del test_data['content']
         print(f"test__call__.test_data: \n{test_data}")
         search = CleanWebSearch(**test_data)
-        results, search_query = search.__call__(**test_data)
-        print(f"\n\n\n{Fore.GREEN}test___call__.search_query:{Fore.RESET} {search_query}")
-        print(f"\n\n\n{Fore.GREEN}test___call__.results{Fore.RESET}: \n{results}")
+        r_cleaned = search(**test_data)
+        search.results_to_table(r_cleaned)
+        search.search_results.show(verbose=2)
+        print(f"\n\n\n{Fore.GREEN}test___call__.r_cleaned{Fore.RESET}: \n{r_cleaned}")
 
     def test_cleaning(self, *args, **kwargs):
         expected = False

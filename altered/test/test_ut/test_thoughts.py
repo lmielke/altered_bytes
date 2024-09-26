@@ -37,7 +37,6 @@ class Test_Chat(unittest.TestCase):
     def test_run(self, *args, **kwargs):
         chat = Chat(name='ut_chat', verbose=verbose, data_dir=self.test_data_dir)
         # we use YmlParser here to load the test_data kwargs from a YAML file
-        print(f"{self.test_io_path = }")
         yml = YmlParser(fields_paths=[self.test_io_path])
         yml.add_labels(name='Unittest', labels=self.test_io_path, description="run chat")
         chat.run(*args, **yml.data,)

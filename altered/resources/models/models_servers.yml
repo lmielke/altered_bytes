@@ -16,8 +16,8 @@ aliasses:
 models:
   dolphin-llama3:
     blob_id: ea025c107c1c
-    context_length: '8192'
-    embedding_length: '4096'
+    context_length: 8192
+    embedding_length: 4096
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 3 months ago
@@ -25,8 +25,8 @@ models:
     new_update_available: false
   dolphin-llama3:8b-256k:
     blob_id: ea025c107c1c
-    context_length: '8192'
-    embedding_length: '4096'
+    context_length: 8192
+    embedding_length: 4096
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 3 months ago
@@ -61,8 +61,8 @@ models:
     new_update_available: false
   llama3.1:70b:
     blob_id: a677b4a4b70c
-    context_length: '131072'
-    embedding_length: '8192'
+    context_length: 131072
+    embedding_length: 8192
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 8 days ago
@@ -70,8 +70,8 @@ models:
     new_update_available: false
   llama3.1:
     blob_id: 8eeb52dfb3bb
-    context_length: '131072'
-    embedding_length: '4096'
+    context_length: 131072
+    embedding_length: 4096
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 8 days ago
@@ -79,8 +79,8 @@ models:
     new_update_available: false
   mixtral:8x22b:
     blob_id: 94e70a590f93
-    context_length: '65536'
-    embedding_length: '6144'
+    context_length: 65536
+    embedding_length: 6144
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 4 weeks ago
@@ -88,8 +88,8 @@ models:
     new_update_available: false
   qwen2:72b:
     blob_id: f6ac28d6f58a
-    context_length: '32768'
-    embedding_length: '8192'
+    context_length: 32768
+    embedding_length: 8192
     general.architecture: qwen2
     general.file_type: Q4_0
     last_update: 2 months ago

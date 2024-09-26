@@ -14,7 +14,7 @@ from colorama import Fore, Style
 
 import altered.hlp_printing as hlpp
 import altered.settings as sts
-from altered.model_connect import ModelConnect
+from altered.model_connect import SingleModelConnect
 from altered.prompt import Prompt, Response
 from altered.data import Data
 
@@ -30,7 +30,7 @@ class Chat:
     def __init__(self, name:str, *args, **kwargs):
         # name of the chat can be used to locate/reference the saved chat
         self.name = re.sub(r'\W+', '_', name.lower())
-        self.assi = ModelConnect(*args, **kwargs)
+        self.assi = SingleModelConnect(*args, **kwargs)
         # initial user_promt provided by the user
         self.running = False
         self.init_prompt = None

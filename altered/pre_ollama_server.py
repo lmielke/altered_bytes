@@ -53,7 +53,7 @@ class Endpoints:
         responses = []
         for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
-                print(f"{Fore.GREEN}get_generates:{Fore.RESET} {prompt[:100] = }, {repeat = }")
+                print(f"{Fore.CYAN}get_generates:{Fore.RESET} {prompt[:100] = }, {repeat = }")
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
                 print(f"{Fore.CYAN}\n{i} get_generates:{Fore.RESET} \n{responses[-1]}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
@@ -83,7 +83,7 @@ class Endpoints:
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for strat in strat_templates:
-                print(f"{Fore.RED}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
+                print(f"{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,
@@ -96,9 +96,9 @@ class Endpoints:
                                             verbose=3,
                                             )
                 if verbose >= 2:
-                    print(f"{Fore.YELLOW}rendered aggreg. prompt:{Fore.RESET} \n{rendered}")
+                    print(f"{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
                 agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                print(f"{Fore.BLUE}\naggregate_responses:{Fore.RESET} \n{agg.get('response')}")
+                print(f"{Fore.BLUE}\naggregate_responses:{Fore.RESET}response: \n{agg.get('response')}")
                 agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
                 agg['strat_template'] = strat
                 agg['fmt'] = kwargs.get('fmt')
@@ -122,12 +122,13 @@ class Endpoints:
         # fmt will only be delivered for get_generates func
         if fmt in self.ollama_formats:
             params['format'] = fmt
-        # here we finally call ollama server
-        r = getattr(self.olc, func)(prompt=prompt, **params)
         self.prompt_counter[func] += 1
         if verbose:
-            print(f"{Fore.YELLOW}_ollama '{func}' params:{Fore.RESET} {params}")
+            print(f"{Fore.RED}_ollama: '{func}'{Fore.RESET} params: {params}")
+            print(f"{len(prompt) = }, {len(prompt.split('\n')) = }, {len(prompt.split(' ')) = }")
             print(self.prompt_counter)
+        # here we finally call ollama server
+        r = getattr(self.olc, func)(prompt=prompt, **params)
         # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
 
@@ -206,7 +207,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     f"\n\ttotal_server_time = {time.time() - self.server_time:.2f}"
                     )
         return {
-                            'network_up_time': self.network_up_time,
+                            'network_up_time': (self.network_up_time),
                             'server_time': time.time() - self.server_time,
                             'network_down_time': time.time(),
         }

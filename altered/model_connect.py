@@ -8,6 +8,8 @@ import json, re, requests, time
 from colorama import Fore, Style
 import random as rd
 import math
+from datetime import datetime as dt
+import pandas as pd
 
 class ModelConnect:
     """
@@ -25,8 +27,13 @@ class ModelConnect:
         self.times = {
                         'network_up_time': 0.0, 
                         'network_down_time': 0.0, 
-                        'total_server_time': 0.0,
+                        'server_time': 0.0,
+                        'total_time': 0.0,
                         }
+        self.columns = ['network_up_time', 'server_time', 'network_down_time', 'total_time',
+                        'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_prompt',
+                        'num_ctx_response']
+        self.times_df = pd.DataFrame(columns=self.columns)
 
     @staticmethod
     def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1) -> float:
@@ -39,7 +46,24 @@ class ModelConnect:
         print(f"{Fore.YELLOW}Warning: {Fore.RESET}temp: {rd_temp:.2f}, {bias = }, {scale = }")
         return rd_temp
 
-    def get_params(self, message:[str, list], *args, service_endpoint:str,
+    def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs) -> int:
+        # we estimate the context length based on the messages length
+        # num_ctx will be get_num_ctx for the longest message in messages
+        num_ctx = max(max([len(msg) // 3 for msg in messages]), self.min_context_len)
+        # if num_ctx is larger than we print an alert
+        if num_ctx > context_length:
+            print(
+                f"{Fore.RED}ERROR{Fore.RESET}: "
+                f"num_ctx: {Fore.YELLOW}{num_ctx}{Fore.RESET} is greater than "
+                f"context_length: {Fore.YELLOW}{context_length}{Fore.RESET}. "
+                f"Setting num_ctx to context_length."
+                )
+            exit()
+        num_ctx = min(num_ctx, context_length)
+        return num_ctx
+
+
+    def get_params(self, messages:[str, list], *args, service_endpoint:str,
                                                         name:str,
                                                         context_length:int,
                                                         temperature:float=None,
@@ -50,25 +74,26 @@ class ModelConnect:
         ) -> dict:
         # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
         if service_endpoint in ['get_embeddings', 'get_generates']:
-            # for embeddings and generate[s]! message is a list, to allow for multiple messages to be embedded
+            # for embeddings and generate[s]! messages is a list, to allow for multiple messages to be embedded
             # with a single server call
             msg = ( 
                     f"{Fore.YELLOW}WARNING{Fore.RESET}: "
-                    f"Expected message to be a list, "
-                    f"but got {Fore.YELLOW}{type(message)}{Fore.RESET} instead.\n"
+                    f"Expected messages to be a list, "
+                    f"but got {Fore.YELLOW}{type(messages)}{Fore.RESET} instead.\n"
                     f"Converting to List"
                     )
-            if type(message) != list:
-                message = [str(message)]
+            if type(messages) != list:
+                messages = [str(messages)]
             # for embeddings we want the temperature to be low to be more deterministic
             if service_endpoint == 'get_embeddings':
                 temperature = 0.
         # repeats refers to the number of times the prompt is repeated
         # we increase the temperature for repeats > 1 to get more diverse responses
         temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats['num'])
-        # we estimate the context length based on the message length
-        num_ctx = max(self.min_context_len, min(len(message) // 3, int(context_length)))
-        messages = self.to_msgs(message) if name.startswith('gpt') else message
+        # we estimate the context length based on the messages length
+
+        num_ctx = self.get_context_length(messages, context_length, *args, **kwargs)
+        messages = self.to_msgs(messages) if name.startswith('gpt') else messages
         return fmt, messages, name, temperature, num_ctx, num_predict,\
                      repeats, service_endpoint
 
@@ -120,22 +145,42 @@ class ModelConnect:
         kwargs.update(self.set_service_endpoint(*args, **kwargs))
         # print(f"model_connect.post: {kwargs = }")
         # print(msts.config.get_model(*args, **kwargs).get('model_file'))
-        r = self.ollama(self.prep_context(*args,
+        context = self.prep_context(*args,
                                 **msts.config.get_model(*args, **kwargs).get('model_file'), 
                                 **kwargs,
-                            ), *args, **kwargs 
                             )
+        r = self.ollama(context, *args, **kwargs )
         r['model'] = msts.config.get_model(*args, **kwargs).get('model_file').get('name')
-        self.get_stats(r, *args, **kwargs)
+        self.get_stats(r, context, *args, **kwargs)
         return r
 
-    def get_stats(self, r, *args, **kwargs) -> dict:
+    def get_stats(self, r, context, *args, context_length:int=2000, **kwargs) -> dict:
         """
         we add the current model times  to the total times
+        we create a pandas dataframe containing all times for each call of get_stats
+        also we calculate and update the cumulative times at each call
         """
-        r['network_down_time'] += -time.time()
-        self.times = {k: float(f"{self.times.get(k, 0.0) + float(vs):.3f}")
-                                                for k, vs in r.items() if k in self.times}
+        r['network_down_time'] = time.time() - (r['network_down_time'])
+        time_delta = (r['network_down_time'] - r['network_up_time']) / 2
+        r['network_up_time'] += time_delta
+        r['network_down_time'] -= time_delta
+        r['total_time'] = r['network_down_time'] + r['network_up_time'] + r['server_time']
+        for col in self.times:
+            self.times[col] += r.get(col)
+        # we append the times to self.times_df
+        r['time_stamp'] = dt.now()
+        r['num_ctx_prompt'] = context['options']['num_ctx']
+        all_responses = [resp.get('response', []) for resp in r.get('responses')]
+        r['num_ctx_response'] = self.get_context_length(all_responses, context_length)
+        # Convert the dictionary into a DataFrame and add it as a row
+        record_df = pd.DataFrame([{k: r[k] for k in self.columns}], columns=self.columns)
+        summary_df = pd.DataFrame([self.times], columns=self.columns)
+        # Use pd.concat to add the new row to the DataFrame
+        self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
+        self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
+        print(f"\n{Fore.CYAN}self.times_df:{Fore.RESET} \n{self.times_df}")
+
+
 
     def ollama(self, context: dict, *args, **kwargs, ) -> dict:
         """
@@ -164,3 +209,21 @@ class ModelConnect:
         self.client = OpenAI(api_key=msts.config.api_key)
         response = self.client.chat.completions.create(**context).choices[0].message.__dict__
         return response
+
+class SingleModelConnect(ModelConnect):
+    """
+    SingleModelConnect is a singleton subclass of ModelConnect that ensures only one instance 
+    of the model configuration parameters is created. 
+    """
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(SingleModelConnect, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, *args, **kwargs):
+        if not self._initialized:
+            super().__init__(*args, **kwargs)
+            self._initialized = True

@@ -1,0 +1,176 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+<[35mresponse_template[39m>
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+</[35mresponse_template[39m>
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+</[36mINST[39m>
+",user,None,llama3.1,ut_chat,None,None,2024-09-26 12:13:42.981388
+"# Answer
+To monitor your GPU's performance, you can use a combination of built-in tools and third-party software. Common themes among the responses include:
+
+*   Using NVIDIA Control Panel (for Windows) or AMD Radeon Settings (for Windows and macOS) to view GPU usage and temperatures.
+*   Utilizing lightweight tools like GPU-Z for detailed information about your GPU's specs, temperature, fan speed, and usage.
+*   Employing command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `amd-gpu-profiler` (for AMD GPUs) to monitor your GPU's performance from the terminal.
+
+Unique details from each response include:
+
+*   Using MSI Afterburner or EVGA Precision X for detailed information about your graphics card's specs, temperature, fan speed, and usage.
+*   Checking for driver updates to ensure your GPU is running with the latest software.
+*   Considering cleaning dust from your GPU or using a cooling pad if you're concerned about overheating.","[33mStrategy Prompt[39m using agg_mean:
+
+
+# 3. Instructions (INST)
+
+## Weighted Mean Aggregation
+This strategy generates a weighted average summary from a given <[35msample[39m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary  that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - Response 1: ""The quick brown fox jumps over the lazy dog.""
+  - Response 2: ""A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - Response 3: ""The nimble fox hops over a lethargic dog.""
+Expected Output:
+  ""Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
+  The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
+  the speed of the fox more than the other descriptions.""
+  
+  This output gives more weight to common themes, like the fox leaping, while incorporating 
+  details from all the responses, balancing frequent mentions with unique contributions.
+
+## Objective
+Read and understand the following <[35msample[39m> texts! Then, read and understand the provided  prompts or, (if no prompt was provided), re-construct the prompt or problem statement  based on the provided responses. Then, create a weighted average summary that synthesizes key points from all the responses,  giving more emphasis to frequently mentioned themes, while still incorporating unique contributions  where they add value. The summary should reflect the overall balance of common and unique points.
+
+
+## Input Data
+### Answers to a single prompt:
+Below is the sample of 3 of an LLM`s responses intending to answer the same single prompt.
+
+<[35msample[39m>
+
+Prompt: 
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+
+<[34mcontext[39m>
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+
+<[33muser_prompt[39m>
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+
+<[36mINST[39m>
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+<[35mresponse_template[39m>
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+</[35mresponse_template[39m>
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+</[36mINST[39m>
+
+
+
+__RESPONSE SAMPLE 1__
+# Answer
+I can help you monitor your GPU's performance by using tools like GPU-Z, MSI Afterburner, or EVGA Precision X. These software programs provide detailed information about your graphics card's specs, temperature, fan speed, and usage. You can also use built-in monitoring tools in your operating system, such as Windows' Task Manager or Linux's System Monitor. Additionally, you can check for driver updates to ensure your GPU is running with the latest software. If you're concerned about overheating, consider cleaning dust from your GPU or using a cooling pad.
+
+__RESPONSE SAMPLE 2__
+# Answer
+To monitor your GPU's performance, you can use various tools and methods:
+
+*   **NVIDIA Control Panel**: On Windows, open the NVIDIA Control Panel and navigate to the ""Monitor"" tab to view GPU usage and temperatures.
+*   **GPU-Z**: A lightweight tool that provides detailed information about your GPU, including clock speeds and memory usage.
+*   **Linux/Unix**: Use tools like `nvidia-smi` or `glxinfo` to monitor GPU performance and utilization.
+
+__RESPONSE SAMPLE 3__
+# Answer
+To monitor your GPU's performance, you can use built-in tools like NVIDIA Control Panel (for Windows) or AMD Radeon Settings (for Windows and macOS). For Linux users, you can check the Performance Tab in the System Monitor. Alternatively, you can download third-party software such as GPU-Z, HWiNFO, or AIDA64 to monitor your GPU's performance. These tools provide detailed information about your GPU's temperature, usage, and other metrics. You can also use command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `amd-gpu-profiler` (for AMD GPUs) to monitor your GPU's performance from the terminal.
+</[35msample[39m>
+
+## Your Task
+From the provided responses, create a weighted summary that incorporates key points from  all responses. Pay more attention to common themes or ideas mentioned by multiple responses,  while ensuring that unique details from each response are included where relevant.
+
+
+
+## Response Layout and Format
+
+Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.1,ut_chat,None,None,2024-09-26 12:13:42.996994

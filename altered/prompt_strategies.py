@@ -174,7 +174,12 @@ class Reduce(Strategy):
         super().__call__(*args, **kwargs)
         return self.mk_prompt_reduce_instruct(*args, **kwargs)
 
-    def mk_prompt_reduce_instruct(self, *args, responses:list, user_prompt:str=None, search_query:str=None, **kwargs) -> dict:
+    def mk_prompt_reduce_instruct(self, *args, 
+                                            responses:list,
+                                            user_prompt:str=None,
+                                            link:str=None,
+                                            search_query:str=None, **kwargs,
+        ) -> dict:
         """
         Generates aggregation prompt based on the specified strategy.
         """
@@ -186,6 +191,9 @@ class Reduce(Strategy):
         if search_query:
             headers += f"search_query: {search_query}\n"
             response = 'Search Result:\n' + resp
+        if link:
+            headers += f"\nlink: {link}\n"
+            response = response
         if not user_prompt and not search_query:
             response = resp
         self.strats['strat_tag'] = self.strat_tag

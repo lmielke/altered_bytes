@@ -94,12 +94,23 @@ class Parser:
                         'Cookies, device or similar online',
                         'Uses other forms of storage',
                         }
-        cleaned = []
+        cleaned, extender = [], ''
         for line in text.split('\n'):
             line = line.strip()
             if not line:
                 continue
             if any(term in line for term in clean_terms):
+                continue
+            if len(line) <= 4:
+                nl = f" {line}" if len(line) > 1 else line
+                if not extender:
+                    extender = nl
+                else:
+                    extender += nl
+                continue
+            elif extender:
+                cleaned.append(extender)
+                extender = ''
                 continue
             cleaned.append(line)
         return '\n'.join(cleaned)

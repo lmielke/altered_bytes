@@ -6,7 +6,7 @@ from tabulate import tabulate as tb
 # test package imports
 import altered.settings as sts
 
-from altered.model_connect import ModelConnect
+from altered.model_connect import SingleModelConnect
 
 class Test_ModelConnect(unittest.TestCase):
     @classmethod
@@ -14,7 +14,7 @@ class Test_ModelConnect(unittest.TestCase):
         cls.verbose = 0
         cls.testData = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
-        cls.m_con = ModelConnect()
+        cls.m_con = SingleModelConnect()
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):

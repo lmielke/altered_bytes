@@ -7,7 +7,7 @@ from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
-from altered.model_connect import ModelConnect
+from altered.model_connect import SingleModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 

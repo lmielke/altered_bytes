@@ -28,6 +28,7 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
                 .replace('user_prompt>', f"{Fore.YELLOW}user_prompt{Fore.RESET}>")
                 .replace('previous_responses>', f"{Fore.CYAN}previous_responses{Fore.RESET}>")
                 .replace('sample>', f"{Fore.MAGENTA}sample{Fore.RESET}>")
+                .replace('response_template>', f"{Fore.MAGENTA}response_template{Fore.RESET}>")
                 .replace('INST>', f"{Fore.CYAN}INST{Fore.RESET}>")
                 .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Fore.RESET}")
                 .replace('____RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Fore.RESET}")

@@ -5,51 +5,53 @@ from colorama import Fore
 
 from altered.search_engine import WebSearch
 
-from altered.model_connect import ModelConnect
+from altered.model_connect import SingleModelConnect
 from altered.renderer import Render
 from altered.prompt_instructs import Instructions
 
 class CleanWebSearch(WebSearch):
 
-    default_repeats = {'num': 1, 'agg': 'agg_mean'}
+    default_repeats = {'num': 1, 'agg': None}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.assi = ModelConnect(*args, **kwargs)
+        self.assi = SingleModelConnect(*args, **kwargs)
         # prompt constructor for LLM interaction
         self.insts = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
+        self.r_cleaned = []
 
 
     def __call__(self, *args, name:str=None, fmt:str=None, repeats:str=None, **kwargs):
-        se_results, search_query = super().__call__(*args, **kwargs)
+        super().__call__(*args, **kwargs)
         if repeats is None: repeats = self.default_repeats
-        cleaned = self.cleaning(se_results, *args, repeats=repeats, **kwargs)
+        cleaned = self.cleaning(*args, repeats=repeats, **kwargs)
         if repeats is not None and 'agg_mean' == repeats['agg']:
             print(f"{Fore.GREEN}Aggregating Cleaned Search Results: {Fore.RESET}: {repeats = }")
             # the second last record contains the aggregation
-            se_results[0]['content'] = cleaned[-2].get('response').strip()
-            se_results = [se_results[0]]
+            self.r_cleaned.append(self.r[0])
+            self.r_cleaned[0]['content'] = cleaned[-2].get('response').strip()
         else:
             print(f"{Fore.GREEN}Looping Cleaned Search Results: {Fore.RESET}: {repeats = }")
             for i, clean in enumerate(cleaned):
                 _clean = clean.get('response').strip()
-                se_results[i]['content'] = _clean
-        return se_results, search_query
+                self.r_cleaned[i]['content'] = _clean
+        return self.r_cleaned
     
-    def cleaning(self, se_results:dict, *args, alias='l3:8b_1', **kwargs):
+    def cleaning(self, *args, alias='l3:8b_1', **kwargs):
         contents = []
         
-        for i, result in enumerate(se_results):
-            contents.append(self.mk_context(result.get('content'), *args, **kwargs))
+        for i, result in enumerate(self.r):
+            contents.append(self.mk_prompt(result.get('content'), result.get('link'), *args, **kwargs))
         # we use the ModelConnect object to post the contents to the AI model
         r = self.assi.post(contents, *args, alias=alias, **kwargs )
         return r.get('responses')
 
-    def mk_context(self, content:str, *args, user_prompt:str, search_query:str, **kwargs):
+    def mk_prompt(self, content:str, link:str, *args, user_prompt:str, search_query:str, **kwargs):
         _context = {
                     'responses': [content.replace('\n\n', '\n')],
                     'fmt': 'markdown',
+                    'link': link,
                     'search_query': search_query,
                     'user_prompt': user_prompt,
         }
@@ -59,4 +61,5 @@ class CleanWebSearch(WebSearch):
                                             template_name='instructs_strats.md',
                                             context = {'instructs': context},
                                             )
-        print(f"{Fore.GREEN}\nrender result:{Fore.RESET} \n{rendered}")
+        print(f"{Fore.GREEN}\nCleanWebSearch.mk_prompt:{Fore.RESET} \n{rendered}")
+        return rendered

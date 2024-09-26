@@ -8,10 +8,12 @@ name: Reduce Text
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy reduces a single long text by removing redundant, non-relevant, or overly 
-        emphasized information. The process includes:
+    This strategy reduces a single "Noisy Text" to a single "Cleaned Text"
+    by removing redundant, non-relevant, or overly emphasized information.
+    The process includes:
     1. **Text De-noising**: Remove irrelevant details such as advertisements, 
         cookie disclaimers, or metadata that detract from the core message.
+        Remove headers that sound relevant but contain no relevant content. (parsing errors)
     2. **Redundancy Cleansing**: Identify and eliminate repetitive information or 
         overly emphasized ideas to maintain conciseness.
     3. **Relevance Filtering**: Retain only content relevant to the main topic, 
@@ -20,24 +22,26 @@ description: >
         concise manner, with verbose or overly detailed sections reduced to their core ideas.
     5. **Content Pruning**: Focus on trimming away non-essential information while keeping 
         the text's most important parts intact.
+    6. **Formula and Code Retention**: Preserve formulas, code snippets, or other technical 
+        details that are essential to the main message.
+
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when solving a task
 example: >
     Example:
     Assume the scenario: "What happens when foxes meet dogs?".
-    We received the following response:
     
-      - "Text: The quick, agile fox leaps with great grace and speed over the lazy, 
-                lethargic, motionless [still, stiff] dog who doesn't even twitch. 
-                copyright: dogs.com
-                The fox's nimble movements showcase its sharp reflexes and unmatched agility.
-                Meanwhile, a rabbit watches from the bushes.
-                Formula: fox_agility = dog_agility * 2 - turtle_agility
-                Impressum: WeAreFoxes Ltd Fox RD 1234
-                "
+    - Example "Noisy Text":
+        The quick, agile fox leaps with great grace and speed over the lazy, 
+        lethargic, motionless [still, stiff] dog who doesn't even twitch. 
+        copyright: dogs.com
+        The fox's nimble movements showcase its sharp reflexes and unmatched agility.
+        Meanwhile, a rabbit watches from the bushes.
+        Formula: fox_agility = dog_agility * 2 - turtle_agility
+        Impressum: WeAreFoxes Ltd Fox RD 1234
     
-    Expected Output:
+    - Example "Cleaned Text":
       "Due to its agility, the quick fox leaps over the lazy dog.
       Formula: fox_agility = dog_agility * 2 - turtle-agility"
       
@@ -50,14 +54,13 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    The <{{ instructs.strats.strat_tag }}> tag below contains a long text that includes 
-    unnecessary and repetitive information. 
-    Your task is to clean the text by removing noise, redundancies,
-    and non-relevant details, while retaining the core message. Only include high and 
-    medium relevance content to the topic. 
+    The <{{ instructs.strats.strat_tag }}> tag below contains a single "Noisy Text",
+    that contains redundant, non-relevant, or overly emphasized information. 
+    This text must be converted into "Cleaned Text" using the strategy above.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Clean the provided text by removing redundant and non-relevant information, 
-    focusing on high and medium relevance to the topic.
+    Clean the "Noisy Text" to make it "Clean Text"! Higlight highly relevant information 
+    but also be generous retaining medium relevance information.
+    In particular you should keep formulas and code snippets.

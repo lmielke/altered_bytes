@@ -39,13 +39,8 @@ class WebSearch:
         se_results = self.run_google_se(*args, **kwargs)
         self.urls = [l.get('link') for l in se_results.get('items')]
         se_contents = self.parser.parse_urls(self.urls, max_workers=5)
-        self.results_to_table(  self.prep_results(
-                                                    se_results, 
-                                                    se_contents, 
-                                                    *args, **kwargs
-                                ), *args, **kwargs,
-        )
-        return self.results_to_direct_output(*args, **kwargs)
+        self.r = self.prep_results(se_results, se_contents, *args, **kwargs )
+        return self.r
 
     def results_to_direct_output(self, search_query:str, *args, fields=['source', 'content'], **kwargs):
         # we use self.search_results.ldf.iterrows to get the data for provided fields as dict

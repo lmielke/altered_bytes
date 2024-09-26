@@ -17,7 +17,7 @@ from colorama import Fore, Style
 # needed for semantic chunking and query preparation
 from altered.data import Data
 # ModelConnect is needed to prompt the Model directly for embeddings
-from altered.model_connect import ModelConnect
+from altered.model_connect import SingleModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
@@ -43,7 +43,7 @@ class VecDB(Data):
         u_fields_paths = self.load_vec_fields(*args, u_fields_paths=u_fields_paths, **kwargs)
         super().__init__(*args, name=name, u_fields_paths=u_fields_paths, **kwargs, )
         self.dtype = np.float32
-        self.assi = ModelConnect(*args, **kwargs)
+        self.assi = SingleModelConnect(*args, **kwargs)
         self.setup_storage(*args, **kwargs)
         self.ldf.set_index('hash', inplace=True, drop=False)
 
