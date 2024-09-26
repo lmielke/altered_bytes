@@ -167,7 +167,7 @@ class Agg(Strategy):
                             )
         return '\n'.join(samples)
 
-    def rm_tags(self, propmt:str, *args, **kwargs):
+    def rm_tags(self, prompt:str, *args, **kwargs):
         tags = ['context', 'user_prompt', 'sample', 'response_template', 'INST']
         for tag in tags:
             prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
