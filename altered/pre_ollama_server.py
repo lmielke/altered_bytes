@@ -125,7 +125,8 @@ class Endpoints:
         self.prompt_counter[func] += 1
         if verbose:
             print(f"{Fore.RED}_ollama: '{func}'{Fore.RESET} params: {params}")
-            print(f"{len(prompt) = }, {len(prompt.split('\n')) = }, {len(prompt.split(' ')) = }")
+            num_lines = len(prompt.split('\n'))
+            print(f"{len(prompt) = }, {num_lines = }, {len(prompt.split(' ')) = }")
             print(self.prompt_counter)
         # here we finally call ollama server
         r = getattr(self.olc, func)(prompt=prompt, **params)
