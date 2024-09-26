@@ -92,7 +92,7 @@ class Agg(Strategy):
             self.strats['inputs'] = self.mk_sample_no_prompt(*args, **kwargs)
         return self.strats
 
-    def mk_sample_multi_prompt(self, *args, prompts:list, responses:list, **kwargs):
+    def mk_sample_multi_prompt(self, *args, prompts:list, responses:list, rm_tags:bool=False, **kwargs):
         """
         Takes in a list of prompts and responses and returns a string that
         represents a bullet point list of the provided prompts and responses. This structures
@@ -108,6 +108,8 @@ class Agg(Strategy):
         # print(f"{Fore.RED}prompts multi:{Fore.RESET} {prompts}")
         sample_pairs = []
         for i, (prompt, resp) in enumerate(zip(prompts, responses)):
+            if rm_tags:
+                prompt = self.rm_tags(prompt, *args, **kwargs)
             sample_pairs.append(
                                     f"\n__SAMPLE {i+1}__\n\n"
                                     f"Prompt {i+1}: {prompt}\n"
@@ -115,7 +117,7 @@ class Agg(Strategy):
                                 )
         return '\n\n'.join(sample_pairs)
 
-    def mk_sample_single_prompt(self, *args, prompts:str, responses:list, **kwargs):
+    def mk_sample_single_prompt(self, *args, prompts:str, responses:list, rm_tags:bool=False, **kwargs):
         """
         Takes in a list of prompts and responses and returns a string that
         represents a bullet point list of the provided prompts and responses. This structures
@@ -131,12 +133,14 @@ class Agg(Strategy):
         # print(f"{Fore.RED}prompt single:{Fore.RESET} {prompts}")
         
         samples = []
+        if rm_tags:
+                prompt = self.rm_tags(prompts[0], *args, **kwargs)
         for i, response in enumerate(responses):
             samples.append(
                             f"\n__RESPONSE SAMPLE {i+1}__\n"
                             f"{response}"
                             )
-        return f"\nPrompt: {prompts[0]}\n\n" + '\n'.join(samples)
+        return f"\nPrompt: {prompt}\n\n" + '\n'.join(samples)
 
     def mk_sample_no_prompt(self, *args, responses:list, **kwargs):
         """
@@ -161,6 +165,11 @@ class Agg(Strategy):
                             )
         return '\n'.join(samples)
 
+    def rm_tags(self, propmt:str, *args, **kwargs):
+        tags = ['context', 'user_prompt', 'sample', 'response_template', 'INST']
+        for tag in tags:
+            prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
+        return prompt
 
 class Reduce(Strategy):
 
@@ -178,6 +187,7 @@ class Reduce(Strategy):
                                             responses:list,
                                             user_prompt:str=None,
                                             link:str=None,
+                                            rm_tags:bool=False,
                                             search_query:str=None, **kwargs,
         ) -> dict:
         """
