@@ -69,6 +69,7 @@ class Endpoints:
     def aggate_responses(self, ep, *args, prompts:list, responses:list,
                                                         strat_templates:str=None,
                                                         verbose:int=0,
+                                                        fmt:str=None,
                                                         **kwargs, ):
         """
         Aggregates muliple responses into a single response using the provided 
@@ -89,6 +90,7 @@ class Endpoints:
                                             prompts=prompts,
                                             rm_tags=True,
                                             responses=responses,
+                                            fmt='json' if strat == 'agg_std' else fmt,
                                             **kwargs,
                                         )
                 rendered = self.renderer.render(
