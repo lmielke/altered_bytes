@@ -94,14 +94,14 @@ class Parser:
                         'Cookies, device or similar online',
                         'Uses other forms of storage',
                         }
-        cleaned, extender = [], ''
+        cleaned, extender, last_line = [], '', ''
         for line in text.split('\n'):
             line = line.strip()
-            if not line:
+            if not line or line == last_line:
                 continue
             if any(term in line for term in clean_terms):
                 continue
-            if len(line) <= 4:
+            if len(line) <= 3 or len(line.split(' ')) <= 2:
                 nl = f" {line}" if len(line) > 1 else line
                 if not extender:
                     extender = nl
@@ -112,5 +112,6 @@ class Parser:
                 cleaned.append(extender)
                 extender = ''
                 continue
+            last_line = line
             cleaned.append(line)
-        return '\n'.join(cleaned)
+        return '\n'.join(cleaned)[:10000]

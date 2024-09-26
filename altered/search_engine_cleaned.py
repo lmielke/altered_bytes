@@ -38,16 +38,23 @@ class CleanWebSearch(WebSearch):
                 self.r_cleaned[i]['content'] = _clean
         return self.r_cleaned
     
-    def cleaning(self, *args, alias='l3:8b_1', **kwargs):
+    def cleaning(self, *args, alias='l3:8b_1', strat_templates=['reduce_text'], **kwargs):
         contents = []
         
         for i, result in enumerate(self.r):
-            contents.append(self.mk_prompt(result.get('content'), result.get('link'), *args, **kwargs))
+            contents.append(self.mk_prompt( result.get('content'),
+                                            result.get('link'), *args,
+                                            strat_templates=strat_templates, 
+                                            **kwargs,
+                            )
+            )
         # we use the ModelConnect object to post the contents to the AI model
-        r = self.assi.post(contents, *args, alias=alias, **kwargs )
+        r = self.assi.post(contents, *args, alias=alias, strat_templates=['reduce_text'], **kwargs )
         return r.get('responses')
 
-    def mk_prompt(self, content:str, link:str, *args, user_prompt:str, search_query:str, **kwargs):
+    def mk_prompt(self, content:str, link:str, *args, 
+                    user_prompt:str, search_query:str, strat_templates:list, **kwargs,
+        ):
         _context = {
                     'responses': [content.replace('\n\n', '\n')],
                     'fmt': 'markdown',
@@ -56,7 +63,7 @@ class CleanWebSearch(WebSearch):
                     'user_prompt': user_prompt,
         }
         # we use the Instructions object to render the context
-        context = self.insts(strat_templates=['reduce_text'], **_context)
+        context = self.insts(strat_templates=strat_templates, **_context)
         rendered = self.renderer.render(
                                             template_name='instructs_strats.md',
                                             context = {'instructs': context},

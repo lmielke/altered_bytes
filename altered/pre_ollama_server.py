@@ -84,7 +84,7 @@ class Endpoints:
             # because we aggregate, we also append a std estimate
             if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
             for i, strat in enumerate(strat_templates):
-                print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat = }, {kwargs = }")
+                print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strats_templates = } {strat = }, {kwargs = }")
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,

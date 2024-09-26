@@ -27,7 +27,6 @@ class WebSearch:
         self.api_key = mpg.services.get('google_se').get('api_key')
         self.cse_id = mpg.services.get('google_se').get('cse_id')
         self.g_url = mpg.services.get('google_se').get('url')
-        print(f"{Fore.YELLOW}{name} Initializing WebSearch: {Fore.RESET} {self.default_data_dir = }")
         self.search_results = VecDB(*args, 
                     name=name, 
                     u_fields_paths=[self.search_fields_path], 
