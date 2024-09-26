@@ -134,7 +134,9 @@ class Agg(Strategy):
         
         samples = []
         if rm_tags:
-                prompt = self.rm_tags(prompts[0], *args, **kwargs)
+            prompt = self.rm_tags(prompts[0], *args, **kwargs)
+        else:
+            prompt = prompts[0]
         for i, response in enumerate(responses):
             samples.append(
                             f"\n__RESPONSE SAMPLE {i+1}__\n"

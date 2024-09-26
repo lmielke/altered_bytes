@@ -87,6 +87,7 @@ class Endpoints:
                 strats = self.instructs(    *args,
                                             strat_templates=[strat],
                                             prompts=prompts,
+                                            rm_tags=True,
                                             responses=responses,
                                             **kwargs,
                                         )
