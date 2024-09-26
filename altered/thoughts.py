@@ -86,6 +86,7 @@ class Chat:
         server_params = {
                             'service_endpoint': 'get_generates',
                             'repeats': repeats,
+                            'verbose': verbose,
                         }
         ignore_fields = {'context',}
         server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})
