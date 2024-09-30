@@ -18,6 +18,7 @@ altered = {editable = true, path = "."}
 pandas = "*"
 beautifulsoup4 = "*"
 playwright = "*"
+openai = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

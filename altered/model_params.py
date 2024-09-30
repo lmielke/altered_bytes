@@ -258,7 +258,6 @@ class ModelParams:
             raise FileNotFoundError(f"Key file not found: {file_path}")
         with open(file_path, 'r', encoding='utf-8') as file:
             content = yaml.safe_load(file)
-            print(f"Service file loaded: {content}")
         return content
 
     def get_model_file(self, url, *args, **kwargs) -> tuple:
