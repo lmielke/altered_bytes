@@ -240,7 +240,7 @@ class ModelParams:
         # we find those key_path s and replace key_path by the content of the key file.
         for service, params in services.items():
             if 'key_path' in params.keys():
-                key_path = self.unpack_path_alias(params['key_path'])
+                key_path = self.unpack_path_alias(params['key_path']).replace(os.sep, '/')
                 if not os.path.isfile(key_path):
                     raise FileNotFoundError(f"Key file not found: {key_path}")
                 with open(key_path, 'r') as file:
