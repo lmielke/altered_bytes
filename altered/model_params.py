@@ -184,20 +184,36 @@ class ModelParams:
         Retrieves the API key from the specified key path.
         
         Returns:
-            str: The API key value.
+            str: The API key value or None if the key could not be retrieved.
         """
         # Retrieve the key_path for openAI
         key_path = self.servers.get('openAI', {}).get('key_path')
         assert key_path, "Key path not found in servers"
+        
+        # Unpack path alias (assuming this function resolves any path aliases)
         key_path = self.unpack_path_alias(key_path, *args, **kwargs)
+        
+        print(f"Resolved key path: {key_path}")  # Debugging print statement
+
         try:
+            # Attempt to open and load the YAML file
             with open(key_path, 'r') as file:
                 s_file = yaml.safe_load(file)
-                print(f"{s_file = }")
+                print(f"YAML content loaded: {s_file}")  # Debugging print statement
                 self.api_key = s_file.get('key')
+                if not self.api_key:
+                    print("API key not found in the YAML file.")
         except FileNotFoundError:
-            print(f"self.api_key loading failed. Continuing with None")
+            print(f"File not found: {key_path}")
             self.api_key = None
+        except OSError as e:
+            print(f"OSError occurred while trying to read the file: {e}")
+            self.api_key = None
+        except yaml.YAMLError as e:
+            print(f"Error loading YAML file: {e}")
+            self.api_key = None
+        
+        # Return the API key or None if it was not found or an error occurred
         return self.api_key
 
     def unpack_path_alias(self, key_path:str, *args, **kwargs):

@@ -51,7 +51,7 @@ class Test_ModelConnect(unittest.TestCase):
                                     context['messages'][0]['content'],
                                     'Why is the sky not green?',
                                     ],
-                                    # alias='l3:8b_1',
+                                    alias='l3:8b_1',
                                     num_predict = 100,
                                     service_endpoint='get_generates',
                                     format='json',
