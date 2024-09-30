@@ -74,38 +74,39 @@ class Endpoints:
         aggregation strategy. If the aggreation condition applies a std is always estimated
         and appended to the end.
         """
-        aggs = []
+        if len(responses) < 2 or (not strat) or (not str(strat).startswith('agg_')):
+            return []
+        strat_templates = [strat, ]
+        # because we aggregate, we also append a std estimate
+        if strat != 'agg_std': 
+            strat_templates.append('agg_std')
         responses = [r.get('response') for r in responses]
-        if len(responses) >= 2 and strat is not None:
-            # during aggregation we do not want higher response diversity
-            kwargs['options']['temperature'] = 0.0
-            # because we aggregate, we also append a std estimate
-            strat_templates = [strat, ]
-            if strat.startswith('agg_') and strat != 'agg_std': 
-                strat_templates.append('agg_std')
-            for i, strat in enumerate(strat_templates):
-                print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat_templates = } {strat = }, {kwargs = }")
-                strats = self.instructs(    *args,
-                                            strat_templates=[strat],
-                                            prompts=prompts,
-                                            rm_tags=True,
-                                            responses=responses,
-                                            fmt='json' if strat == 'agg_std' else fmt,
-                                            **kwargs,
+        # during aggregation we do not want higher response diversity
+        kwargs['options']['temperature'] = 0.0
+        aggs = []
+        for i, strat in enumerate(strat_templates):
+            print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat_templates = } {strat = }, {kwargs = }")
+            strats = self.instructs(    *args,
+                                        strat_templates=[strat],
+                                        prompts=prompts,
+                                        rm_tags=True,
+                                        responses=responses,
+                                        fmt='json' if strat == 'agg_std' else fmt,
+                                        **kwargs,
+                                    )
+            rendered = self.renderer.render(
+                                        template_name='instructs.md',
+                                        context = {'instructs': strats},
+                                        verbose=3,
                                         )
-                rendered = self.renderer.render(
-                                            template_name='instructs.md',
-                                            context = {'instructs': strats},
-                                            verbose=3,
-                                            )
-                if verbose >= 2:
-                    print(f"\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
-                agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-                print(f"\n{Fore.BLUE}aggregate_responses:{Fore.RESET} out: \n{agg.get('response')}")
-                agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
-                agg['strat_template'] = strat
-                agg['fmt'] = kwargs.get('fmt')
-                aggs.append(agg)
+            if verbose >= 2:
+                print(f"\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
+            agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
+            print(f"\n{Fore.BLUE}aggregate_responses:{Fore.RESET} out: \n{agg.get('response')}")
+            agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
+            agg['strat_template'] = strat
+            agg['fmt'] = kwargs.get('fmt')
+            aggs.append(agg)
         return aggs
 
     def unittest(self, *args, repeats, **kwargs) -> dict:
