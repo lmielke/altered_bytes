@@ -15,13 +15,14 @@ class Parser:
     def __init__(self, *args, **kwargs):
         pass
 
-    def parse_site(self, url: str, use_playwright: bool = True, timeout: int = 10, *args, **kwargs) -> str:
+    def parse_site(self, url: str, use_pwr: bool = True, timeout: int = 10, *args, **kwargs
+        ) -> str:
         """
-        Fetches and parses the content from a given URL. If `use_playwright` is True, 
+        Fetches and parses the content from a given URL. If `use_pwr` is True, 
         it will use Playwright for JavaScript-rendered content.
         """
         try:
-            if use_playwright:
+            if use_pwr:
                 return self.fetch_with_playwright(url)
             else:
                 return self.fetch_with_requests(url, timeout=timeout)
@@ -68,13 +69,13 @@ class Parser:
         combined_content = self.clean_text(combined_content, *args, **kwargs)
         return combined_content if combined_content else "No readable content found."
 
-    def parse_urls(self, urls: dict, max_workers: int = 5, use_playwright: bool = True, *args, **kwargs) -> dict:
+    def parse_urls(self, urls:dict, max_workers:int=5, use_pwr:bool=True, *args, **kwargs,
+        ) -> dict:
         """
         Parses multiple URLs in parallel and updates the provided dictionary with parsed content.
         """
         def process_url(url):
-            return url, self.parse_site(url, use_playwright=use_playwright, *args, **kwargs)
-
+            return url, self.parse_site(url, use_pwr=use_pwr, *args, **kwargs)
         url_contents = {}
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(process_url, url): url for url in urls}
@@ -109,9 +110,9 @@ class Parser:
                     extender += nl
                 continue
             elif extender:
-                cleaned.append(extender)
+                cleaned.append(f" {extender}")
                 extender = ''
                 continue
             last_line = line
             cleaned.append(line)
-        return '\n'.join(cleaned)[:10000]
+        return '\n'.join(cleaned)[2000:16000]

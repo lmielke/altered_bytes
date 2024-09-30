@@ -32,39 +32,46 @@ class WebSearch:
                     u_fields_paths=[self.search_fields_path], 
                     data_dir = data_dir if data_dir is not None else self.default_data_dir,
                     **kwargs)
-        self.parser = Parser()  # Instantiate the Parser class
+        self.parser = Parser(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
         se_results = self.run_google_se(*args, **kwargs)
-        self.urls = [l.get('link') for l in se_results.get('items')]
-        se_contents = self.parser.parse_urls(self.urls, max_workers=5)
-        self.r = self.prep_results(se_results, se_contents, *args, **kwargs )
+        urls = [l.get('link') for l in se_results.get('items')]
+        se_contents = self.parser.parse_urls(urls, max_workers=5)
+        self.r = self.prep_results(se_results, se_contents, urls, *args, **kwargs )
         return self.r
 
-    def results_to_direct_output(self, search_query:str, *args, fields=['source', 'content'], **kwargs):
+    def results_to_direct_output(self, search_query:str, *args, fields=['source', 'content'], 
+        **kwargs):
         # we use self.search_results.ldf.iterrows to get the data for provided fields as dict
         dr = [{f: r[f] for f in fields} for i, r in self.search_results.ldf[1:].iterrows()]
         return dr, search_query
 
-    def run_google_se(self, search_query:str, num:int=None, *args, **kwargs) -> dict:
-        """
-        Performs a Google Custom Search and returns the results as a JSON dictionary.
-        """
-        num = num if num is not None else self.se_num
-        params = {'key': self.api_key, 'cx': self.cse_id, 'q': search_query, 'num': num}
-        print(f"{Fore.YELLOW}Performing Search for query: '{search_query}' {Fore.RESET}")
-        r = requests.get(self.g_url, params=params)
-        r.raise_for_status()
-        return r.json()
+    def run_google_se(self, search_query: str, num: int = None, *args, **kwargs) -> dict:
+      """
+      Performs a Google Custom Search and returns the results as a JSON dictionary.
+      """
+      num = num if num is not None else self.se_num
+      params = {
+          'key': self.api_key,
+          'cx': self.cse_id,
+          'q': search_query,
+          'num': num,
+          'lang': 'en'  # Add the 'lang' parameter with value 'en' for English
+      }
+      print(f"{Fore.YELLOW}Performing Search for query: '{search_query}' {Fore.RESET}")
+      r = requests.get(self.g_url, params=params)
+      r.raise_for_status()
+      return r.json()
 
-    def prep_results(self, se_results:dict, se_contents:dict, *args, **kwargs):
+    def prep_results(self, se_results:dict, se_contents:dict, urls:list, *args, **kwargs):
         """
         Filters the search results to only include relevant fields.
         """
         # field mapping is expensive, so do it only once before the loop
         # map_fields = self.search_results.mfields
         r = []
-        for i, (url, item) in enumerate(zip(self.urls, se_results.get('items'))):
+        for i, (url, item) in enumerate(zip(urls, se_results.get('items'))):
             # here we filter some values for the data record by using the columns property
             record = {k: vs for k, vs in item.items() if k in self.search_results.columns}
             record['content'] = se_contents[item.get('link')]

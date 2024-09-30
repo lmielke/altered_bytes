@@ -56,6 +56,7 @@ class Test_ModelConnect(unittest.TestCase):
                                     service_endpoint='get_generates',
                                     format='json',
                                     strategy='prompt_aggregations.best',
+                                    verbose=3,
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
         for i, out in enumerate(r.get('responses')):

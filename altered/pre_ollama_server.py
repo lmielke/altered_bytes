@@ -57,17 +57,15 @@ class Endpoints:
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
                 print(f"\n{Fore.CYAN}get_generates out:{Fore.RESET} responses[-1]\n{responses[-1]}")
         # aggreations (i.e. min, max, mean) are appended to the end of responses
-        responses.extend(self.aggate_responses(ep, *args, 
-                                                    prompts=prompts, 
-                                                    responses=responses,
-                                                    strat_templates=[repeats['agg']],
-                                                    **kwargs,
+        responses.extend(self.aggate_responses(ep, repeats['agg'], *args, 
+                                                                    prompts=prompts, 
+                                                                    responses=responses,
+                                                                    **kwargs,
                             )
         )
         return {'responses': responses}
 
-    def aggate_responses(self, ep, *args, prompts:list, responses:list,
-                                                        strat_templates:str=None,
+    def aggate_responses(self, ep, strat, *args, prompts:list, responses:list,
                                                         verbose:int=0,
                                                         fmt:str=None,
                                                         **kwargs, ):
@@ -78,11 +76,13 @@ class Endpoints:
         """
         aggs = []
         responses = [r.get('response') for r in responses]
-        if len(responses) >= 2 and strat_templates is not None:
+        if len(responses) >= 2 and strat is not None:
             # during aggregation we do not want higher response diversity
             kwargs['options']['temperature'] = 0.0
             # because we aggregate, we also append a std estimate
-            if not 'agg_std' in strat_templates: strat_templates.append('agg_std')
+            strat_templates = [strat, ]
+            if strat.startswith('agg_') and strat != 'agg_std': 
+                strat_templates.append('agg_std')
             for i, strat in enumerate(strat_templates):
                 print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat_templates = } {strat = }, {kwargs = }")
                 strats = self.instructs(    *args,

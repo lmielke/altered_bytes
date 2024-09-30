@@ -33,18 +33,8 @@ class Render:
         # we sort the keys to make sure the fields are in the correct order
         self.document = template.render({k: context.get(k) for k in self.fields})
         self.document = Render.render_from_string(self.document, context, *args, **kwargs)
-        self.document = self.correct_ansi_codes(self.document, *args, **kwargs)
+        self.document = Render.correct_ansi_codes(self.document, *args, **kwargs)
         return self.document
-
-    def correct_ansi_codes(self, text, *args, **kwargs):
-        # Replace escaped newlines with actual newlines
-        text = text.replace('\\n', '\n')
-        
-        # Replace escaped ANSI codes with actual ANSI codes
-        ansi_escapes = re.compile(r'\\033\[((?:\d+;)*\d+)?([a-zA-Z])')
-        text = ansi_escapes.sub(lambda m: f'\033[{m.group(1) or ""}{m.group(2)}', text)
-        
-        return text
 
     def save_rendered(self, *args, template_name:str, output_file:str=None, **kwargs):
         output_file = output_file if output_file else sts.time_stamp()
@@ -67,3 +57,14 @@ class Render:
         """
         template = jinja2.Template(template_str)
         return template.render(context)
+
+    @staticmethod
+    def correct_ansi_codes(text, *args, **kwargs):
+        # Replace escaped newlines with actual newlines
+        text = text.replace('\\n', '\n')
+        
+        # Replace escaped ANSI codes with actual ANSI codes
+        ansi_escapes = re.compile(r'\\033\[((?:\d+;)*\d+)?([a-zA-Z])')
+        text = ansi_escapes.sub(lambda m: f'\033[{m.group(1) or ""}{m.group(2)}', text)
+        text = text.replace('\n'*3, '\n'*2)
+        return text

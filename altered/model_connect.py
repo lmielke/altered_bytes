@@ -32,7 +32,7 @@ class ModelConnect:
                         }
         self.columns = ['network_up_time', 'server_time', 'network_down_time', 'total_time',
                         'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_prompt',
-                        'num_ctx_response']
+                        'num_ctx_response', 'server', 'model']
         self.times_df = pd.DataFrame(columns=self.columns)
 
     @staticmethod
@@ -53,12 +53,11 @@ class ModelConnect:
         # if num_ctx is larger than we print an alert
         if num_ctx > context_length:
             print(
-                f"{Fore.RED}ERROR{Fore.RESET}: "
+                f"{Fore.YELLOW}WARNING{Fore.RESET}: "
                 f"num_ctx: {Fore.YELLOW}{num_ctx}{Fore.RESET} is greater than "
                 f"context_length: {Fore.YELLOW}{context_length}{Fore.RESET}. "
                 f"Setting num_ctx to context_length."
                 )
-            exit()
         num_ctx = min(num_ctx, context_length)
         return num_ctx
 
@@ -137,22 +136,43 @@ class ModelConnect:
             service_endpoint = msts.config.defaults.get('service_endpoint')
         return {'service_endpoint': service_endpoint}
 
-
-    def post(self, *args, **kwargs) -> dict:
+    def post(self, *args, verbose=0, **kwargs) -> dict:
         """
         Sends a message to the appropriate assistant and handles the response.
         """
         kwargs.update(self.set_service_endpoint(*args, **kwargs))
         # print(f"model_connect.post: {kwargs = }")
         # print(msts.config.get_model(*args, **kwargs).get('model_file'))
-        context = self.prep_context(*args,
-                                **msts.config.get_model(*args, **kwargs).get('model_file'), 
-                                **kwargs,
-                            )
-        r = self.ollama(context, *args, **kwargs )
-        r['model'] = msts.config.get_model(*args, **kwargs).get('model_file').get('name')
+        model_params = msts.config.get_model(*args, **kwargs)
+        context = self.prep_context(*args, **model_params.get('model_file'), **kwargs, )
+        url = msts.config.get_url(*args, **kwargs)
+        if verbose:
+            print(f"{Fore.MAGENTA}ModelConnect.post:{Fore.RESET} \n{url}, {context['model']}")
+            print(context)
+        r = self._ollama(url, context, *args, verbose=verbose, **kwargs )
+        if verbose:
+            print(f"{Fore.MAGENTA}post.len(response):{Fore.RESET} \n{r['num_results']}")
+        r['model'] = model_params.get('model_file').get('name')
+        r['server'] = model_params.get('server')
         self.get_stats(r, context, *args, **kwargs)
         return r
+
+    def _ollama(self, url, context: dict, *args, **kwargs, ) -> dict:
+        """
+        Handles communication with a custom AI assistant.
+        service_endpoint: str, ['get_embeddings', 'generate']
+        """
+        # we are sending the request to the server
+        context['network_up_time'] = time.time()
+        r = requests.post(  url,
+                            headers={'Content-Type': 'application/json'},
+                            data=json.dumps(context),
+        )
+        r.raise_for_status()
+        r_dict = r.json()
+        for i, (field, response) in enumerate(r_dict.copy().items()):
+            r_dict['num_results'] = len(r_dict)
+        return r_dict
 
     def get_stats(self, r, context, *args, context_length:int=2000, **kwargs) -> dict:
         """
@@ -179,28 +199,6 @@ class ModelConnect:
         self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
         self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
         print(f"\n{Fore.CYAN}self.times_df:{Fore.RESET} \n{self.times_df}")
-
-
-
-    def ollama(self, context: dict, *args, **kwargs, ) -> dict:
-        """
-        Handles communication with a custom AI assistant.
-        service_endpoint: str, ['get_embeddings', 'generate']
-        """
-        # we are sending the request to the server
-        context['network_up_time'] = time.time()
-        # print(f"model_connect.ollama.url: {msts.config.get_url(*args, **kwargs)}")
-        # print(f"model_connect.ollama.context: {context}")
-        r = requests.post(  
-                            msts.config.get_url(*args, **kwargs),
-                            headers={'Content-Type': 'application/json'},
-                            data=json.dumps(context),
-        )
-        r.raise_for_status()
-        r_dict = r.json()
-        for i, (field, response) in enumerate(r_dict.copy().items()):
-            r_dict['num_results'] = len(r_dict)
-        return r_dict
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """

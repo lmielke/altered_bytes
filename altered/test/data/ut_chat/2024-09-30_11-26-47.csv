@@ -1,0 +1,156 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+<[34mcontext[39m>
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+<[33muser_prompt[39m>
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+<[36mINST[39m>
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+<[35mresponse_template[39m>
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+</[35mresponse_template[39m>
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+</[36mINST[39m>
+",user,None,llama3.1,ut_chat,None,None,2024-09-30 11:27:04.712792
+"# Answer
+To monitor your GPU's performance, you can use various tools and methods. One common approach is to use software such as GPU-Z, HWiNFO, or Afterburner (for NVIDIA GPUs) or AMD Overdrive (for AMD GPUs). These tools provide detailed information about your GPU's specifications, temperature, voltage, and clock speeds.
+
+You can also monitor your GPU's performance in real-time using tools like MSI Afterburner or EVGA Precision X. Additionally, many modern graphics cards have built-in monitoring software that allows you to track performance metrics such as frame rates, temperatures, and power consumption.
+
+It is essential to ensure that your system is configured to display GPU usage in the task manager or system monitor. You can also use online tools like GPU Shark or GPU Monitor to track your GPU's performance in real-time. Updating your drivers and checking for any software conflicts may help resolve performance issues.
+
+Using built-in Windows tools like Task Manager or Performance Monitor, you can track CPU and GPU usage. Third-party software such as GPU-Z, HWiNFO, or Afterburner (for NVIDIA) or AMD Radeon Software (for AMD) can provide detailed information about your GPU's performance, temperature, and power consumption.","[33mStrategy Prompt[39m using agg_mean:
+
+
+# 3. Instructions (INST)
+
+## Weighted Mean Aggregation
+This strategy generates a weighted average summary from a given <[35msample[39m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary  that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - Response 1: ""The quick brown fox jumps over the lazy dog.""
+  - Response 2: ""A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - Response 3: ""The nimble fox hops over a lethargic dog.""
+Expected Output:
+  ""Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
+  The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
+  the speed of the fox more than the other descriptions.""
+  
+  This output gives more weight to common themes, like the fox leaping, while incorporating 
+  details from all the responses, balancing frequent mentions with unique contributions.
+
+## Objective
+Read and understand the following <[35msample[39m> texts! Then, read and understand the provided  prompts or, (if no prompt was provided), re-construct the prompt or problem statement  based on the provided responses. Then, create a weighted average summary that synthesizes key points from all the responses,  giving more emphasis to frequently mentioned themes, while still incorporating unique contributions  where they add value. The summary should reflect the overall balance of common and unique points.
+
+
+## Input Data
+### Answers to a single prompt:
+Below is the sample of 3 of an LLM`s responses intending to answer the same single prompt.
+
+<[35msample[39m>
+
+Prompt: 
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '': Relevant available information for you to better understand the problem.
+2. User Prompt '': The recent user Question or Instruction.
+3. Instructions '': __Master instructions__ for the _LLM_ to follow right now.
+
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+
+
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+
+
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a  or question in the text above.  Use all available sources of information from  and  to  prepare a high quality response.
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+
+
+
+
+__RESPONSE SAMPLE 1__
+# Answer
+To monitor your GPU's performance, you can use various tools and methods. One common approach is to use software such as GPU-Z, HWiNFO, or Afterburner (for NVIDIA GPUs) or AMD Overdrive (for AMD GPUs). These tools provide detailed information about your GPU's specifications, temperature, voltage, and clock speeds.
+
+You can also monitor your GPU's performance in real-time using tools like MSI Afterburner or EVGA Precision X. Additionally, many modern graphics cards have built-in monitoring software that allows you to track performance metrics such as frame rates, temperatures, and power consumption.
+
+__RESPONSE SAMPLE 2__
+# Answer
+To monitor your GPU's performance, you can use various tools and methods. First, ensure that your system is configured to display GPU usage in the task manager or system monitor. You can also use software like GPU-Z, HWiNFO, or Afterburner (for NVIDIA GPUs) or AMD Overdrive (for AMD GPUs) to monitor and adjust settings. Additionally, many graphics cards have built-in monitoring tools that can be accessed through their respective control panels. If you're experiencing performance issues, try updating your drivers and checking for any software conflicts.
+
+__RESPONSE SAMPLE 3__
+# Answer
+To monitor your GPU's performance, you can use various tools and methods. First, ensure that your system is up to date with the latest drivers for your graphics card. Then, you can use built-in Windows tools like Task Manager or Performance Monitor to track CPU and GPU usage. Additionally, third-party software such as GPU-Z, HWiNFO, or Afterburner (for NVIDIA) or AMD Radeon Software (for AMD) can provide detailed information about your GPU's performance, temperature, and power consumption. You can also use online tools like GPU Shark or GPU Monitor to track your GPU's performance in real-time.
+</[35msample[39m>
+
+## Your Task
+Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporates key points from  all responses. Pay more attention to common themes or ideas mentioned by multiple responses,  while ensuring that unique details from each response are included where relevant. NOTE: Generously keep/include formulas and code snippets or shell commands.
+
+
+
+## Response Layout and Format
+
+Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.1,ut_chat,None,None,2024-09-30 11:27:04.712792
