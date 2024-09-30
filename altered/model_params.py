@@ -189,17 +189,12 @@ class ModelParams:
         # Retrieve the key_path for openAI
         key_path = self.servers.get('openAI', {}).get('key_path')
         assert key_path, "Key path not found in servers"
-        
         # Unpack path alias (assuming this function resolves any path aliases)
         key_path = self.unpack_path_alias(key_path, *args, **kwargs)
-        
-        print(f"Resolved key path: {key_path}")  # Debugging print statement
-
         try:
             # Attempt to open and load the YAML file
             with open(key_path, 'r') as file:
                 s_file = yaml.safe_load(file)
-                print(f"YAML content loaded: {s_file}")  # Debugging print statement
                 self.api_key = s_file.get('key')
                 if not self.api_key:
                     print("API key not found in the YAML file.")
@@ -212,7 +207,6 @@ class ModelParams:
         except yaml.YAMLError as e:
             print(f"Error loading YAML file: {e}")
             self.api_key = None
-        
         # Return the API key or None if it was not found or an error occurred
         return self.api_key
 
