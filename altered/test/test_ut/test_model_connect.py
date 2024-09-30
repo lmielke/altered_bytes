@@ -27,20 +27,6 @@ class Test_ModelConnect(unittest.TestCase):
         #     out = yaml.safe_load(f)
         return out
 
-    # def test___init__(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
-
-    # def test_prep_context(self, *args, **kwargs):
-    #     expected = False
-    #     # initialize test class
-    #     out = True
-    #     # tests and asserts
-    #     self.assertEqual(self.msg, expected)
-
     def test_post(self, *args, **kwargs):
         expected = False
         context = {'messages': [{'role': 'user', 'content': 'Why is the sky blue?'}]}

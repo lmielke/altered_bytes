@@ -241,15 +241,25 @@ class ModelParams:
         for service, params in services.items():
             if 'key_path' in params.keys():
                 key_path = self.unpack_path_alias(params['key_path'])
-                if not os.path.isfile(key_path):
-                    raise FileNotFoundError(f"Key file not found: {key_path}")
-                print(f"get_services: \n{services = }")
-                print(f"get_services: \n{services[service] = }")
-                print(f"get_services.isfile: {os.path.isfile(key_path) = }")
-                with open(key_path, 'r', encoding='utf-8') as file:
-                    print(f"file text: {file.load() = }")
-                    services[service].update(yaml.safe_load(file))
+                services[service].update(self.load_service(key_path, *args, **kwargs))
         return services
+
+    def load_service(self, file_path: str, *args, **kwargs) -> dict:
+        """
+        Load a service file from a specified path.
+
+        Args:
+            file_path (str): The path to the service file.
+
+        Returns:
+            dict: The service file as a dictionary.
+        """
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"Key file not found: {file_path}")
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = yaml.safe_load(file)
+            print(f"Service file loaded: {content}")
+        return content
 
     def get_model_file(self, url, *args, **kwargs) -> tuple:
         response = requests.get(url)
