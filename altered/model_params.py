@@ -192,7 +192,9 @@ class ModelParams:
         key_path = self.unpack_path_alias(key_path, *args, **kwargs)
         try:
             with open(key_path, 'r') as file:
-                self.api_key = yaml.safe_load(file).get('key')
+                s_file = yaml.safe_load(file)
+                print(f"{s_file = }")
+                self.api_key = s_file.get('key')
         except FileNotFoundError:
             print(f"self.api_key loading failed. Continuing with None")
             self.api_key = None
