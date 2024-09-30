@@ -1,7 +1,5 @@
 # test_model_connect.py
 import sys
-print(f"test_model_connect: {sys.executable = }")
-exit()
 import os, re, shutil, sys, time, yaml
 import unittest
 from tabulate import tabulate as tb
