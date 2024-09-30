@@ -224,6 +224,7 @@ class ModelParams:
             key_path_elements[0] = os.environ.get(match.group(1))
             key_path = os.path.join(*key_path_elements)
             key_path = os.path.expanduser(key_path)
+            key_path = os.path.abspath(key_path)
         if not isinstance(key_path, str):
             raise ValueError("key_path must be a string")
         if not os.path.isfile(key_path):
