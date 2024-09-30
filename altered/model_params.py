@@ -245,7 +245,9 @@ class ModelParams:
                     raise FileNotFoundError(f"Key file not found: {key_path}")
                 print(f"get_services: \n{services = }")
                 print(f"get_services: \n{services[service] = }")
+                print(f"get_services.isfile: {os.path.isfile(key_path) = }")
                 with open(key_path, 'r') as file:
+                    print(f"file text: {file.load() = }")
                     services[service].update(yaml.safe_load(file))
         return services
 
