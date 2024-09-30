@@ -240,9 +240,11 @@ class ModelParams:
         # we find those key_path s and replace key_path by the content of the key file.
         for service, params in services.items():
             if 'key_path' in params.keys():
-                key_path = self.unpack_path_alias(params['key_path']).replace(os.sep, '/')
+                key_path = self.unpack_path_alias(params['key_path'])
                 if not os.path.isfile(key_path):
                     raise FileNotFoundError(f"Key file not found: {key_path}")
+                print(f"get_services: \n{services = }")
+                print(f"get_services: \n{services[service] = }")
                 with open(key_path, 'r') as file:
                     services[service].update(yaml.safe_load(file))
         return services
