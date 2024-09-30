@@ -1,5 +1,6 @@
 # test_assistant.py
-
+import sys
+print(sys.path, sys.executable)
 import os, re, shutil, sys, time, yaml
 import unittest
 from tabulate import tabulate as tb
