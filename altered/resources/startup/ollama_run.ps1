@@ -43,6 +43,23 @@ try {
 Write-Output "ollama_run.ps1 script completed."
 Stop-Transcript
 
+
+function ollama_kill {
+    # Get the process that ends with ollama_llama_server.exe
+    $process = Get-Process | Where-Object { $_.Path -like "*ollama_llama_server.exe" }
+
+    if ($process) {
+        # Construct the taskkill command string
+        $taskkillCommand = "taskkill /PID $($process.Id) /F"
+        # Output the command to the console
+        Write-Host "Copy and run the following command:" -ForegroundColor Yellow
+        Write-Host $taskkillCommand -ForegroundColor Green
+    } else {
+        Write-Host "No process named ollama_llama_server.exe was found." -ForegroundColor Red
+    }
+}
+
+
 # we also start docker in case openWebUi is used
 # timeout /t 15
 # winget uninstall Docker.DockerDesktop

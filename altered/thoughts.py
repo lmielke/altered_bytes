@@ -97,7 +97,7 @@ class Chat:
         # we add the chat history to the context
         history = self.data.mk_history(*args, **kwargs)
         if history:
-            context['context_history'] = history
+            context['chat_history'] = history
         # we add the initial prompt to the context
         context['init_prompt'] = self.init_prompt
         return context

@@ -1,5 +1,3 @@
-# 3. Instructions (INST)
-
 ## {{ instructs.strats.method.data.name }}
 {{ instructs.strats.method.data.description }}
 {{ instructs.strats.method.data.example }}

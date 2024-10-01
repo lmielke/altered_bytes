@@ -1,9 +1,10 @@
 {%- if instructs %}
+# 3. Instructions (INST)
 {{ instructs.assi_role }}
 {{ instructs.intro }}
 
 {%- if instructs.strats %}
-{%- include "instructs_strats.md" ignore missing %}
+{%- include "i_instructs_strats.md" ignore missing %}
 {%- endif %}
 
 {%- endif %}

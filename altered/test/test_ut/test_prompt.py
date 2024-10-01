@@ -11,6 +11,7 @@ from altered.prompt import Prompt
 class Test_Prompt(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
+        cls.alias = 'l3.2_0'
         cls.verbose = 0
         cls.test_templates_names = ['qa_simple', 'agg_best']
         cls.name = 'ut_Test_Prompt'
@@ -29,18 +30,18 @@ class Test_Prompt(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        pr = Prompt(name='ut_Test_Prompt',)
+        pr = Prompt(name='ut_Test_Prompt', *args, verbose=self.verbose, alias=self.alias)
 
     def test___call__(self, *args, **kwargs):
         _context = {
-                    'context_search_query': 'list comprehensions in Python',
+                    'search_query': 'list comprehensions in Python',
                     # 'strategy': 'prompt_aggregations.mean',
-                    # 'context_search_results': [
+                    # 'search_results': [
                     #                     {'source': 'https://www.stackoverflow.com/some_topic', 'content': 'Search Query is None because this is unittest'},
                     #                     {'source': 'https://www.stackexchange.com/some_other_topic', 'content': 'List comprehensions in Python'},
                     #                     {'source': 'https://www.python.org/some_topic', 'content': 'Python list comprehensions'},
                     # ],
-                    'context_history': [
+                    'chat_history': [
                             {'role': 'user', 'content': 'Hello, how can you help me today?'},
                             {'role': 'assistant', 'content': 'Id be happy to assist you. What kind of help do you need?'},
                             {'role': 'user', 'content': 'I need help with Python programming.'},
@@ -61,8 +62,9 @@ class Test_Prompt(unittest.TestCase):
                                 'There are 100 billion stars in the Milky Way galaxy.',
                                 'Airplanes fly because of Bernoullis...',
                     ],
+                    'verbose': self.verbose,
                     }
-        prompt = Prompt(name='ut_Test_Prompt',)(**_context, fmt='json', alias='l3:8b_1')
+        prompt = Prompt(name='ut_Test_Prompt', *args, verbose=self.verbose, alias=self.alias)(**_context, fmt='json', alias=self.alias)
         print(prompt.data)
 
 

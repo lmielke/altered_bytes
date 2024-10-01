@@ -13,7 +13,7 @@ from altered.search_engine_cleaned import CleanWebSearch
 class Test_CleanWebSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.verbose = 0
+        cls.verbose = 2
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -37,13 +37,14 @@ class Test_CleanWebSearch(unittest.TestCase):
 
     def test___call__(self, *args, **kwargs):
         test_data = self.test_data.copy()
+        test_data['verbose'] = self.verbose
         del test_data['content']
         print(f"test__call__.test_data: \n{test_data}")
-        search = CleanWebSearch(**test_data)
+        search = CleanWebSearch(**test_data, data_dir=sts.test_data_dir,)
         r_cleaned = search(**test_data)
-        search.results_to_table(r_cleaned)
-        search.search_results.show(verbose=2)
-        print(f"\n\n\n{Fore.GREEN}test___call__.r_cleaned{Fore.RESET}: \n{r_cleaned}")
+        search.results_to_table(verbose=self.verbose, max_files=6)
+        search.search_results.show(verbose=1)
+        # print(f"\n\n\n{Fore.GREEN}test___call__.r_cleaned{Fore.RESET}: \n{r_cleaned}")
 
     def test_cleaning(self, *args, **kwargs):
         expected = False

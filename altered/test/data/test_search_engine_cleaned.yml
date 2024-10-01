@@ -7,4 +7,4 @@ fmt: markdown
 user_prompt: What are list comprehensions in Python?
 search_query: Python list comprehensions
 name: test_search_engine_cleaned
-verbose: 1
+verbose: 0

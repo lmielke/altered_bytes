@@ -1,6 +1,7 @@
 # assistant.py
 
 import altered.model_params as msts
+import altered.hlp_printing as hlpp
 import altered.settings as sts
 from typing import Dict, Union, Tuple
 from openai import OpenAI
@@ -141,19 +142,20 @@ class ModelConnect:
         Sends a message to the appropriate assistant and handles the response.
         """
         kwargs.update(self.set_service_endpoint(*args, **kwargs))
-        # print(f"model_connect.post: {kwargs = }")
         # print(msts.config.get_model(*args, **kwargs).get('model_file'))
         model_params = msts.config.get_model(*args, **kwargs)
-        context = self.prep_context(*args, **model_params.get('model_file'), **kwargs, )
-        url = msts.config.get_url(*args, **kwargs)
-        if verbose:
-            print(f"{Fore.MAGENTA}ModelConnect.post:{Fore.RESET} \n{url}, {context['model']}")
-            print(context)
+        context = self.prep_context(*args, **model_params.get('model_file'), verbose=verbose, 
+                                            **kwargs, )
+        url, server = msts.config.get_url(*args, **kwargs), model_params.get('server')
+        if verbose >= 2:
+            print(      f"{Fore.MAGENTA}ModelConnect.post: "
+                        f"{url}, {context['model']}, {server = }{Fore.RESET}")
+            hlpp.unroll_print_dict(context, 'prompts')
+
         r = self._ollama(url, context, *args, verbose=verbose, **kwargs )
         if verbose:
-            print(f"{Fore.MAGENTA}post.len(response):{Fore.RESET} \n{r['num_results']}")
-        r['model'] = model_params.get('model_file').get('name')
-        r['server'] = model_params.get('server')
+            print(f"{Fore.MAGENTA}ModelConnect.post:{Fore.RESET} {r['num_results'] = }")
+        r['model'], r['server'] = model_params.get('model_file').get('name'), server
         self.get_stats(r, context, *args, **kwargs)
         return r
 
@@ -198,7 +200,7 @@ class ModelConnect:
         # Use pd.concat to add the new row to the DataFrame
         self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
         self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
-        print(f"\n{Fore.CYAN}self.times_df:{Fore.RESET} \n{self.times_df}")
+        print(f"\n{Fore.MAGENTA}self.times_df:{Fore.RESET} \n{self.times_df}\n")
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """

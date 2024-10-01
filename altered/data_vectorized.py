@@ -20,14 +20,19 @@ from altered.data import Data
 from altered.model_connect import SingleModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
+import altered.model_params as msts
 
 
 class VecDB(Data):
     """
     VecDB stores content as vectors and retrieves similar content
     based on cosine similarity.
+    It maintains two storage components:
+    - DataFrame storing data (inherit from class Data), and a hash to map embeddings to data.
+    - NumPy array for storing the embeddings of the data.
     """
     mem_file_ext = 'npy'
+    embedding_model = 'llama3.1'
     # default_data_dir handles where table data are stored and loaded
     default_data_dir = os.path.join(sts.resources_dir, 'vec_db')
     # vec_fields_path is the path to the fields file for the table creator
@@ -58,7 +63,7 @@ class VecDB(Data):
         fields_paths.extend(u_fields_paths)
         return fields_paths
 
-    def setup_storage(self, *args, embedd_size:int=4096, verbose:int=0, **kwargs):
+    def setup_storage(self, *args, verbose:int=0, **kwargs):
         """
         Sets up the initial storage for the VecDB, including content data and vector embeddings.
         The VecDB utilizes two components for storage: 
@@ -76,7 +81,8 @@ class VecDB(Data):
         """
         # Create an initial record for the storage
         # define self.vector
-        embedding = np.array(self.embedds(self.name))
+        print(f"{Fore.CYAN}VecDB.setup_storage: {Fore.RESET} {kwargs = }, {verbose = }")
+        embedding = np.array(self.embedds(self.name, *args, verbose=verbose, **kwargs))
         normalized = self.normalize(embedding)
         self.vectors = np.stack((embedding, normalized)).astype(self.dtype)[None, ...]
         self.ldf.at[0, 'hash'] = self.hashify(normalized)
@@ -95,7 +101,7 @@ class VecDB(Data):
         """
         return hashlib.sha256(vector[:30].tobytes()).hexdigest()[:num]
 
-    def embedds(self, contents: List[str], *args, **kwargs) -> np.ndarray:
+    def embedds(self, contents: List[str], *args, model:str=None, **kwargs) -> np.ndarray:
         """
         Retrieves embeddings for the given contents from the server.
         Args:
@@ -104,9 +110,15 @@ class VecDB(Data):
             An ndarray representing the embeddings.
         """
         # add this for getting the embedding directly
+        assert contents, f"{Fore.RED}ERROR: VecDB.embedds: Contents is empty !{Fore.RESET}"
+        if model is not None and model != self.embedding_model:
+            print(  f"{Fore.YELLOW}WARNING: VecDB.embedds.embedding_model: "
+                    f"{model} != {self.embedding_model} {Fore.RESET}"
+                    f"continuing with {self.embedding_model = }")
         return self.assi.post(
                                 contents, 
-                                service_endpoint=self.service_endpoint, 
+                                service_endpoint=self.service_endpoint,
+                                model=self.embedding_model,
                                 **kwargs
                 ).get('responses')[0].get('embedding')
 
@@ -136,7 +148,7 @@ class VecDB(Data):
         # first we update the vectors with the newly embedded content token
         normalized =    self.update_vector_store(
                                     np.array(
-                                        self.embedds( record['content'] )
+                                        self.embedds( record['content'], *args, **kwargs)
                                     ), *args, **kwargs,
                                 )
         # then we add the record to the storage
@@ -148,9 +160,10 @@ class VecDB(Data):
 
     def get(self, query:str, *args, num:int=5, **kwargs):
         start = time.time()
+        print(f"{Fore.CYAN}VecDB.get: {Fore.RESET} {kwargs = }")
         # Find the idxs for num most similar vectors to the query vector inside self.vectors
         top_num_ixs, top_num_dists = self.find_nearest(
-                                        np.array(self.embedds( query )), 
+                                        np.array(self.embedds( query, *args, **kwargs )), 
                                         num,
                                     )
         # Get the records for num most similar records to the query inside rag_data
@@ -167,8 +180,8 @@ class VecDB(Data):
         self.mk_stats_table(records, *args, **kwargs)
         if verbose: 
             print(
-                        f"{Fore.YELLOW}\nResults/Stats for rag search: {Fore.RESET}\n"
-                        f"{Fore.GREEN}Query: {Fore.RESET}{query}\n"
+                        f"{Fore.CYAN}\nResults/Stats for rag search: {Fore.RESET}\n"
+                        f"{Fore.CYAN}Query: {Fore.RESET}{query}\n"
                         f"{tb(self.stats_tbl, headers='keys', tablefmt='grid')}"
                         f"\nStats: {records['stats']}\n"
                     )
@@ -224,12 +237,10 @@ class VecDB(Data):
         # super takes care of saving self.data (pd.DataFrame) to disk and returns the path
         data_saved_path = super().save_to_disk(*args, verbose=verbose, **kwargs)
         # we save the self.vectors (np.ndarray) to disk using the parents file_path
-        np.save(f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}", self.vectors)
-        if verbose >= 2: 
-            path = f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}" 
-            print(  f"{Fore.YELLOW}Data.save_to_disk: "
-                    f"Saving {self.name} to:{Fore.RESET} {path}"
-                    )
+        v_save_path = f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}"
+        np.save(v_save_path, self.vectors)
+        if verbose >= 1:
+            print(f"{Fore.MAGENTA}VecDB.save_to_disk:{Fore.RESET} {v_save_path = }")
 
     def load_from_disk(self, *args, data_file_name:str=None, verbose:int=0, **kwargs) -> None:
         if data_file_name is None: return
@@ -239,8 +250,8 @@ class VecDB(Data):
                             **kwargs)
         # we save the self.vectors (np.ndarray) to disk using the parents file_path
         npy_load_path = f"{os.path.splitext(data_load_path)[0]}.{self.mem_file_ext}"
-        if verbose >= 2: 
-            print(f"{Fore.CYAN}VecDB.load_from_disk:{Fore.RESET} {npy_load_path = }")
+        if verbose: 
+            print(f"{Fore.YELLOW}VecDB.load_from_disk:{Fore.RESET} {npy_load_path = }")
         with open(npy_load_path, 'rb') as f:
             self.vectors = np.load(f)
 

@@ -33,14 +33,14 @@ class Test_Prompt(unittest.TestCase):
 
     def test___call__(self, *args, **kwargs):
         _context = {
-                    'context_search_query': 'list comprehensions in Python',
+                    'search_query': 'list comprehensions in Python',
                     # 'strategy': 'prompt_aggregations.mean',
-                    'context_search_results': [
+                    'search_results': [
                                         {'url': 'https://www.stackoverflow.com/some_topic', 'content': 'How to use list comprehensions in Python'},
                                         {'url': 'https://www.stackexchange.com/some_other_topic', 'content': 'List comprehensions in Python'},
                                         {'url': 'https://www.python.org/some_topic', 'content': 'Python list comprehensions'},
                     ],
-                    'context_history': [
+                    'chat_history': [
                             {'role': 'user', 'content': 'Hello, how can you help me today?'},
                             {'role': 'assistant', 'content': 'Id be happy to assist you. What kind of help do you need?'},
                             {'role': 'user', 'content': 'I need help with Python programming.'},

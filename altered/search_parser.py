@@ -15,8 +15,7 @@ class Parser:
     def __init__(self, *args, **kwargs):
         pass
 
-    def parse_site(self, url: str, use_pwr: bool = True, timeout: int = 10, *args, **kwargs
-        ) -> str:
+    def parse_site(self, url:str, timeout:int=10, *args, use_pwr:bool=True, **kwargs) -> str:
         """
         Fetches and parses the content from a given URL. If `use_pwr` is True, 
         it will use Playwright for JavaScript-rendered content.
@@ -30,11 +29,11 @@ class Parser:
             print(f"{Fore.RED}Failed to fetch content from {url}: {e}{Fore.RESET}")
             return "Failed to fetch content."
 
-    def fetch_with_requests(self, url: str, timeout: int = 10) -> str:
+    def fetch_with_requests(self, url:str, timeout:int=10) -> str:
         """
         Fetches content from a URL using requests.
         """
-        print(f"{Fore.YELLOW}\tRequests, {Fore.RESET}Fetching content from {url}")
+        print(f"\tRequests, Fetching content from {Fore.YELLOW}{url} ...{Fore.RESET}")
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()
         return self.extract_content(response.content)
@@ -43,7 +42,7 @@ class Parser:
         """
         Fetches content from a URL using Playwright to render JavaScript.
         """
-        print(f"{Fore.YELLOW}\tPlaywright, {Fore.RESET}Fetching content from {url}")
+        print(f"\tPlaywright, Fetching content from {Fore.YELLOW}{url} ...{Fore.RESET}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
@@ -54,7 +53,7 @@ class Parser:
 
             return self.extract_content(content)
 
-    def extract_content(self, html_content: str, *args, **kwargs) -> str:
+    def extract_content(self, html_content:str, *args, **kwargs) -> str:
         """
         Extracts both paragraph text and code snippets from the HTML content.
         """
@@ -69,13 +68,13 @@ class Parser:
         combined_content = self.clean_text(combined_content, *args, **kwargs)
         return combined_content if combined_content else "No readable content found."
 
-    def parse_urls(self, urls:dict, max_workers:int=5, use_pwr:bool=True, *args, **kwargs,
+    def parse_urls(self, urls:dict, max_workers:int=5, *args, **kwargs,
         ) -> dict:
         """
         Parses multiple URLs in parallel and updates the provided dictionary with parsed content.
         """
         def process_url(url):
-            return url, self.parse_site(url, use_pwr=use_pwr, *args, **kwargs)
+            return url, self.parse_site(url, *args, **kwargs)
         url_contents = {}
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(process_url, url): url for url in urls}
@@ -84,7 +83,7 @@ class Parser:
                 url_contents[url] = parsed_content
         return url_contents
 
-    def clean_text(self, text: str, *args, **kwargs) -> str:
+    def clean_text(self, text:str, *args, **kwargs) -> str:
         """
         Cleans the text by removing extra whitespace and newlines.
         """
@@ -115,4 +114,4 @@ class Parser:
                 continue
             last_line = line
             cleaned.append(line)
-        return '\n'.join(cleaned)[2000:16000]
+        return '\n'.join(cleaned)[2000:20000]

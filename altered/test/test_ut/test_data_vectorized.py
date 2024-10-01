@@ -100,7 +100,7 @@ class Test_VecDB(unittest.TestCase):
         
         # Add these entries to data_vectorized
         for entry in test_contents:
-            self.d_vec.append({'role': 'user', 'content': entry})
+            self.d_vec.append({'role': 'user', 'content': entry},)
         self.d_vec.show(verbose=2)
         # Query that is nearest to one of the test entries
         query = "Why is the sky blue?"

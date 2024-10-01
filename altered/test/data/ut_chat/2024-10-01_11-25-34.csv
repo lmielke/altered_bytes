@@ -1,0 +1,175 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+<[34mcontext[39m>
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+<[33muser_prompt[39m>
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+<[36mINST[39m>
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+<[36mresponse_template[39m>
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+</[36mresponse_template[39m>
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+</[36mINST[39m>
+",user,None,llama3.2,ut_chat,None,None,2024-10-01 11:25:40.077746
+"To create a weighted summary of the provided responses, we will analyze the key points mentioned in each response and assign weights based on their frequency and relevance.
+
+**Weighted Summary**
+
+Monitoring GPU performance is crucial for optimal system performance. The most common methods to monitor GPU performance are:
+
+*   **Using NVIDIA Management Library (NVML)**: NVML provides an interface to query and control NVIDIA GPUs. It can be installed using pip (`pip install nvidia-mmlibv2`) or conda (`conda install -c nvml nvidia-mmlibv2`).
+*   **Using CUDA Profiler**: CUDA Profiler is a tool that provides detailed information about GPU memory usage, data transfer rates, and other performance metrics. It can be run using the `nvprof` command-line tool.
+*   **System Monitoring Tools**: System monitoring tools such as `top`, `htop`, or `systemd-analyze` provide real-time information about CPU and memory usage, which can help identify potential bottlenecks in applications.
+*   **GPU Monitoring Software**: Dedicated GPU monitoring software like GPU-Z, NVMonitor, or GPU-M provide detailed information about GPU temperature, memory usage, and other performance metrics.
+
+To monitor GPU performance, it is recommended to:
+
+*   Regularly check performance metrics using tools like `nvidia-smi` (for NVIDIA GPUs) or `glrxinfo` (for AMD GPUs).
+*   Keep your GPU drivers up-to-date, as newer drivers often include performance improvements.
+*   Use command-line tools and system monitoring software to monitor performance metrics.
+
+By following these methods and best practices, you can effectively monitor your GPU's performance and optimize your system for better performance.","[33mStrategy Prompt[39m using agg_mean:
+
+
+# 3. Instructions (INST)
+
+## Weighted Mean Aggregation
+This strategy generates a weighted average summary from a given <[36msample[39m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary  that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - Response 1: ""The quick brown fox jumps over the lazy dog.""
+  - Response 2: ""A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - Response 3: ""The nimble fox hops over a lethargic dog.""
+Expected Output:
+  ""Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
+  The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
+  the speed of the fox more than the other descriptions.""
+  
+  This output gives more weight to common themes, like the fox leaping, while incorporating 
+  details from all the responses, balancing frequent mentions with unique contributions.
+
+## Objective
+Read and understand the following <[36msample[39m> texts! Then, read and understand the provided  prompts or, (if no prompt was provided), re-construct the prompt or problem statement  based on the provided responses. Then, create a weighted average summary that synthesizes key points from all the responses,  giving more emphasis to frequently mentioned themes, while still incorporating unique contributions  where they add value. The summary should reflect the overall balance of common and unique points.
+
+## Input Data
+### Answers to a single prompt:
+Below is the sample of 3 of an LLM`s responses intending to answer the same single prompt.
+
+<[36msample[39m>
+
+Prompt: 
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '': Relevant available information for you to better understand the problem.
+2. User Prompt '': The recent user Question or Instruction.
+3. Instructions '': __Master instructions__ for the _LLM_ to follow right now.
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+
+
+# 3. Instructions (INST)
+
+## To Do
+You were provided with a  or question in the text above.  Use all available sources of information from  and  to  prepare a high quality response.
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+
+Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+
+
+__RESPONSE SAMPLE 1__
+# The answer field contains the model response
+## Answer
+Monitor your GPU performance using tools like NVIDIA System Management Interface (SMI) or AMD Radeon Pro Software. These tools provide detailed information on temperature, memory usage, and clock speeds.
+
+To access SMI, open a command prompt as an administrator and type `nvidia-smi`. This will display information about your GPUs, including their status and performance metrics.
+
+Alternatively, you can use the GPU-Z software to monitor your GPU's temperature, voltage, and fan speed.
+
+__RESPONSE SAMPLE 2__
+# The answer field contains the model response
+## Answer
+To monitor your GPU's performance, you can use the following methods:
+
+### Method 1: Using NVIDIA Management Library (NVML)
+ NVML is a software library that provides an interface to query and control NVIDIA GPUs. You can install NVML on your system using pip (`pip install nvidia-mmlibv2`) or conda (`conda install -c nvml nvidia-mmlibv2`).
+
+### Method 2: Using CUDA Profiler
+ CUDA Profiler is a tool that provides detailed information about GPU memory usage, data transfer rates, and other performance metrics. You can run the profiler using the `nvprof` command-line tool.
+
+### Method 3: Using System Monitoring Tools
+You can also use system monitoring tools such as `top`, `htop`, or `systemd-analyze` to monitor your GPU's performance. These tools provide real-time information about CPU and memory usage, which can help you identify potential bottlenecks in your application.
+
+### Method 4: Using GPU Monitoring Software
+There are also dedicated GPU monitoring software such as GPU-Z, NVMonitor, or GPU-M, that provide detailed information about GPU temperature, memory usage, and other performance metrics.
+
+__RESPONSE SAMPLE 3__
+# Answer
+Monitoring GPU performance involves tracking various metrics such as temperature, power consumption, and memory usage. To monitor your GPUs' performance, you can use tools like NVIDIA's Nsight or AMD's Radeon Software. These tools provide real-time monitoring and allow you to adjust settings for optimal performance.
+
+Additionally, you can use command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `glrxinfo` (for AMD GPUs) to monitor performance metrics. By regularly checking these metrics, you can identify any issues with your GPU's performance and take corrective action.
+
+It is also recommended to keep your GPU drivers up-to-date, as newer drivers often include performance improvements.
+</[36msample[39m>
+
+## Your Task
+Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporates key points from  all responses. Pay more attention to common themes or ideas mentioned by multiple responses,  while ensuring that unique details from each response are included where relevant. NOTE: Generously keep/include formulas and code snippets or shell commands.
+
+
+## Response Layout and Format
+
+Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.2,ut_chat,None,None,2024-10-01 11:25:40.077746

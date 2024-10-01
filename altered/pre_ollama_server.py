@@ -95,14 +95,13 @@ class Endpoints:
                                         **kwargs,
                                     )
             rendered = self.renderer.render(
-                                        template_name='instructs.md',
+                                        template_name='i_instructs.md',
                                         context = {'instructs': strats},
                                         verbose=3,
                                         )
             if verbose >= 2:
                 print(f"\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} rendered: \n{rendered}")
             agg = self._ollama(self.ep_mappings.get(ep), rendered, *args, **kwargs)
-            print(f"\n{Fore.BLUE}aggregate_responses:{Fore.RESET} out: \n{agg.get('response')}")
             agg['prompt'] = f"Strategy Prompt using {strat}:\n" + rendered
             agg['strat_template'] = strat
             agg['fmt'] = kwargs.get('fmt')

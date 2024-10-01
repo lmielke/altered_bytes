@@ -59,12 +59,12 @@ class WebSearch:
           'num': num,
           'lang': 'en'  # Add the 'lang' parameter with value 'en' for English
       }
-      print(f"{Fore.YELLOW}Performing Search for query: '{search_query}' {Fore.RESET}")
+      print(f"Performing Search for query:{Fore.YELLOW} '{search_query}' {Fore.RESET}")
       r = requests.get(self.g_url, params=params)
       r.raise_for_status()
       return r.json()
 
-    def prep_results(self, se_results:dict, se_contents:dict, urls:list, *args, **kwargs):
+    def prep_results(self, se_results:dict, se_contents:dict, urls:list, *args, search_query, **kwargs):
         """
         Filters the search results to only include relevant fields.
         """
@@ -75,14 +75,16 @@ class WebSearch:
             # here we filter some values for the data record by using the columns property
             record = {k: vs for k, vs in item.items() if k in self.search_results.columns}
             record['content'] = se_contents[item.get('link')]
+            record['search_query'] = search_query
             record['link'] = url
             r.append(record)
         return r
 
-    def results_to_table(self, r:list, *args, **kwargs):
+    def results_to_table(self, r:list=None, *args, **kwargs):
         """
         Appends filtered search results to the internal VecDB object.
         """
+        r = r if r is not None else self.r
         for result in r:
             self.search_results.append(result, *args, **kwargs)
         self.search_results.save_to_disk(*args, **kwargs)

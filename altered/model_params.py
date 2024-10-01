@@ -93,7 +93,12 @@ class ModelParams:
         with open(path, 'w') as file:
             yaml.safe_dump(self.config, file)
 
-    def unpack_alias(self, *args, alias:str=None, service_endpoint:str=None, **kwargs) -> Tuple[str, str]:
+    def unpack_alias(self, *args,   alias:str=None,
+                                    model:str=None,
+                                    server:str=None,
+                                    service_endpoint:str=None,
+                                    **kwargs
+        ) -> Tuple[str, str]:
         """
         alias:[str, tuple] combined model_server alias 
                             i.e. 'l31:8b_0' -> (modelAlias_server_id)
@@ -115,13 +120,15 @@ class ModelParams:
             service_endpoint = self.defaults.get('service_endpoint')
         if alias is None:
             model_alias, server_alias = None, None
-            model_name = self.defaults.get(service_endpoint)['model']
-            server_name = self.defaults.get(service_endpoint)['server']
+            model_name = self.defaults.get(service_endpoint)['model'] if model is None else model
+            server_name = self.defaults.get(service_endpoint)['server'] if server is None else server
             # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
         elif type(alias) == tuple:
             model_alias, server_alias = None, None
             model_name, server_name = alias
+            model_name = model_name if model is None else model
+            server_name = server_name if server is None else server
             return model_name, server_name
         elif alias.startswith('gpt'):
             if '_' in alias:
@@ -135,8 +142,11 @@ class ModelParams:
             model_alias, server_alias = alias, None
         # replace this for something more general
         model_name = self.aliasses['models'].get(model_alias, {})
+        model_name = model_name if model is None else model
         server_name = self.aliasses['servers'].get(server_alias, {})
-        if not server_name: server_name = self.defaults.get('get_embeddings', {})['server']
+        server_name = server_name if server is None else server
+        if not server_name: 
+            server_name = self.defaults.get('get_embeddings', {})['server']
         if model_name:
             return model_name, server_name
         else:
@@ -156,6 +166,8 @@ class ModelParams:
         """
         model_name, server_name = self.unpack_alias(*args, **kwargs)
         model_file = self.models.get(model_name)
+        assert type(model_file) == dict, (  f"{Fore.RED}'ERROR: {model_name} "
+                                            f"not found in models_servers.yml'{Fore.RESET}")
         if server_name == 'openAI' or server_name is None:
             api_key = self.get_api_key()
             params = {'api_key': api_key,}

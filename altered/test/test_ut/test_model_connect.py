@@ -37,12 +37,12 @@ class Test_ModelConnect(unittest.TestCase):
                                     context['messages'][0]['content'],
                                     'Why is the sky not green?',
                                     ],
-                                    # alias='l3:8b_1',
+                                    alias='l3.2_0',
                                     num_predict = 100,
                                     service_endpoint='get_generates',
                                     format='json',
                                     strategy='prompt_aggregations.best',
-                                    verbose=3,
+                                    verbose=self.verbose,
                 )
         # out = {k: f"{vs:12,d}" for k, vs in out.items() if k in ['load_duration', 'total_duration']}
         for i, out in enumerate(r.get('responses')):

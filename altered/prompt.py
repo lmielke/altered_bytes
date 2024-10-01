@@ -18,6 +18,7 @@ class Prompt:
 
 
     def __init__(self, name, *args, **kwargs):
+        print(f"{Fore.YELLOW}Prompt Initiated{Fore.RESET} {kwargs = }")
         self.name = name
         self.C = Context(name, *args, **kwargs)
         self.I = Instructions(name, *args, **kwargs)

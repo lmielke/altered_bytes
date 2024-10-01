@@ -27,8 +27,8 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
                 .replace('rag_db_matches>', f"{Fore.GREEN}rag_db_matches{Fore.RESET}>")
                 .replace('user_prompt>', f"{Fore.YELLOW}user_prompt{Fore.RESET}>")
                 .replace('previous_responses>', f"{Fore.CYAN}previous_responses{Fore.RESET}>")
-                .replace('sample>', f"{Fore.MAGENTA}sample{Fore.RESET}>")
-                .replace('response_template>', f"{Fore.MAGENTA}response_template{Fore.RESET}>")
+                .replace('sample>', f"{Fore.CYAN}sample{Fore.RESET}>")
+                .replace('response_template>', f"{Fore.CYAN}response_template{Fore.RESET}>")
                 .replace('INST>', f"{Fore.CYAN}INST{Fore.RESET}>")
                 .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Fore.RESET}")
                 .replace('____RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Fore.RESET}")
@@ -123,10 +123,25 @@ def normalize_max_chars(max_chars:int, text, *args, **kwargs):
     so we re-compute max_chars to result in a minimum of 3 lines
     """
     if len(text) <= 50:
-        return max_chars // 4
+        return max_chars // 5
     elif len(text) <= 128:
-        return max_chars // 3
+        return max_chars // 4
     elif len(text) <= 400:
+        return max_chars // 3
+    elif len(text) <= 1200:
         return max_chars // 2
     else:
-        return int(max_chars * 1.3)
+        return int(max_chars * 2)
+
+def unroll_print_dict(d:dict, unroll_key:str='prompts', *args, **kwargs):
+    for k, vs in d.items():
+        if k == 'service_endpoint':
+            print(f"\t{k = }: {Fore.MAGENTA}{vs}{Fore.RESET}")
+        elif k == unroll_key:
+            print(f"\t{k = }: {len(vs)}")
+            for i, prompt in enumerate(vs):
+                start = '\n' if i != 0 else ''
+                prompt = '\n\t\t'.join(prompt[:200].split('\n'))
+                print(f"{start}\t\t{Fore.MAGENTA}{i}{Fore.RESET}: {prompt[:150]}")
+        else:
+            print(f"\t{k = }: {vs}")

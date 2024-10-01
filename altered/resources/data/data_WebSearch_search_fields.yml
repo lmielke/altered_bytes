@@ -13,6 +13,10 @@ kind: null
 # The title of the search result page.
 title: null
 
+# meta: {"name": "search_query", "type": "string", "default": "", "example": "GPU Performance Powershell"}
+# The search_query of the search result page.
+search_query: null
+
 # meta: {"name": "source", "type": "string", "default": "", "example": "https://example.com/gpu-performance", "mapping_source": "link"}
 # The URL of the search result.
 source: null
@@ -28,6 +32,10 @@ snippet: null
 # meta: {"name": "pagemap", "type": "string", "default": "{}", "example": ""}
 # Additional metadata related to the search result, such as images, authors, etc.
 pagemap: null
+
+# meta: {"name": "short", "type": "string", "default": "", "example": "This is the shortened body of the page."}
+# The extracted body short from the page.
+short: null
 
 # meta: {"name": "content", "type": "string", "default": "", "example": "This is the full body content of the page."}
 # The extracted body content from the page.

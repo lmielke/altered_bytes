@@ -22,6 +22,7 @@ class CleanWebSearch(WebSearch):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assi = SingleModelConnect(*args, **kwargs)
+        self.alias = 'l3.2_0'
         # prompt constructor for LLM interaction
         self.insts = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
@@ -34,20 +35,15 @@ class CleanWebSearch(WebSearch):
         if repeats is None: repeats = self.default_repeats
         # Note, self.cleaning is doing a ollama call
         cleaned = self.cleaning(*args, repeats=repeats, **kwargs)
-        if repeats is not None and 'agg_mean' == repeats['agg']:
-            # We might want to aggregate multiple search results into a single RAG Info
-            print(f"{Fore.GREEN}Aggregating Cleaned Results: {Fore.RESET}: {repeats = }")
-            # the second last record contains the aggregation
-            self.r_cleaned.append(self.r[0])
-            self.r_cleaned[0]['content'] = cleaned[-2].get('response').strip()
-        else:
-            # Or, we want to keep all the search results seperate
-            print(f"{Fore.GREEN}Looping Cleaned Results: {Fore.RESET}: {repeats = }")
-            for i, clean in enumerate(cleaned):
-                _clean = clean.get('response').strip()
-                self.r_cleaned[i]['content'] = _clean
-        return self.r_cleaned
-    
+        for i, clean in enumerate(cleaned):
+            if clean.get('strat_template') is not None:
+                self.r.append(self.r[0].copy())
+                self.r[-1]['content'] = clean.get('response').strip()
+                self.r[-1]['short'] = ''
+            else:
+                self.r[i]['short'] = clean.get('response').strip()
+        return self.r
+
     def cleaning(self, *args, alias='l3:8b_1', **kwargs):
         contents = []
         
@@ -55,10 +51,11 @@ class CleanWebSearch(WebSearch):
             contents.append(self.mk_prompt(result.get('content'), result.get('link'), 
                                             *args, **kwargs))
         # we use the ModelConnect object to post the contents to the AI model
-        r = self.assi.post(contents, *args, alias=alias, **kwargs )
+        # NOTE: due to the potentially giant context size we have to use a powerfull server
+        r = self.assi.post(contents, *args, alias=self.alias, **kwargs )
         return r.get('responses')
 
-    def mk_prompt(self, content:str, link:str, *args, user_prompt:str, search_query:str, 
+    def mk_prompt(self, content:str, link:str, search_query:str, *args, user_prompt:str, 
         **kwargs):
         _context = {
                     'responses': [content.replace('\n\n', '\n')],
@@ -70,8 +67,7 @@ class CleanWebSearch(WebSearch):
         # we use the Instructions object to render the context
         context = self.insts(strat_templates=['reduce_text'], **_context)
         rendered = self.renderer.render(
-                                            template_name='instructs_strats.md',
+                                            template_name='i_instructs_strats.md',
                                             context = {'instructs': context},
                                             )
-        print(f"{Fore.GREEN}\nCleanWebSearch.mk_prompt:{Fore.RESET} \n{rendered}")
         return rendered

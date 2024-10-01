@@ -1,0 +1,40 @@
+hash,tools,name,content,prompt,role,category,sub_category,source,model,timestamp
+0e82ab6db77f4e15,"VecDB(name=UT_Test_VecDB, fields=fields_dict, )",UT_Test_VecDB,,,user,,,,,
+e91c1f851bf6b794,,UT_Test_VecDB,test_data_vectorized.Test_VecDB.test_append,,user,,,,,2024-10-01 11:51:58.174213
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 11:51:58.471092
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 11:51:58.689849
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 11:51:58.924250
+b0a032ada49ab4ac,,UT_Test_VecDB,What is the meaning of life?,,user,,,,,2024-10-01 11:51:59.158597
+ab4391213006780c,,UT_Test_VecDB,What causes earthquakes?,,user,,,,,2024-10-01 11:51:59.361726
+1f37edfe538b61c7,,UT_Test_VecDB,How do computers work?,,user,,,,,2024-10-01 11:51:59.580477
+dae32820b2bda3f6,,UT_Test_VecDB,Explain the theory of relativity.,,user,,,,,2024-10-01 11:51:59.799226
+19f462740afb6e0d,,UT_Test_VecDB,What is quantum mechanics?,,user,,,,,2024-10-01 11:51:59.971107
+0bcfb82f9e39ec24,,UT_Test_VecDB,How do magnets work?,,user,,,,,2024-10-01 11:52:00.236738
+4ad84c55525a440f,,UT_Test_VecDB,Why do we dream?,,user,,,,,2024-10-01 11:52:00.424235
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 11:52:02.924365
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 11:52:03.158743
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 11:52:03.361868
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 11:52:33.764517
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 11:52:33.998895
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 11:52:34.217680
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 11:55:11.357429
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 11:55:11.544936
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 11:55:11.716808
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 11:55:34.952404
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 11:55:35.186724
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 11:55:35.467986
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 12:07:53.833109
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 12:07:54.036235
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 12:07:54.239362
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 12:17:10.160270
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 12:17:10.347772
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 12:17:10.535273
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 12:18:13.354699
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 12:18:13.542201
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 12:18:13.729705
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 12:20:03.785871
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 12:20:04.051499
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 12:20:04.238999
+fe5dedada3d2d325,,UT_Test_VecDB,What is the capital of France?,,user,,,,,2024-10-01 12:20:30.476629
+6f6655e6577a02df,,UT_Test_VecDB,How does a plane fly?,,user,,,,,2024-10-01 12:20:30.695381
+ea7da495d31dfd60,,UT_Test_VecDB,Why is the sky blue?,,user,,,,,2024-10-01 12:20:30.929756
