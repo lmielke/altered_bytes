@@ -33,7 +33,8 @@ class Instructions:
                     'user_prompt': user_prompt_context, 
                     'io': strat_io,
                 }
-        if num_predict is not None: context['default_max_words'] = num_predict // 4
+        if num_predict is not None:
+            context['default_max_words'] = num_predict // 4
         return context
 
     def get_strats_names(self, *args, strat_templates:list=None, fmt:str=None, **kwargs):

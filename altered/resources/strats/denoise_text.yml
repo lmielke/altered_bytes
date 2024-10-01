@@ -1,36 +1,35 @@
-# reduce_text.yml
+# denoise_text.yml
 # Strategy for reducing a single long text by removing redundant or irrelevant information.
 
-# meta: {"name": "name", "type": "string", "default": "", "example": "Reduce Text ..."}
+# meta: {"name": "name", "type": "string", "default": "", "example": "De-Noise Text ..."}
 # name of the strategy
-name: Reduce Text
+name: De-Noise Text Strategy
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy reduces a single "Noisy Text" to a single "Cleaned Text"
+    This strategy reduces a single "Noisy Text" to a single "De-Noised Text"
     by removing redundant, non-relevant, or overly emphasized information.
     The process includes:
     1. **Text De-noising**: Remove irrelevant details such as advertisements, 
         cookie disclaimers, or metadata that detract from the core message.
         Remove headers that sound relevant but contain no relevant content. (parsing errors)
-    2. **Redundancy Cleansing**: Identify and eliminate repetitive information or 
-        overly emphasized ideas to maintain conciseness.
-    3. **Relevance Filtering**: Retain only content relevant to the main topic, 
-        omitting tangential or background details.
-    4. **Conciseness Enhancement**: Ensure that the text is presented in a clear and 
-        concise manner, with verbose or overly detailed sections reduced to their core ideas.
-    5. **Content Pruning**: Focus on trimming away non-essential information while keeping 
-        the text's most important parts intact.
-    6. **Formula and Code Retention**: Preserve formulas, code snippets, or other technical 
-        details that are essential to the main message.
+    2. **Redundancy Cleansing**: Identify and eliminate repetitive information, 
+        overly emphasized ideas or long exhaustive explanations.
+    3. **Relevance Filtering**: Retain only content relevant to the main topic, like formulas,
+        code snipptest and core ideas, while omitting tangential or background details.
+    4. **Conciseness Enhancement**: Keep it short and to the point.
+    5. **Content Pruning**: Focus on trimming away non-essential texts while keeping 
+        the most important parts intact.
+    6. **Formula and Code Retention**: It is essential to Preserve formulas, code snippets, 
+        or other technical details that are relevant to the topic.
 
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when solving a task
 example: >
-    Example:
-    Assume the scenario: "What happens when foxes meet dogs?".
+    Here is an illustrative example, to be used as a template or guide:
+    Assume the example scenario: "What happens when foxes meet dogs?".
     
     - Example "Noisy Text":
         The quick, agile fox leaps with great grace and speed over the lazy, 
@@ -41,11 +40,11 @@ example: >
         Formula: fox_agility = dog_agility * 2 - turtle_agility
         Impressum: WeAreFoxes Ltd Fox RD 1234
     
-    - Example "Cleaned Text":
+    - Example "De-Noised Text":
       "Due to its agility, the quick fox leaps over the lazy dog.
       Formula: fox_agility = dog_agility * 2 - turtle-agility"
       
-      This output retains the core idea of the fox leaping over the dog while removing 
+      This examle output retains the core idea of the fox leaping over the dog while removing 
       redundant details such as over-emphasizing the fox's agility or the dog's lethargy, 
       which are not essential to the main message. 
       Note: Formulas often contain valuable insight, so it makes sense to keep them.
@@ -54,13 +53,14 @@ example: >
 # meta: {"name": "task", "type": "string", "default": "", "example": ""}
 # task to be performed
 task: >
-    The <{{ instructs.strats.strat_tag }}> tag below contains a single "Noisy Text",
-    that contains redundant, non-relevant, or overly emphasized information. 
-    This text must be converted into "Cleaned Text" using the strategy above.
+    The <noisy_text> tag below contains a single "Noisy Text",
+    that includes redundant, non-relevant, or overly emphasized information. 
+    This text must be cleaned into "De-Noised Text" while following the rules of the
+    template/example shown above.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Clean the "Noisy Text" to make it "Clean Text"! Higlight highly relevant information 
-    but also be generous retaining medium relevance information.
-    In particular you should keep formulas and code snippets.
+    Clean the "Noisy Text" provided inside the <noisy_text> ... </noisy_text> tags ! 
+    Higlight highly relevant information, but be generous retaining medium relevance information.
+    In particular keep and highlight formulas and code snippets relevant to the topic.

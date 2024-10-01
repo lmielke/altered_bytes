@@ -62,7 +62,7 @@ class Test_Instructions(unittest.TestCase):
 
         instr2 = Instructions(name='Test_Instructions')
         # test is using the qa template
-        strats = instr2(  strat_templates=['reduce_text', 'qa_simple'],
+        strats = instr2(  strat_templates=['denoise_text', 'qa_simple'],
                         # user_prompt='Why do horses neigh?',
                         user_prompt=out.get('user_prompt'),
                         search_query=out.get('search_query'),

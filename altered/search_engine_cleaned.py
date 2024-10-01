@@ -9,8 +9,9 @@ import requests
 import pandas as pd
 from colorama import Fore
 
-from altered.search_engine import WebSearch
 
+import altered.hlp_printing as hlpp
+from altered.search_engine import WebSearch
 from altered.model_connect import SingleModelConnect
 from altered.renderer import Render
 from altered.prompt_instructs import Instructions
@@ -65,9 +66,17 @@ class CleanWebSearch(WebSearch):
                     'user_prompt': user_prompt,
         }
         # we use the Instructions object to render the context
-        context = self.insts(strat_templates=['reduce_text'], **_context)
+        context = self.insts(strat_templates=['denoise_text'], **_context)
         rendered = self.renderer.render(
-                                            template_name='i_instructs_strats.md',
-                                            context = {'instructs': context},
-                                            )
+                                        template_name='search.md',
+                                        context = {
+                                                    'instructs': context,
+                                                    'prompt_title': 'Clean Up Search Results',
+                                                    },
+                                        )
+        hlpp.pretty_prompt(rendered, *args, **kwargs)
+
+        # exit()
+
+        
         return rendered

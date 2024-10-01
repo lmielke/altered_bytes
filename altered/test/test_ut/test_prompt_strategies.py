@@ -6,9 +6,9 @@ import unittest
 # test package imports
 import altered.settings as sts
 from colorama import Fore, Style
-
+import altered.hlp_printing as hlpp
 from altered.prompt_strategies import Strategy
-from altered.prompt_strategies import Agg, Reduce
+from altered.prompt_strategies import Agg, Denoise
 # we use renderer to veryfy the validity of results
 from altered.renderer import Render
 
@@ -57,11 +57,11 @@ class Test_Strategy(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs_strats.md',
+                                            template_name='i_instructs_strats.md',
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.GREEN}\nrender result multi:{Fore.RESET} \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
 
@@ -109,11 +109,11 @@ class Test_Agg(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs_strats.md',
+                                            template_name='i_instructs_strats.md',
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.CYAN}\nrender result single:{Fore.RESET} \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
         agg4 = Agg()
         # test is using the qa template
@@ -131,11 +131,11 @@ class Test_Agg(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs_strats.md',
+                                            template_name='i_instructs_strats.md',
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.BLUE}\nrender result None:{Fore.RESET} \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
 class Test_Reduce(unittest.TestCase):
@@ -159,9 +159,9 @@ class Test_Reduce(unittest.TestCase):
         return out
 
     def test___call__(self, *args, **kwargs):
-        reduce_1 = Reduce()
+        reduce_1 = Denoise()
         # test is using the qa template
-        strats = reduce_1(  'reduce_text', *args,
+        strats = reduce_1(  'denoise_text', *args,
                         fmt='json',
                         prompts=[],
                         responses=[
@@ -173,11 +173,11 @@ class Test_Reduce(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs_strats.md',
+                                            template_name='i_instructs_strats.md',
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.RED}\nrender result None:{Fore.RESET} \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
 if __name__ == "__main__":

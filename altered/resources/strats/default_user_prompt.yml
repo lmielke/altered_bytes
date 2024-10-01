@@ -15,5 +15,5 @@ description: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Answer the <user_propmpt> directly! Do not add any conversational comments!
-    Do not explain your reasoning.
+    Answer the <user_prompt> directly! Closely follow the rules as shown by the provided
+    response template. 

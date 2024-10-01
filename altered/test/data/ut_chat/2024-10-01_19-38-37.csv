@@ -25,33 +25,41 @@ How do I monitor my GPUs performance?
 
 # 3. Instructions (INST)
 
-## To Do
-You were provided with a <[33muser_prompt[39m> or question in the text above.  Use all available sources of information from <[34mcontext[39m> and <[33muser_prompt[39m> to  prepare a high quality response.
-
 
 ## Response Layout and Format
 
 ### Response Layout:
 The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
 
-<[36mresponse_template[39m>
-
+<!-- <[36mio_template[39m> -->
 >  The answer field contains the model response
 # Answer
 I am a helpful assistant. How can I help you today?
+<!-- </[36mio_template[39m> -->
 
-</[36mresponse_template[39m>
+Merge all entries shown in '<[36mio_template[39m>' into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
 
-Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+## Your Task
+Answer the <[33muser_prompt[39m> directly! Closely follow the rules as shown by the provided response template. 
 
+Go strait to the answer!
+Do not make any conversational comments!
+Do not repeat any text provided in this prompt!
+Do not explain your reasoning unless specifically asked for!
 </[36mINST[39m>
-",user,None,llama3.1:70b,ut_chat,None,None,2024-10-01 11:08:52.783581
-"# Answer
-To monitor your GPU's performance, you can use various tools and software. Commonly recommended options include the NVIDIA Control Panel or `nvidia-smi` command for NVIDIA GPUs, and AMD Radeon Settings or `rocm-smi` command for AMD GPUs. Additionally, third-party monitoring tools like GPU-Z, HWiNFO, or MSI Afterburner provide detailed information about your GPU's temperature, usage, memory, and performance.
+",user,None,llama3.2,ut_chat,None,None,2024-10-01 19:38:41.791275
+"To monitor GPU performance, you can use tools like NVIDIA's Nsight Systems or AMD's Radeon Profiler. These tools provide detailed information on GPU usage, temperature, and power consumption.
 
-For Windows users, the Task Manager (Ctrl + Shift + Esc) offers a ""Performance"" tab that displays GPU usage. On Linux systems, command-line tools such as `nvidia-smi` (for NVIDIA GPUs) or `radeontop` (for AMD GPUs) are available. Many graphics cards also come with their own monitoring software.
+Monitoring GPU Performance with Nsight Systems and Radeon Profiler
+-----------------------------------------------------------
 
-These methods provide a comprehensive overview of your GPU's performance, allowing you to monitor and optimize its usage effectively.","[33mStrategy Prompt[39m using agg_mean:
+*   **Nvidia-Smoothwall**: A web-based tool that provides real-time monitoring of GPU temperatures, voltages, and memory usage.
+*   **GPU-Z**: A free utility that displays detailed information about your graphics card's specifications, temperature, and fan speed.
+*   **HWiNFO**: A comprehensive system monitoring software that tracks GPU performance, including temperature, voltage, and memory usage.
+
+Additionally, you can use command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `glxgears` (for testing OpenGL performance).
+
+**Note:** These methods require administrative privileges to access advanced settings.","[33mStrategy Prompt[39m using agg_mean:
 
 
 # 3. Instructions (INST)
@@ -101,35 +109,57 @@ How do I monitor my GPUs performance?
 
 # 3. Instructions (INST)
 
-## To Do
-You were provided with a  or question in the text above.  Use all available sources of information from  and  to  prepare a high quality response.
-
 ## Response Layout and Format
 
 ### Response Layout:
 The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
 
-
+<!-- <[36mio_template[39m> -->
 >  The answer field contains the model response
 # Answer
 I am a helpful assistant. How can I help you today?
+<!-- </[36mio_template[39m> -->
 
+Merge all entries shown in '<[36mio_template[39m>' into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
 
-Return all entries shown in '<reponse_template>' combined into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+## Your Task
+Answer the  directly! Closely follow the rules as shown by the provided response template. 
+
+Go strait to the answer!
+Do not make any conversational comments!
+Do not repeat any text provided in this prompt!
+Do not explain your reasoning unless specifically asked for!
 
 
 
 __RESPONSE SAMPLE 1__
+# <[36mio_template[39m>
+>  To monitor GPU performance, you can use tools like NVIDIA's Nsight Systems or AMD's Radeon Profiler. These tools provide detailed information on GPU usage, temperature, and power consumption.
 # Answer
-To monitor your GPU's performance, you can use various tools and software. For NVIDIA GPUs, you can use the NVIDIA Control Panel or the `nvidia-smi` command in the terminal. For AMD GPUs, you can use the Radeon Settings or the `rocm-smi` command. Additionally, you can also use third-party monitoring software such as GPU-Z, HWiNFO, or MSI Afterburner. These tools provide detailed information about your GPU's temperature, usage, memory, and performance.
+Monitoring GPU Performance with Nsight Systems and Radeon Profiler
+</[36mio_template[39m>
 
 __RESPONSE SAMPLE 2__
 # Answer
-To monitor your GPU's performance, you can use various tools and software. For NVIDIA GPUs, you can use the NVIDIA Control Panel or the `nvidia-smi` command in the terminal. For AMD GPUs, you can use the AMD Radeon Settings or the `rocm-smi` command. Additionally, you can also use third-party monitoring tools such as GPU-Z, HWiNFO, or MSI Afterburner. These tools provide detailed information about your GPU's temperature, usage, memory, and performance.
+### How to Monitor GPU Performance
+
+To monitor GPU performance, you can use various tools and software. Here are a few methods:
+
+*   **Nvidia-Smoothwall**: A web-based tool that provides real-time monitoring of GPU temperatures, voltages, and memory usage.
+*   **GPU-Z**: A free utility that displays detailed information about your graphics card's specifications, temperature, and fan speed.
+*   **HWiNFO**: A comprehensive system monitoring software that tracks GPU performance, including temperature, voltage, and memory usage.
+
+Additionally, you can use command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `glxgears` (for testing OpenGL performance).
+
+**Note:** These methods require administrative privileges to access advanced settings.
 
 __RESPONSE SAMPLE 3__
+# <[36mio_template[39m>
+>  To monitor GPU performance, you can use tools like NVIDIA's Nsight or AMD's Radeon Pro Software. These tools provide detailed information on GPU usage, temperature, and memory utilization.
+>  You can also use command-line tools such as `nvidia-smi` for NVIDIA GPUs or `clinfo` for AMD GPUs to monitor performance in real-time.
+>  Additionally, you can use monitoring software like GPU-Z or HWiNFO to track GPU temperatures, voltages, and other critical parameters.
 # Answer
-To monitor your GPU's performance, you can use various tools and methods. For Windows users, the Task Manager (Ctrl + Shift + Esc) provides a ""Performance"" tab that displays GPU usage. Alternatively, software like GPU-Z, HWiNFO, or MSI Afterburner offer detailed monitoring capabilities. On Linux systems, tools such as `nvidia-smi` (for NVIDIA GPUs) or `radeontop` (for AMD GPUs) provide command-line monitoring options. Additionally, many graphics cards come with their own monitoring software.
+</[36mio_template[39m>
 </[36msample[39m>
 
 ## Your Task
@@ -138,4 +168,4 @@ Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporate
 
 ## Response Layout and Format
 
-Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.1:70b,ut_chat,None,None,2024-10-01 11:08:52.799168
+Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.2,ut_chat,None,None,2024-10-01 19:38:41.791275

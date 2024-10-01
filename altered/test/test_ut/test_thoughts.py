@@ -39,7 +39,7 @@ class Test_Chat(unittest.TestCase):
         # we use YmlParser here to load the test_data kwargs from a YAML file
         yml = YmlParser(fields_paths=[self.test_io_path])
         yml.add_labels(name='Unittest', labels=self.test_io_path, description="run chat")
-        chat.run(*args, **yml.data,)
+        chat.run(*args, **yml.data, max_files=6)
 
 
 if __name__ == "__main__":

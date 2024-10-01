@@ -142,7 +142,10 @@ class Agg(Strategy):
                             f"\n__RESPONSE SAMPLE {i+1}__\n"
                             f"{response}"
                             )
-        return f"\nPrompt: {prompt}\n\n" + '\n'.join(samples)
+        all_samples = '\n'.join(samples)
+        return (    f"\nOriginal Prompt for all Samples:\n{prompt}\n"
+                    f"Samples of Provided Answers to the Original Prompt:\n{all_samples}\n"
+                    )
 
     def mk_sample_no_prompt(self, *args, responses:list, **kwargs):
         """
@@ -173,9 +176,9 @@ class Agg(Strategy):
             prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
         return prompt
 
-class Reduce(Strategy):
+class Denoise(Strategy):
 
-    strat_tag = 'de_noise_text'
+    strat_tag = 'noisy_text'
     """
     Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
     instruction.
@@ -190,7 +193,8 @@ class Reduce(Strategy):
                                             user_prompt:str=None,
                                             link:str=None,
                                             rm_tags:bool=False,
-                                            search_query:str=None, **kwargs,
+                                            search_query:str=None, 
+                                            **kwargs,
         ) -> dict:
         """
         Generates aggregation prompt based on the specified strategy.
@@ -202,13 +206,14 @@ class Reduce(Strategy):
             response = 'Response:\n' + resp
         if search_query:
             headers += f"search_query: {search_query}\n"
-            response = 'Search Result:\n' + resp
+            response = 'Text:\n' + resp
         if link:
             headers += f"\nlink: {link}\n"
             response = response
         if not user_prompt and not search_query:
             response = resp
+        # self.strats['inputs_intro'] = f"The following text is noisy and hard to read."
         self.strats['strat_tag'] = self.strat_tag
         self.strats['inputs'] = f"{headers}\n" + response
-        self.strats['inputs_header'] = f"Text to clean:"
+        self.strats['inputs_header'] = f"Text to de-noise:"
         return self.strats

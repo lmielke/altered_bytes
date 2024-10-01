@@ -1,0 +1,218 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,
+How do I monitor my GPUs performance?,"
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[34mcontext[39m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[33muser_prompt[39m>': The recent user Question or Instruction.
+3. Instructions '<[36mINST[39m>': __Master instructions__ for the _LLM_ to follow right now.
+
+<[34mcontext[39m>
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+</[34mcontext[39m>
+
+<[33muser_prompt[39m>
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+</[33muser_prompt[39m>
+
+<[36mINST[39m>
+
+# 3. Instructions (INST)
+
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+<[36mresponse_template[39m>
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+</[36mresponse_template[39m>
+
+Merge all entries shown in '<reponse_template>' into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+## Your Task
+Answer the <[33muser_prompt[39m> directly! Closely follow the rules as shown by the provided response template. 
+
+Go strait to the answer!
+Do not make any conversational comments!
+Do not repeat any text provided in this prompt!
+Do not explain your reasoning unless specifically asked for!
+</[36mINST[39m>
+",user,None,llama3.2,ut_chat,None,None,2024-10-01 19:19:31.041969
+"To create a weighted summary of the provided responses, we need to identify common themes, unique details, and assign weights to each response based on their relevance.
+
+**Common Themes:**
+
+1. Monitoring GPU performance
+2. Using tools like NVIDIA's Nsight or AMD's Radeon Software
+3. Tracking system temperature, voltage, and memory usage
+
+**Unique Details:**
+
+1. Response 1 mentions using HWiNFO for monitoring GPU temperatures and voltages.
+2. Response 2 provides additional resources for more information on GPU manufacturer documentation.
+3. Response 3 suggests using `nvidia-smi` for monitoring NVIDIA GPUs.
+
+**Weighted Summary:**
+
+To create a weighted summary, we'll assign weights to each response based on their relevance to the common themes and unique details.
+
+* Common Theme 1 (Monitoring GPU performance): 30% weight
+	+ Response 1: ""You can monitor your GPUs performance using various tools and software.""
+	+ Response 2: ""To monitor GPU performance, you can use tools such as NVIDIA's Nsight or AMD's Radeon Software.""
+	+ Response 3: ""To monitor GPU performance, you can use tools like NVIDIA's Nsight or AMD's GPU Monitor.""
+* Common Theme 2 (Using tools): 20% weight
+	+ Response 1: ""You can monitor your GPUs performance using various tools and software.""
+	+ Response 2: ""To monitor GPU performance, you can use tools such as NVIDIA's Nsight or AMD's Radeon Software.""
+	+ Response 3: ""To monitor GPU performance, you can use tools like NVIDIA's Nsight or AMD's GPU Monitor.""
+* Unique Detail 1 (HWiNFO): 15% weight
+	+ Response 1: ""You can install the recommended tools according to your operating system's instructions. You can also use HWiNFO for monitoring GPU temperatures and voltages.""
+* Unique Detail 2 (GPU manufacturer documentation): 10% weight
+	+ Response 2: ""For more information, refer to the official documentation for your specific GPU manufacturer.""
+* Unique Detail 3 (`nvidia-smi`): 5% weight
+	+ Response 3: ""You can also track your system's temperature, voltage, and memory usage using software like HWiNFO or GPU-Z. Additionally, many Linux distributions come with built-in tools like `nvidia-smi` for monitoring NVIDIA GPUs","[33mStrategy Prompt[39m using agg_mean:
+
+
+# 3. Instructions (INST)
+
+## Weighted Mean Aggregation
+This strategy generates a weighted average summary from a given <[36msample[39m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary  that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - Response 1: ""The quick brown fox jumps over the lazy dog.""
+  - Response 2: ""A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - Response 3: ""The nimble fox hops over a lethargic dog.""
+Expected Output:
+  ""Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
+  The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
+  the speed of the fox more than the other descriptions.""
+  
+  This output gives more weight to common themes, like the fox leaping, while incorporating 
+  details from all the responses, balancing frequent mentions with unique contributions.
+
+## Objective
+Read and understand the following <[36msample[39m> texts! Then, read and understand the provided  prompts or, (if no prompt was provided), re-construct the prompt or problem statement  based on the provided responses. Then, create a weighted average summary that synthesizes key points from all the responses,  giving more emphasis to frequently mentioned themes, while still incorporating unique contributions  where they add value. The summary should reflect the overall balance of common and unique points.
+
+## Input Data
+### Answers to a single prompt:
+Below is the sample of 3 of an LLM`s responses intending to answer the same single prompt.
+
+<[36msample[39m>
+
+Prompt: 
+# Prompt for ut_chat
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '': Relevant available information for you to better understand the problem.
+2. User Prompt '': The recent user Question or Instruction.
+3. Instructions '': __Master instructions__ for the _LLM_ to follow right now.
+
+
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+
+
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+
+
+# 3. Instructions (INST)
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response. For clarity, comments ""> ..."" have been added between the lines.
+
+
+>  The answer field contains the model response
+# Answer
+I am a helpful assistant. How can I help you today?
+
+
+Merge all entries shown in '<reponse_template>' into a single MARKDOWN string. Your response should be shorter than 125 words. Do NOT include comments ""> ..."" or surrounding text!
+
+## Your Task
+Answer the  directly! Closely follow the rules as shown by the provided response template. 
+
+Go strait to the answer!
+Do not make any conversational comments!
+Do not repeat any text provided in this prompt!
+Do not explain your reasoning unless specifically asked for!
+
+
+
+__RESPONSE SAMPLE 1__
+# Answer
+## GPU Performance Monitoring
+You can monitor your GPUs performance using various tools and software.
+
+### Recommended Tools:
+1. NVIDIA Nsight Systems: A comprehensive monitoring tool for NVIDIA GPUs.
+2. GPU-Z: A lightweight, open-source utility to display GPU information.
+3. HWiNFO: A hardware monitoring tool that tracks GPU temperatures, voltages, and usage.
+
+### Steps:
+1. Install the recommended tools according to your operating system's instructions.
+2. Open the tool of your choice and navigate to the relevant sections (e.g., GPU info, temperature, or performance metrics).
+3. Observe and record the current GPU performance data.
+4. Regularly check the monitoring tools for any changes in performance or potential issues.
+
+Remember to follow proper safety precautions when working with high-performance computing systems.
+
+__RESPONSE SAMPLE 2__
+ `<[36mresponse_template[39m>
+
+# Answer
+To monitor GPU performance, you can use tools such as NVIDIA's Nsight or AMD's Radeon Software. These tools provide detailed information on GPU usage, temperature, and memory consumption.
+
+# Additional Resources
+For more information, refer to the official documentation for your specific GPU manufacturer.
+
+</[36mresponse_template[39m>`
+
+__RESPONSE SAMPLE 3__
+# 1. Context Information
+Here you find all available context information possibly relevant for this prompt.
+
+# 2. User Prompt
+How do I monitor my GPUs performance?
+
+# 3. Instructions (INST)
+
+## Response Layout and Format
+
+### Response Layout:
+The following is a MARKDOWN template to be used for the expected LLM response.
+
+<[36mresponse_template[39m>
+
+> The answer field contains the model response
+# Answer
+To monitor GPU performance, you can use tools like NVIDIA's Nsight or AMD's GPU Monitor. You can also track your system's temperature, voltage, and memory usage using software like HWiNFO or GPU-Z. Additionally, many Linux distributions come with built-in tools like `nvidia-smi` for monitoring NVIDIA GPUs.
+
+</[36mresponse_template[39m>
+
+## Your Task
+Answer the user prompt directly!
+</[36msample[39m>
+
+## Your Task
+Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporates key points from  all responses. Pay more attention to common themes or ideas mentioned by multiple responses,  while ensuring that unique details from each response are included where relevant. NOTE: Generously keep/include formulas and code snippets or shell commands.
+
+
+## Response Layout and Format
+
+Answer using MARKDOWN! Do not include comments or surrounding text!",assistant,None,llama3.2,ut_chat,None,None,2024-10-01 19:19:31.047613
