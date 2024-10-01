@@ -115,7 +115,9 @@ class Agg(Strategy):
                                     f"Prompt {i+1}: {prompt}\n"
                                     f"Response {i+1}: {resp}"
                                 )
-        return '\n\n'.join(sample_pairs)
+        all_samples = '\n\n'.join(sample_pairs)
+        return (f"Samples of Provided multiple Prompts and Answers:\n{all_samples}\n"
+                    ) 
 
     def mk_sample_single_prompt(self, *args, prompts:str, responses:list, rm_tags:bool=False, **kwargs):
         """
@@ -168,10 +170,11 @@ class Agg(Strategy):
                             f"\n__TEXT SAMPLE {i+1}__\n"
                             f"{response}"
                             )
-        return '\n'.join(samples)
+        all_samples = '\n'.join(samples)
+        return (f"Samples of Provided Texts:\n{all_samples}\n")
 
     def rm_tags(self, prompt:str, *args, **kwargs):
-        tags = ['context', 'user_prompt', 'sample', 'response_template', 'INST']
+        tags = ['context', 'user_prompt', 'sample', 'io_template', 'INST']
         for tag in tags:
             prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
         return prompt

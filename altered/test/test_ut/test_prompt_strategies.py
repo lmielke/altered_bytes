@@ -41,6 +41,7 @@ class Test_Strategy(unittest.TestCase):
         # test is using the qa template
         strats = agg2(  'agg_best', *args,
                         fmt='json',
+                        max_files=6,
                         prompts=[
                                     'Why is the sky blue?',
                                     'How many stars are in the sky?',
