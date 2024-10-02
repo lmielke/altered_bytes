@@ -2,7 +2,7 @@
 hlp_printing.py
 """
 import re
-from colorama import Fore, Style
+from colorama import Fore, Back, Style
 import altered.settings as sts
 from textwrap import wrap as tw
 from tabulate import tabulate as tb
@@ -18,28 +18,29 @@ def wrap_text(text:str, *args, max_chars:int=sts.table_max_chars, **kwargs):
         return wrapped.strip()
     return text
 
-
 def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     prompt = re.sub(r'<user_prompt>\s*</user_prompt>', '', prompt, flags=re.MULTILINE)
         # we replace the <tags> in prompt with colorized tags
     p = (
-            prompt.replace('context>', f"{Fore.BLUE}context{Fore.RESET}>")
-                .replace('rag_db_matches>', f"{Fore.GREEN}rag_db_matches{Fore.RESET}>")
-                .replace('user_prompt>', f"{Fore.YELLOW}user_prompt{Fore.RESET}>")
-                .replace('previous_responses>', f"{Fore.CYAN}previous_responses{Fore.RESET}>")
-                .replace('sample>', f"{Fore.CYAN}sample{Fore.RESET}>")
-                .replace('io_template>', f"{Fore.CYAN}io_template{Fore.RESET}>")
-                .replace('INST>', f"{Fore.CYAN}INST{Fore.RESET}>")
-                .replace('noisy_text>', f"{Fore.CYAN}noisy_text{Fore.RESET}>")
-                .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Fore.RESET}")
-                .replace('__RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Fore.RESET}")
-                .replace('__TEXT SAMPLE', f"__{Style.DIM}{Fore.WHITE}TEXT SAMPLE{Style.RESET_ALL}{Fore.RESET}")
-                .replace('Strategy Prompt', f"{Fore.YELLOW}Strategy Prompt{Fore.RESET}")
+            prompt.replace('context>', f"{Back.BLUE}context{Style.RESET_ALL}>")
+                .replace('rag_db_matches>', f"{Back.GREEN}rag_db_matches{Style.RESET_ALL}>")
+                .replace('user_prompt>', f"{Back.YELLOW}user_prompt{Style.RESET_ALL}>")
+                .replace('previous_responses>', f"{Back.CYAN}previous_responses{Style.RESET_ALL}>")
+                .replace('sample>', f"{Back.CYAN}sample{Style.RESET_ALL}>")
+                .replace('io_template>', f"{Back.CYAN}io_template{Style.RESET_ALL}>")
+                .replace('INST>', f"{Back.CYAN}INST{Style.RESET_ALL}>")
+                .replace('noisy_text>', f"{Back.CYAN}noisy_text{Style.RESET_ALL}>")
+                .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")
+                .replace('__RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")
+                .replace('__TEXT SAMPLE', f"__{Style.DIM}{Fore.WHITE}TEXT SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")
+                .replace('Strategy Prompt', f"{Fore.YELLOW}Strategy Prompt{Style.RESET_ALL}")
         )
+    # we color markdown headers level 1 and 2 ('# Some Text' and '## Some Text') with BLUE
+    p = re.sub(r'^# (.+)$', f"{Fore.BLUE}# \\1{Fore.RESET}", p, flags=re.MULTILINE)
+    p = re.sub(r'^## (.+)$', f"{Fore.BLUE}## \\1{Fore.RESET}", p, flags=re.MULTILINE)
     if verbose >= 2:
         print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")
     return p
-
 
 def pretty_dict(name:str, d:dict, *args, **kwargs):
     print(f"\n{Fore.CYAN}#{name}.keys(): {Fore.RESET}{d.keys()}")

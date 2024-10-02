@@ -58,6 +58,7 @@ class Instructions:
         return strat
 
     def run_io(self, s_name:dict, *args, fmt:str='markdown', **kwargs):
+        print(f"{Fore.YELLOW}{s_name = }{Fore.RESET}")
         if s_name is None:
             return
         template_path = os.path.join(sts.io_dir, f'{s_name["s_name"]}.yml')

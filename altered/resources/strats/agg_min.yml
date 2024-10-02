@@ -27,9 +27,9 @@ example: >
       
       This output focuses only on the essential information that is consistent across all texts.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
     Read and understand the following <sample> texts! Then, read and understand the provided 
     prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
     based on the provided responses.

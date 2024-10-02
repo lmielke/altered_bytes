@@ -31,15 +31,12 @@ example: >
       This output gives more weight to common themes, like the fox leaping, while incorporating 
       details from all the responses, balancing frequent mentions with unique contributions.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
-    Read and understand the following <sample> texts! Then, read and understand the provided 
-    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
-    based on the provided responses.
-    Then, create a weighted average summary that synthesizes key points from all the responses, 
-    giving more emphasis to frequently mentioned themes, while still incorporating unique contributions 
-    where they add value. The summary should reflect the overall balance of common and unique points.
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
+    Objective is to aggregate multiple responses into one atomic single response 
+    using the outlined stratey. The reader should not be bothered with multiple responses,
+    their original content and/or any reasoning on how the resulting single response was derived.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed

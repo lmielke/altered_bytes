@@ -21,7 +21,7 @@ description: >
     4. **Conciseness Enhancement**: Keep it short and to the point.
     5. **Content Pruning**: Focus on trimming away non-essential texts while keeping 
         the most important parts intact.
-    6. **Formula and Code Retention**: It is essential to Preserve formulas, code snippets, 
+    6. **Formula and Code Retention**: It is essential to preserve formulas, code snippets, 
         or other technical details that are relevant to the topic.
 
 
@@ -50,9 +50,9 @@ example: >
       Note: Formulas often contain valuable insight, so it makes sense to keep them.
       However, the mentioning of the rabbit is not relevant given the scenario question.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
     The <noisy_text> tag below contains a single "Noisy Text",
     that includes redundant, non-relevant, or overly emphasized information. 
     This text must be cleaned into "De-Noised Text" while following the rules of the
@@ -62,5 +62,6 @@ task: >
 # your_task to be performed
 your_task: >
     Clean the "Noisy Text" provided inside the <noisy_text> ... </noisy_text> tags ! 
-    Higlight highly relevant information, but be generous retaining medium relevance information.
-    In particular keep and highlight formulas and code snippets relevant to the topic.
+    Higlight highly relevant information, but be also generous keeping medium relevance information.
+    In particular keep and highlight contained __formulas__ and __code snippets__ 
+    when relevant to the topic.

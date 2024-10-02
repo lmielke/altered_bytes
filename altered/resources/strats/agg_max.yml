@@ -29,9 +29,9 @@ example: >
       This output combines all the relevant details from the provided texts, ensuring that both common 
       themes and specific descriptions from each text are included.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
     Read and understand the following <sample> texts! Then, read and understand the provided 
     prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
     based on the provided responses.

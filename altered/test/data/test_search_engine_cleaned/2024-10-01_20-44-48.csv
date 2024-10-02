@@ -1,17 +1,26 @@
 hash,tools,name,kind,title,search_query,source,displayLink,snippet,pagemap,short,content,category,sub_category,timestamp
 0b4065c752945716,"VecDB(name=test_search_engine_cleaned, fields=fields_dict, )",test_search_engine_cleaned,,,,,,,,,,,,
 66b01b871461f2ca,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension,Python list comprehensions,https://www.w3schools.com/python/python_lists_comprehension.asp,www.w3schools.com,List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list. Example: Based on a ...,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK28hevOmBJFWCrR_j9haYslGiDqoHd8JVz9UagOLfERG6u8LzMER5mGo&s', 'width': '169', 'height': '193'}], 'metatags': [{'msapplication-tilecolor': '#00a300', 'og:image': 'https://www.w3schools.com/images/w3schools_logo_436_2.png', 'og:image:width': '436', 'theme-color': '#ffffff', 'viewport': 'width=device-width, initial-scale=1', 'og:image:height': '228', 'og:image:type': 'image/png', 'title': 'W3Schools.com', 'og:description': 'W3Schools offers free online tutorials, references and exercises in all the major languages of the web. Covering popular subjects like HTML, CSS, JavaScript, Python, SQL, Java, and many, many more.'}], 'cse_image': [{'src': 'https://www.w3schools.com/signup/lynxlogo.svg'}]}","# De-Noised Text
-Due to its ability to filter out irrelevant elements, the list comprehension in Python is a concise way to create new lists from existing ones. The expression is the current item in the iteration, but it is also the outcome, which can be manipulated before it ends up like a list item in the new list.
-
-### Formula: 
-`newlist = [x for x in fruits if condition]`
-
+What are list comprehensions in Python?
+### Formula:
+`newlist = [x for x in fruits if x == 'banana']`
 ### Code Snippet:
 ```python
-fruits = ['apple', 'banana', 'cherry']
-newlist = [x for x in fruits if x == 'banana']
+for True: 
+    if range()
 ```
-Note: The mention of W3Schools services and their data processing policies is not relevant to the main message.","return True for all elements other
+
+The expression `for True: if range()` is a valid Python statement, but it doesn't seem to be related to list comprehensions. It's likely a mistake or an example of unnecessary code.
+
+List comprehensions in Python are used to create new lists by applying a transformation function to each element in an existing list (or other iterable). The general syntax is:
+```python
+new_list = [expression(x) for x in iterable if condition]
+```
+In the case of `newlist = [x for x in fruits if x == 'banana']`, we're creating a new list that contains only the elements from the `fruits` list where the value is equal to `'banana'`.
+
+List comprehensions are often used to simplify code and make it more concise. They can also be used to perform complex operations on data, such as filtering, mapping, and reducing.
+
+Note: The W3Schools website provides a tutorial on Python list comprehensions, but the provided text seems to be an example of unnecessary code.","return True for all elements other
 than ""apple"", making the new list contain all fruits except ""apple"".
 The condition is optional and can be omitted:
 With no if statement:
@@ -36,67 +45,55 @@ Beim Besuch unserer Website können ausgewählte Unternehmen auf bestimmte Infor
 Wir, der 'Herausgeber' und eine ausgewählte Gruppe von vertrauenswürdigen Partnern (850), die als 'Anbieter' bezeichnet werden, benötigen Ihre Zustimmung zum Zweck der Datenverarbeitung. Mit diesen Zwecken können wir Informationen auf einem Gerät speichern und/oder abrufen, wie z. B. die Cookie-Verwaltung, und personenbezogene Daten verarbeiten, wie Standardinformationen, die von einem Gerät gesendet werden, und andere eindeutige Kennungen für personalisierte Anzeigen und Inhalte, Anzeigen- und Inhaltsmessungen, Erkenntnisse über Zielgruppen und Produktentwicklungen. Mit Ihrer Zustimmung  können wir und unsere Partner möglicherweise genaue Standortdaten verwenden und Geräteeigenschaften zur Identifikation aktiv abfragen.
 Sie können der oben beschriebenen Verarbeitung zustimmen oder auf detailliertere Informationen zugreifen und Ihre Auswahl anpassen. Die erteilte Zustimmung gilt nur für diese Website. Bitte beachten Sie, dass ein Teil der Verarbeitung Ihrer personenbezogenen Daten möglicherweise auf berechtigten Interessen beruht, für die Ihre Zustimmung nicht erforderlich ist. Sie haben jedoch das Recht, dem zu widersprechen.
 Sie können Ihre Einstellungen jederzeit auf der Datenschutzerklärungsseite auf unserer Website ändern.
-  for True True if range()",,,2024-10-01 18:37:58.857296
+  for True True if range()",,,2024-10-01 20:45:31.586051
 65cf1b52600adc47,,test_search_engine_cleaned,customsearch#result,5. Data Structures — Python 3.12.7 documentation,Python list comprehensions,https://docs.python.org/3/tutorial/datastructures.html,docs.python.org,List comprehensions provide a concise way to create lists. Common applications are to make new lists where each element is the result of some operations.,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0o3uDlERm3RSZ54TCeoDN14moS7xHs1hbH7QgJM1nFOyOGmJgE0ze3tc&s', 'width': '200', 'height': '200'}], 'metatags': [{'og:image': 'https://docs.python.org/3/_static/og-image.png', 'og:type': 'website', 'og:image:alt': 'Python documentation', 'og:image:width': '200', 'theme-color': '#3776ab', 'og:site_name': 'Python documentation', 'viewport': 'width=device-width, initial-scale=1.0', 'og:title': '5. Data Structures', 'og:image:height': '200', 'og:url': 'https://docs.python.org/3/tutorial/datastructures.html', 'og:description': 'This chapter describes some things you’ve learned about already in more detail, and adds some new things as well. More on Lists: The list data type has some more methods. Here are all of the method...', 'readthedocs-addons-api-version': '1'}], 'cse_image': [{'src': 'https://docs.python.org/3/_static/og-image.png'}]}","# De-Noised Text
-Due to its agility, the quick fox leaps over the lazy dog.
+Due to its ability, the quick fox leaps over the lazy dog.
 Formula: fox_agility = dog_agility * 2 - turtle-agility
 
-### Raw Web-Search Parse Results
-#### List Comprehensions in Python
 List comprehensions provide a concise way to create lists. Common applications are to make new lists where each element is the result of some operations applied to each member of another sequence or iterable, or to create a subsequence of those elements that satisfy a certain condition.
 
-#### Example:
+For example, assume we want to create a list of squares, like:
 ```python
 squares = [x**2 for x in range(10)]
 ```
-#### Using List Comprehensions with Conditional Statements
-You can also use list comprehensions with conditional statements:
+or, equivalently:
 ```python
-combs = [(x, y) for x in [1, 2, 3] for y in [3, 1, 4] if x != y]
+squares = [x**2 for x in range(10) if x % 2 == 0]
 ```
-#### Filtering and Transforming Lists
-List comprehensions can be used to filter and transform lists:
+
+List comprehensions can contain complex expressions and nested functions:
+The initial expression in a list comprehension can be any arbitrary expression, including another list comprehension.
+
+Consider the following example of a 3x4 matrix implemented as a list of 3 lists of length 4:
 ```python
-filtered_data = [value for value in raw_data if not math.isnan(value)]
-```
-#### Nested List Comprehensions
-You can also use nested list comprehensions:
-```python
+matrix = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12]
+]
+
 transposed = [[row[i] for row in matrix] for i in range(4)]
 ```
-#### Zip Function
-The `zip` function can be used to iterate over multiple lists simultaneously:
+
+List comprehensions can also be used to filter elements:
 ```python
-for q, a in zip(questions, answers):
-    print(f'What is your {q}?  It is {a}.')
+numbers = [1, 2, 3, 4, 5, 6]
+even_numbers = [x for x in numbers if x % 2 == 0]
 ```
-#### Reversed and Sorted Functions
-You can use the `reversed` and `sorted` functions to iterate over lists in reverse and sorted order:
+
+Set comprehensions are similar:
 ```python
-for i in reversed(sorted(basket)):
-    print(i)
+numbers = {1, 2, 3, 4, 5, 6}
+unique_numbers = {x for x in numbers}
 ```
-#### Set Operations
-Set operations can be used to eliminate duplicate elements from a list:
+
+Dictionary comprehensions are also available:
 ```python
-unique_elements = set(some_list)
+person = {'name': 'John', 'age': 30}
+new_person = {k: v * 2 for k, v in person.items()}
 ```
-#### Dictionary Comprehensions
-Dictionary comprehensions can be used to create dictionaries:
-```python
-my_dict = {x: x**2 for x in range(10)}
-```
-#### Enumerate Function
-The `enumerate` function can be used to iterate over lists with both index and value:
-```python
-for i, v in enumerate(some_list):
-    print(i, v)
-```
-#### Conditional Statements
-Conditional statements can be used in list comprehensions:
-```python
-non_null = string1 or string2 or string3
-```","on’t have a defined
+
+Note that this is not an exhaustive list of all possible list comprehensions.","on’t have a defined
 ordering relation.  For example, 3+4j < 5+7j isn’t a valid
   comparison.
 element added is the first element retrieved (“last-in, first-out”).  To add an
@@ -459,42 +456,33 @@ What is your favorite color?  It is blue.
 (1, 2, 3, 4)           < (1, 2, 4)
 (1, 2)                 < (1, 2, -1)
 (1, 2, 3)             == (1.0, 2.0, 3.0)
-(1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)",,,2024-10-01 18:38:07.115957
-481f8c0f7992280c,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension - GeeksforGeeks,Python list comprehensions,https://www.geeksforgeeks.org/python-list-comprehension/,www.geeksforgeeks.org,"Dec 27, 2023 ... A Python list comprehension consists of brackets containing the expression, which is executed for each element along with the for loop to ...","{'metatags': [{'image': 'https://media.geeksforgeeks.org/wp-content/cdn-uploads/gfg_200x200-min.png', 'theme-color': '#308D46', 'og:image:width': '200', 'og:type': 'article', 'article:section': 'Python', 'article:published_time': '2020-10-28T17:23:51+00:00', 'og:site_name': 'GeeksforGeeks', 'og:title': 'Python - List Comprehension - GeeksforGeeks', 'og:image:height': '200', 'og:image:type': 'image/png', 'og:updated_time': '2023-12-27T12:26:19+00:00', 'msapplication-tileimage': 'https://www.geeksforgeeks.org/wp-content/uploads/gfg_200X200.png', 'og:description': 'Master Python list comprehensions to create concise, efficient code like a pro. Write clean, readable lists in one line, boost performance, and simplify complex data operations.', 'facebook-domain-verification': 'xo7t4ve2wn3ywfkjdvwbrk01pvdond', 'article:tag': 'python-list', 'article:modified_time': '2023-12-27T12:26:19+00:00', 'viewport': 'width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0', 'og:locale': 'en_US', 'og:url': 'https://www.geeksforgeeks.org/python-list-comprehension/'}]}","### De-Noised Text
-#### Formula: list_comprehension(n) = [i for i in range(n)]
-#### Vendor preferences Accept all Confirm choices TCF vendors Ad partners
+(1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)",,,2024-10-01 20:45:39.664213
+86dc35382ff5a060,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension - GeeksforGeeks,Python list comprehensions,https://www.geeksforgeeks.org/python-list-comprehension/,www.geeksforgeeks.org,"Dec 27, 2023 ... A Python list comprehension consists of brackets containing the expression, which is executed for each element along with the for loop to ...","{'metatags': [{'image': 'https://media.geeksforgeeks.org/wp-content/cdn-uploads/gfg_200x200-min.png', 'theme-color': '#308D46', 'og:image:width': '200', 'og:type': 'article', 'article:section': 'Python', 'article:published_time': '2020-10-28T17:23:51+00:00', 'og:site_name': 'GeeksforGeeks', 'og:title': 'Python - List Comprehension - GeeksforGeeks', 'og:image:height': '200', 'og:image:type': 'image/png', 'og:updated_time': '2023-12-27T12:26:19+00:00', 'msapplication-tileimage': 'https://www.geeksforgeeks.org/wp-content/uploads/gfg_200X200.png', 'og:description': 'Master Python list comprehensions to create concise, efficient code like a pro. Write clean, readable lists in one line, boost performance, and simplify complex data operations.', 'facebook-domain-verification': 'xo7t4ve2wn3ywfkjdvwbrk01pvdond', 'article:tag': 'python-list', 'article:modified_time': '2023-12-27T12:26:19+00:00', 'viewport': 'width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0', 'og:locale': 'en_US', 'og:url': 'https://www.geeksforgeeks.org/python-list-comprehension/'}]}","# De-Noised Text
+## What are list comprehensions in Python?
+List comprehensions provide a concise way to create lists by performing an operation on each element of an existing list or other iterable.
 
-#### List comprehensions:
-- Using loop: `List= [character for character in[1,2,3 ]] print( List)`
-- Using list comprehension: `List= [character for character in[1,2,3 ]] print( List)`
-- Import required module: `import time`
-  - def for_loop(n): result= [] fori in range (n): result.append(i**2) return result
-  - def list_comprehension(n): return [i**2 for i in range (n)]
-    - Time taken by for_loop(): 0.35 seconds
-- Using nested loop: `matrix= [[j for j in range(5 )] for i in range(3 )] print (matrix)`
-- Using lambda: `numbers= list(map(lambda i: i*10, [i for i in range(1,6 )])) print(numbers)`
-  - numbers=[10,20,30,40,50]
-- List comprehensions:
-  - `lis=[ ""Even number"" if i%2==0 else ""Odd number"" for i in range(8 )]` 
-    - lis=['Even number', 'Odd number', 'Even number', 'Odd number']
-  - `lis= [num for num in range(100) if num%5==0 and num%10==0]` 
-    - lis=[]
-- Getting square of numbers from 1 to 10: `squares= [n**2 for n in range(1,11)]`
-  - squares=[1,4,9,16,25,36,49,64,81,100]
-- Assigning matrix: `twoDMatrix= [[10,20,30],[40,50,60],[70,80,90]]` 
-  - trans=[[10,20,30],[40,50,60],[70,80,90]]
-- Initializing string: `string='Geeks4Geeks'`
-  - List=list(map(lambda i: chr(ord(i)^32),string))
-    - List=['G','e','e','k','s','4','G','e','e','k','s']
-- Reversing strings in tuple: `List= [string[::-1] for string in ('Geeks', 'for', 'Geeks')]`
-  - List=['skeeg', 'rof', 'sekeeg']
-- Explicit function:
-  - `def digitSum(n): dsum=0 for ele in str(n): dsum+= int(ele) return dsum`
-    - newList=[2,3,7,9,8]
-  - numbers=[1,2,3,4,5,6,7,8,9,10] 
-    - cube=[1,8,27,64,125,216,343,512,729,1000]
-  - words=['apple', 'banana', 'cherry', 'orange']
-    - word_lengths=[5,6,6,6]","e eines berechtigten Interesses. Sie können dem widersprechen, indem Sie unten Ihre Optionen verwalten. Unten auf dieser Seite finden Sie einen Link, über den Sie die Einwilligung in den Datenschutz- und Cookie-Einstellungen verwalten oder widerrufen können.
+### Formula:
+`list_comprehension = [expression for element in iterable if condition]`
+
+### Code Snippet:
+```python
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = [n**2 for n in numbers]
+print(squared_numbers)  # Output: [1, 4, 9, 16, 25]
+```
+### Example Use Case:
+List comprehensions can be used to filter and transform data. For example, you can use a list comprehension to create a new list that contains only the even numbers from the original list.
+
+```python
+numbers = [1, 2, 3, 4, 5, 6]
+even_numbers = [n for n in numbers if n % 2 == 0]
+print(even_numbers)  # Output: [2, 4, 6]
+```
+### Advantages:
+List comprehensions are a concise and efficient way to create lists. They can also be used to perform complex operations on data.
+
+### Disadvantages:
+List comprehensions can be less readable than traditional for loops, especially for complex operations.","e eines berechtigten Interesses. Sie können dem widersprechen, indem Sie unten Ihre Optionen verwalten. Unten auf dieser Seite finden Sie einen Link, über den Sie die Einwilligung in den Datenschutz- und Cookie-Einstellungen verwalten oder widerrufen können.
   Zustimmung Optionen verwalten Data preferences
   TCF vendors
 Information about your activity on this service (for instance, forms you submit, non-advertising content you look at) can be stored and combined with other information about you (such as your previous activity on this service or other websites or apps) or similar users. This is then used to build or improve a profile about you (which might for example include possible interests and personal aspects). Your profile can be used (also later) to present content that appears more relevant based on your possible interests, such as by adapting the order in which content is shown to you, so that it is even easier for you to find content that matches your interests.
@@ -515,6 +503,8 @@ Information about your activity on this service (for instance, forms you submit,
 Information regarding which content is presented to you and how you interact with it can be used to determine whether the (non-advertising) content e.g. reached its intended audience and matched your interests. For instance, whether you read an article, watch a video, listen to a podcast or look at a product description, how long you spent on this service and the web pages you visit etc. This is very helpful to understand the relevance of (non-advertising) content that is shown to you.
 Reports can be generated based on the combination of data sets (like user profiles, statistics, market research, analytics data) regarding your interactions and those of other users with advertising or (non-advertising) content to identify common characteristics (for instance, to determine which target audiences are more receptive to an ad campaign or to certain contents).
 Information about your activity on this service, such as your interaction with ads or content, can be very helpful to improve products and services and to build new products and services based on user interactions, the type of audience, etc. This specific purpose does not include the development or improvement of user profiles and identifiers.
+How this consent management platform (CMP) works:
+CMP privacy choices
   Vendor preferences Accept all Confirm choices Vendor preferences
   TCF vendors Ad partners Accept all Confirm choices Close numbers=[ 12, 13, 14 ,] doubled= [x*2 forx in numbers] print (doubled)
   numbers=[1,2,3,4,5] squared= [x**2 forx in numbers] print (squared)
@@ -575,58 +565,108 @@ Time taken for list_comprehension: 0.35
   newList= [digitSum(i) fori in List if i &1]
   print (newList)
   numbers=[1,2,3,4,5,6,7,8,9, 10] cube= [number**3 for number in numbers] print (cube)
-  words=[ ""apple"", ""banana"", ""cherry"", ""orange""] word_lengths=[ len (word) for word in words] print (word_lengths)",,,2024-10-01 18:38:12.334813
-55009eb834713eb2,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension,Python list comprehensions,https://www.w3schools.com/python/python_lists_comprehension.asp,www.w3schools.com,List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list. Example: Based on a ...,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK28hevOmBJFWCrR_j9haYslGiDqoHd8JVz9UagOLfERG6u8LzMER5mGo&s', 'width': '169', 'height': '193'}], 'metatags': [{'msapplication-tilecolor': '#00a300', 'og:image': 'https://www.w3schools.com/images/w3schools_logo_436_2.png', 'og:image:width': '436', 'theme-color': '#ffffff', 'viewport': 'width=device-width, initial-scale=1', 'og:image:height': '228', 'og:image:type': 'image/png', 'title': 'W3Schools.com', 'og:description': 'W3Schools offers free online tutorials, references and exercises in all the major languages of the web. Covering popular subjects like HTML, CSS, JavaScript, Python, SQL, Java, and many, many more.'}], 'cse_image': [{'src': 'https://www.w3schools.com/signup/lynxlogo.svg'}]}",,"### De-Noised Text
-#### Formula: list_comprehension(n) = [i for i in range(n)]
+  words=[ ""apple"", ""banana"", ""cherry"", ""orange""] word_lengths=[ len (word) for word in words] print (word_lengths)",,,2024-10-01 20:45:44.789260
+b83202af4d2b87cc,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension,Python list comprehensions,https://www.w3schools.com/python/python_lists_comprehension.asp,www.w3schools.com,List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list. Example: Based on a ...,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK28hevOmBJFWCrR_j9haYslGiDqoHd8JVz9UagOLfERG6u8LzMER5mGo&s', 'width': '169', 'height': '193'}], 'metatags': [{'msapplication-tilecolor': '#00a300', 'og:image': 'https://www.w3schools.com/images/w3schools_logo_436_2.png', 'og:image:width': '436', 'theme-color': '#ffffff', 'viewport': 'width=device-width, initial-scale=1', 'og:image:height': '228', 'og:image:type': 'image/png', 'title': 'W3Schools.com', 'og:description': 'W3Schools offers free online tutorials, references and exercises in all the major languages of the web. Covering popular subjects like HTML, CSS, JavaScript, Python, SQL, Java, and many, many more.'}], 'cse_image': [{'src': 'https://www.w3schools.com/signup/lynxlogo.svg'}]}",,"# List Comprehensions in Python
+List comprehensions provide a concise way to create lists by performing an operation on each element of an existing list or other iterable.
 
-#### Vendor preferences Accept all Confirm choices TCF vendors Ad partners
+### Formula:
+`list_comprehension = [expression for element in iterable if condition]`
 
-#### List comprehensions:
-- Using loop: `List= [character for character in[1,2,3 ]] print( List)`
-- Using list comprehension: `List= [character for character in[1,2,3 ]] print( List)`
-- Import required module: `import time`
-  - def for_loop(n): result= [] fori in range (n): result.append(i**2) return result
-  - def list_comprehension(n): return [i**2 for i in range (n)]
-    - Time taken by for_loop(): 0.35 seconds
-- Using nested loop: `matrix= [[j for j in range(5 )] for i in range(3 )] print (matrix)`
-- Using lambda: `numbers= list(map(lambda i: i*10, [i for i in range(1,6 )])) print(numbers)`
-  - numbers=[10,20,30,40,50]
-- List comprehensions:
-  - `lis=[ ""Even number"" if i%2==0 else ""Odd number"" for i in range(8 )]` 
-    - lis=['Even number', 'Odd number', 'Even number', 'Odd number']
-  - `lis= [num for num in range(100) if num%5==0 and num%10==0]` 
-    - lis=[]
-- Getting square of numbers from 1 to 10: `squares= [n**2 for n in range(1,11)]`
-  - squares=[1,4,9,16,25,36,49,64,81,100]
-- Assigning matrix: `twoDMatrix= [[10,20,30],[40,50,60],[70,80,90]]` 
-  - trans=[[10,20,30],[40,50,60],[70,80,90]]
-- Initializing string: `string='Geeks4Geeks'`
-  - List=list(map(lambda i: chr(ord(i)^32),string))
-    - List=['G','e','e','k','s','4','G','e','e','k','s']
-- Reversing strings in tuple: `List= [string[::-1] for string in ('Geeks', 'for', 'Geeks')]`
-  - List=['skeeg', 'rof', 'sekeeg']
-- Explicit function:
-  - `def digitSum(n): dsum=0 for ele in str(n): dsum+= int(ele) return dsum`
-    - newList=[2,3,7,9,8]
-  - numbers=[1,2,3,4,5,6,7,8,9,10] 
-    - cube=[1,8,27,64,125,216,343,512,729,1000]
-  - words=['apple', 'banana', 'cherry', 'orange']
-    - word_lengths=[5,6,6,6]
+### Code Snippet:
+```python
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = [n**2 for n in numbers]
+print(squared_numbers)  # Output: [1, 4, 9, 16, 25]
 
-### Common Themes
+# Filtering and transforming data
+numbers = [1, 2, 3, 4, 5, 6]
+even_numbers = [n for n in numbers if n % 2 == 0]
+print(even_numbers)  # Output: [2, 4, 6]
 
-*   List comprehensions are a powerful tool in Python for creating lists.
-*   They can be used to iterate through loops and perform operations on data.
-*   The `map()` function can also be used with lambda functions to achieve similar results.
+# Creating a new list with nested loops
+matrix = [[1, 2], [3, 4]]
+flattened_matrix = [num for row in matrix for num in row]
+print(flattened_matrix)  # Output: [1, 2, 3, 4]
 
-### Key Points
+# Using lambda functions
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = list(map(lambda x: x**2, numbers))
+print(squared_numbers)  # Output: [1, 4, 9, 16, 25]
 
-*   List comprehensions provide a concise way to create lists from existing lists or other iterables.
-*   They are often faster than using for loops to create lists.
-*   The `time` module can be used to measure the execution time of code snippets, such as the `for_loop()` function.
+# Creating a new list with map and filter
+numbers = [1, 2, 3, 4, 5]
+even_squares = list(map(lambda x: x**2 if x % 2 == 0 else None, numbers))
+print(even_squares)  # Output: [4, 16]
 
-### Unique Details
+# Using list comprehension with zip
+names = ['John', 'Jane', 'Bob']
+ages = [25, 30, 35]
+person_tuples = [(name, age) for name, age in zip(names, ages)]
+print(person_tuples)  # Output: [('John', 25), ('Jane', 30), ('Bob', 35)]
 
-*   The `digitSum()` function is an example of a custom function that uses list comprehensions to perform a specific task.
-*   The `twoDMatrix` assignment demonstrates how to create and initialize a 2D matrix using list comprehensions.",,,2024-10-01 18:38:16.100532
-cec5422b52248f93,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension,Python list comprehensions,https://www.w3schools.com/python/python_lists_comprehension.asp,www.w3schools.com,List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list. Example: Based on a ...,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK28hevOmBJFWCrR_j9haYslGiDqoHd8JVz9UagOLfERG6u8LzMER5mGo&s', 'width': '169', 'height': '193'}], 'metatags': [{'msapplication-tilecolor': '#00a300', 'og:image': 'https://www.w3schools.com/images/w3schools_logo_436_2.png', 'og:image:width': '436', 'theme-color': '#ffffff', 'viewport': 'width=device-width, initial-scale=1', 'og:image:height': '228', 'og:image:type': 'image/png', 'title': 'W3Schools.com', 'og:description': 'W3Schools offers free online tutorials, references and exercises in all the major languages of the web. Covering popular subjects like HTML, CSS, JavaScript, Python, SQL, Java, and many, many more.'}], 'cse_image': [{'src': 'https://www.w3schools.com/signup/lynxlogo.svg'}]}",,"{""std"": 4, ""reasoning"": ""The responses have a moderate level of similarity, with many formulas and code snippets being identical. However, the order and presentation of some information differ, resulting in a standard deviation score of 4 out of 6.""}",,,2024-10-01 18:38:16.350522
+# Creating a new list with dictionary comprehension
+students = [{'name': 'John', 'age': 25}, {'name': 'Jane', 'age': 30}]
+names_and_ages = [student['name'] + ', ' + str(student['age']) for student in students]
+print(names_and_ages)  # Output: ['John, 25', 'Jane, 30']
+```
+### Advantages:
+List comprehensions are a concise and efficient way to create lists. They can also be used to perform complex operations.
+
+### Disadvantages:
+List comprehensions can be less readable than traditional for loops, especially for complex operations.
+
+### Best Practices:
+* Use list comprehensions when you need to create a new list by performing an operation on each element of an existing list or other iterable.
+* Use the `if` clause to filter out unwanted elements from the original list.
+* Use the `lambda` function to define small, anonymous functions that can be used in place of traditional function definitions.
+* Use the `map` and `filter` functions to apply operations to each element of a list.
+
+### Common Use Cases:
+* Creating new lists by transforming or filtering existing data
+* Performing complex operations on large datasets
+* Improving code readability and conciseness
+
+### Formula:
+`list_comprehension = [expression for element in iterable if condition]`
+
+### Code Snippet:
+```python
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = [n**2 for n in numbers]
+print(squared_numbers)  # Output: [1, 4, 9, 16, 25]
+
+# Filtering and transforming data
+numbers = [1, 2, 3, 4, 5, 6]
+even_numbers = [n for n in numbers if n % 2 == 0]
+print(even_numbers)  # Output: [2, 4, 6]
+
+# Creating a new list with nested loops
+matrix = [[1, 2], [3, 4]]
+flattened_matrix = [num for row in matrix for num in row]
+print(flattened_matrix)  # Output: [1, 2, 3, 4]
+
+# Using lambda functions
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = list(map(lambda x: x**2, numbers))
+print(squared_numbers)  # Output: [1, 4, 9, 16, 25]
+
+# Creating a new list with map and filter
+numbers = [1, 2, 3, 4, 5]
+even_squares = list(map(lambda x: x**2 if x % 2 == 0 else None, numbers))
+print(even_squares)  # Output: [4, 16]
+
+# Using list comprehension with zip
+names = ['John', 'Jane', 'Bob']
+ages = [25, 30, 35]
+person_tuples = [(name, age) for name, age in zip(names, ages)]
+print(person_tuples)  # Output: [('John', 25), ('Jane', 30), ('Bob', 35)]
+
+# Creating a new list with dictionary comprehension
+students = [{'name': 'John', 'age': 25}, {'name': 'Jane', 'age': 30}]
+names_and_ages = [student['name'] + ', ' + str(student['age']) for student in students]
+print(names_and_ages)  # Output: ['John, 25', 'Jane, 30']
+```",,,2024-10-01 20:45:48.695580
+40ebb3034f34fb6d,,test_search_engine_cleaned,customsearch#result,Python - List Comprehension,Python list comprehensions,https://www.w3schools.com/python/python_lists_comprehension.asp,www.w3schools.com,List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list. Example: Based on a ...,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK28hevOmBJFWCrR_j9haYslGiDqoHd8JVz9UagOLfERG6u8LzMER5mGo&s', 'width': '169', 'height': '193'}], 'metatags': [{'msapplication-tilecolor': '#00a300', 'og:image': 'https://www.w3schools.com/images/w3schools_logo_436_2.png', 'og:image:width': '436', 'theme-color': '#ffffff', 'viewport': 'width=device-width, initial-scale=1', 'og:image:height': '228', 'og:image:type': 'image/png', 'title': 'W3Schools.com', 'og:description': 'W3Schools offers free online tutorials, references and exercises in all the major languages of the web. Covering popular subjects like HTML, CSS, JavaScript, Python, SQL, Java, and many, many more.'}], 'cse_image': [{'src': 'https://www.w3schools.com/signup/lynxlogo.svg'}]}",,"{
+  ""std"": 4,
+  ""reasoning"": ""The responses have a moderate level of similarity, with the main topic being list comprehensions in Python. The formulas and code snippets are well-represented in both responses, but there are some differences in the wording and examples used.""
+}",,,2024-10-01 20:45:48.929969

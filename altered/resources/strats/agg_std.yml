@@ -30,9 +30,9 @@ example: >
       
       In this case, the responses share a common theme but vary in their descriptions, leading to a moderate variance score of 2.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
     Read and understand the following <sample> texts! Then, read and understand the provided 
     prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
     based on the provided responses.

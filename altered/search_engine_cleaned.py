@@ -7,7 +7,7 @@ search results. We use the returned links to parse the web-sites contents
 import os
 import requests
 import pandas as pd
-from colorama import Fore
+from colorama import Fore, Style
 
 
 import altered.hlp_printing as hlpp
@@ -78,5 +78,5 @@ class CleanWebSearch(WebSearch):
 
         # exit()
 
-        
+
         return rendered

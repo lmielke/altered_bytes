@@ -3,9 +3,9 @@
 {% block content %}
 
 <context>
-## {{ instructs.strats.method.data.name }}
-{{ instructs.strats.method.data.description }}
-{{ instructs.strats.method.data.example }}
+## {{ instructs.strats.name }}
+{{ instructs.strats.description }}
+{{ instructs.strats.example }}
 </context>
 
 

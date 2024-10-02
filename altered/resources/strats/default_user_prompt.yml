@@ -3,7 +3,7 @@
 
 # meta: {"name": "name", "type": "string", "default": "", "example": "Best Answer ..."}
 # name of the strategy
-name: To Do
+name: Simple Answer
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
@@ -12,8 +12,16 @@ description: >
     Use all available sources of information from <context> and <user_prompt> to 
     prepare a high quality response.
 
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to precede when soliving a task
+example: null
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective is what we want to achieve
+objective: The <user_prompt> be answered or the user problem be solved.
+
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Answer the <user_prompt> directly! Closely follow the rules as shown by the provided
-    response template. 
+    Answer the <user_prompt> directly! 

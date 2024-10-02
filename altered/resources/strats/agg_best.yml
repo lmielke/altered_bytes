@@ -3,7 +3,7 @@
 
 # meta: {"name": "name", "type": "string", "default": "", "example": "Best Answer ..."}
 # name of the strategy
-name: Best Answer/Best Text Aggregation
+name: Best Answer/Text
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
@@ -29,9 +29,9 @@ example: >
       In our example Text 2 is selected because it provides more detail and a more vivid 
       description, which __'best'__ explains the interaction between the fox and the dog.
 
-# meta: {"name": "task", "type": "string", "default": "", "example": ""}
-# task to be performed
-task: >
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
     Read and understand the following <sample> texts! Then, read and understand the provided 
     prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
     based on the provided responses.

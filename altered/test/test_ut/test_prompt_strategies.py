@@ -39,7 +39,7 @@ class Test_Strategy(unittest.TestCase):
     def test___call__(self, *args, **kwargs):
         agg2 = Agg()
         # test is using the qa template
-        strats = agg2(  'agg_best', *args,
+        strats = agg2(  'agg_mean', *args,
                         fmt='json',
                         max_files=6,
                         prompts=[
@@ -92,7 +92,7 @@ class Test_Agg(unittest.TestCase):
     def test___call__(self, *args, **kwargs):
         agg3 = Agg()
         # test is using the qa template
-        strats = agg3(  'agg_best', *args,
+        strats = agg3(  'agg_mean', *args,
                         fmt='json',
                         prompts=[
                                     'Why is the sky blue?',
@@ -118,7 +118,7 @@ class Test_Agg(unittest.TestCase):
 
         agg4 = Agg()
         # test is using the qa template
-        strats = agg4(  'agg_best', *args,
+        strats = agg4(  'agg_mean', *args,
                         fmt='json',
                         prompts=[],
                         responses=[

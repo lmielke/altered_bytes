@@ -1,139 +1,118 @@
-"""
-prompt_strategies.py
-Creates the self.strat dictionary that is a sub-dict of self.context in Instructions class.
-As such it is used to render the prompt instructions for the user.
-"""
-import os, re, yaml
-import altered.settings as sts
+import os
+import warnings
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, Union, List
 from colorama import Fore, Style
 
+import altered.settings as sts
 from altered.yml_parser import YmlParser
 
-class Strategy:
+from altered.renderer_fields import StrategyFields
 
-    fmts = {'json': '# ...', 'yaml': '# ...', 'yml': '# ...', 'markdown': '> ...'}
+
+class Strategy:
     s_types = {'outputs', 'instructs'}
-    s_type, s_name = None, None
     jinja_var = r'(^\w+)(?::\s*\\)(\{\{ \w+ \}\})(\s*$)'
 
     def __init__(self, *args, **kwargs):
-        self.strats = {}
+        self.fields = None
         self.templates = {}
+        self.s_type = None
+        self.s_name = None
+        self.template_name = None
+        self.template_file_name = None
+        self.template_path = None
 
     def __call__(self, *args, **kwargs):
         self.mk_strat_params(*args, **kwargs)
         self.load_strat(*args, **kwargs)
-        return self.mk_context(*args, **kwargs)
+        result = self.mk_context(*args, **kwargs)
+        return result
 
-    def mk_strat_params(self, strat_template_name:str, *args, **kwargs):
+    def mk_strat_params(self, strat_template_name: str, *args, **kwargs):
         self.template_name = strat_template_name
         self.template_file_name = f'{strat_template_name}.yml'
         self.template_path = os.path.join(sts.strats_dir, self.template_file_name)
-        self.s_type, self.key = strat_template_name.split('_', 1)
+        self.s_type, key = strat_template_name.split('_', 1)
+        self.fields = StrategyFields(key=key, s_type=self.s_type)
 
     def load_strat(self, *args, fmt='markdown', **kwargs):
         loader = YmlParser(*args, fields_paths=[self.template_path], **kwargs)
-        self.strats['method'] = {
-                                                'body': loader.describe(fmt=fmt),
-                                                'meta': loader.fields.get('meta'),
-                                                'data': loader.data,
-                                            }
-        self.strats['fmt_comment'] = f'''"{self.fmts.get(fmt, '# ...')}"'''
+        self.fields.method = {
+            'body': loader.describe(fmt=fmt),
+            'meta': loader.fields.get('meta'),
+        }
+        for k, vs in loader.data.items():
+            setattr(self.fields, k, vs)
+        self.fields.fmt_comment = f"<!--, #..., >..."
+        self.fields.fmt = fmt
 
     def mk_context(self, *args, fmt:str=None, **kwargs):
         if fmt is not None:
-            self.strats['fmt'] = fmt
-        self.strats['key'] = self.key
-        return self.strats
+            self.fields.fmt = fmt
+        return self.fields.__dict__
+
+    def add_strat(self, key, value):
+        setattr(self.fields, key, value)
+        self.fields.__post_init__()  # Re-run validation after adding a new field
+
 
 class Default(Strategy):
     pass
 
 class Agg(Strategy):
+    inputs_tag = 'sample'
 
-    strat_tag = 'sample'
-    """
-    Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
-    instruction.
-    Aggregation refers to condensing multiple prompts into a single prompt.
-    """
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        return self.mk_prompt_agg_instruct(*args, **kwargs)
+        strat = self.mk_prompt_agg_instruct(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat
 
     def mk_prompt_agg_instruct(self, *args, **kwargs) -> dict:
-        """
-        Generates aggregation prompt based on the specified strategy.
-        """
         num_responses = len(kwargs['responses'])
-        self.strats['strat_tag'] = self.strat_tag
-        self.strats['inputs_intro'] = (
-                            f"Below is the {self.strat_tag} of {num_responses} "
-                            f"of an LLM`s responses "
-                        )
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.inputs_intro = (
+            f"Below is the {self.inputs_tag} of {num_responses} "
+            f"of an LLM's responses "
+        )
+        
         if not kwargs.get('prompts'):
-            self.strats['inputs'] = self.mk_sample_no_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += (
-                        f"that need to be aggregated. "
-                        f"Note, that there is no prompt associated with these responses. "
-                        f"Therefore you have to infer the prompt from other information, "
-                        f"i.e. the responses, name or search query."
-                                            )
-            self.strats['inputs_header'] = f"Texts to aggregate:"
-        if len(kwargs['prompts']) == 1:
-            self.strats['inputs'] = self.mk_sample_single_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += f"intending to answer the same single prompt."
-            self.strats['inputs_header'] = f"Answers to a single prompt:"
+            self.fields.inputs_intro += (
+                f"that need to be aggregated. "
+                f"Note, that there is no prompt associated with these responses. "
+                f"Therefore you have to infer the prompt from other information, "
+                f"i.e. the responses, name or search query."
+            )
+            self.fields.inputs_header = f"Texts to aggregate:"
+            self.fields.inputs_data = self.mk_sample_no_prompt(*args, **kwargs)
+        elif len(kwargs['prompts']) == 1:
+            self.fields.inputs_header = f"Answers to a single prompt:"
+            self.fields.inputs_intro += f"intending to answer the same single prompt."
+            self.fields.inputs_data = self.mk_sample_single_prompt(*args, **kwargs)
         elif len(kwargs['prompts']) > 1:
-            self.strats['inputs'] = self.mk_sample_multi_prompt(*args, **kwargs)
-            self.strats['inputs_intro'] += f"intending to answer {num_responses} prompts."
-            self.strats['inputs_header'] = f"Answers and prompts:"
+            self.fields.inputs_header = f"Answers and prompts:"
+            self.fields.inputs_intro += f"intending to answer {num_responses} prompts."
+            self.fields.inputs_data = self.mk_sample_multi_prompt(*args, **kwargs)
         else:
-            self.strats['inputs'] = self.mk_sample_no_prompt(*args, **kwargs)
-        return self.strats
+            self.fields.inputs_data = self.mk_sample_no_prompt(*args, **kwargs)
+        
+        return self.fields.__dict__
 
-    def mk_sample_multi_prompt(self, *args, prompts:list, responses:list, rm_tags:bool=False, **kwargs):
-        """
-        Takes in a list of prompts and responses and returns a string that
-        represents a bullet point list of the provided prompts and responses. This structures
-        the prompts and responses in a easy to understand way to allow the LLM to aggregate.
-        Example output:
-        ## Sample of Provided Answers:
-        Prompt 1: Why is the sky blue?
-        Response 1: The sky is blue because of Rayleigh scattering.
-
-        Prompt 2: How many stars are in the sky?
-        Response 2: There are an infinite number of stars in the sky.
-        """
-        # print(f"{Fore.RED}prompts multi:{Fore.RESET} {prompts}")
+    def mk_sample_multi_prompt(self, *args, prompts: List[str], responses: List[str], rm_tags: bool = False, **kwargs) -> str:
         sample_pairs = []
         for i, (prompt, resp) in enumerate(zip(prompts, responses)):
             if rm_tags:
                 prompt = self.rm_tags(prompt, *args, **kwargs)
             sample_pairs.append(
-                                    f"\n__SAMPLE {i+1}__\n\n"
-                                    f"Prompt {i+1}: {prompt}\n"
-                                    f"Response {i+1}: {resp}"
-                                )
+                f"\n__SAMPLE {i+1}__\n\n"
+                f"Prompt {i+1}: {prompt}\n"
+                f"Response {i+1}: {resp}"
+            )
         all_samples = '\n\n'.join(sample_pairs)
-        return (f"Samples of Provided multiple Prompts and Answers:\n{all_samples}\n"
-                    ) 
+        return f"Samples of Provided multiple Prompts and Answers:\n{all_samples}\n"
 
-    def mk_sample_single_prompt(self, *args, prompts:str, responses:list, rm_tags:bool=False, **kwargs):
-        """
-        Takes in a list of prompts and responses and returns a string that
-        represents a bullet point list of the provided prompts and responses. This structures
-        the prompts and responses in a easy to understand way to allow the LLM to aggregate.
-        Example output:
-        ## Sample of Provided Answers:
-        Prompt 1: Why is the sky blue?
-        Response 1: The sky is blue because of Rayleigh scattering.
-
-        Prompt 2: How many stars are in the sky?
-        Response 2: There are an infinite number of stars in the sky.
-        """
-        # print(f"{Fore.RED}prompt single:{Fore.RESET} {prompts}")
-        
+    def mk_sample_single_prompt(self, *args, prompts: List[str], responses: List[str], rm_tags: bool = False, **kwargs) -> str:
         samples = []
         if rm_tags:
             prompt = self.rm_tags(prompts[0], *args, **kwargs)
@@ -141,67 +120,47 @@ class Agg(Strategy):
             prompt = prompts[0]
         for i, response in enumerate(responses):
             samples.append(
-                            f"\n__RESPONSE SAMPLE {i+1}__\n"
-                            f"{response}"
-                            )
+                f"\n__RESPONSE SAMPLE {i+1}__\n"
+                f"{response}"
+            )
         all_samples = '\n'.join(samples)
-        return (    f"\nOriginal Prompt for all Samples:\n{prompt}\n"
-                    f"Samples of Provided Answers to the Original Prompt:\n{all_samples}\n"
-                    )
+        return (
+            f"\nOriginal Prompt for all Samples:\n{prompt}\n"
+            f"Samples of Provided Answers to the Original Prompt:\n{all_samples}\n"
+        )
 
-    def mk_sample_no_prompt(self, *args, responses:list, **kwargs):
-        """
-        Takes in a list of prompts and responses and returns a string that
-        represents a bullet point list of the provided prompts and responses. This structures
-        the prompts and responses in a easy to understand way to allow the LLM to aggregate.
-        Example output:
-        ## Sample of Provided Answers:
-        Prompt 1: Why is the sky blue?
-        Response 1: The sky is blue because of Rayleigh scattering.
-
-        Prompt 2: How many stars are in the sky?
-        Response 2: There are an infinite number of stars in the sky.
-        """
-        # print(f"{Fore.RED}prompt none:{Fore.RESET} {responses}")
-        
+    def mk_sample_no_prompt(self, *args, responses: List[str], **kwargs) -> str:
         samples = []
         for i, response in enumerate(responses):
             samples.append(
-                            f"\n__TEXT SAMPLE {i+1}__\n"
-                            f"{response}"
-                            )
+                f"\n__TEXT SAMPLE {i+1}__\n"
+                f"{response}"
+            )
         all_samples = '\n'.join(samples)
-        return (f"Samples of Provided Texts:\n{all_samples}\n")
+        return f"Samples of Provided Texts:\n{all_samples}\n"
 
-    def rm_tags(self, prompt:str, *args, **kwargs):
+    def rm_tags(self, prompt: str, *args, **kwargs) -> str:
         tags = ['context', 'user_prompt', 'sample', 'io_template', 'INST']
         for tag in tags:
             prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
         return prompt
 
 class Denoise(Strategy):
+    inputs_tag = 'noisy_text'
 
-    strat_tag = 'noisy_text'
-    """
-    Generates the Aggregation instantiation of Strategy.strats dict to render a Aggregation
-    instruction.
-    Aggregation refers to condensing multiple prompts into a single prompt.
-    """
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        return self.mk_prompt_reduce_instruct(*args, **kwargs)
+        strat = self.mk_prompt_reduce_instruct(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat
 
     def mk_prompt_reduce_instruct(self, *args, 
-                                            responses:list,
-                                            user_prompt:str=None,
-                                            link:str=None,
-                                            rm_tags:bool=False,
-                                            search_query:str=None, 
-                                            **kwargs,
-        ) -> dict:
-        """
-        Generates aggregation prompt based on the specified strategy.
-        """
+                                  responses: List[str],
+                                  user_prompt: Optional[str] = None,
+                                  link: Optional[str] = None,
+                                  rm_tags: bool = False,
+                                  search_query: Optional[str] = None, 
+                                  **kwargs) -> dict:
         resp = responses[0]
         headers = ''
         if user_prompt:
@@ -215,8 +174,9 @@ class Denoise(Strategy):
             response = response
         if not user_prompt and not search_query:
             response = resp
-        # self.strats['inputs_intro'] = f"The following text is noisy and hard to read."
-        self.strats['strat_tag'] = self.strat_tag
-        self.strats['inputs'] = f"{headers}\n" + response
-        self.strats['inputs_header'] = f"Text to de-noise:"
-        return self.strats
+        
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.inputs_data = f"{headers}\n" + response
+        self.fields.inputs_header = f"Text to de-noise:"
+        self.fields.inputs_intro = f"Below is a {self.inputs_tag} that needs to be cleaned and summarized."
+        return self.fields.__dict__

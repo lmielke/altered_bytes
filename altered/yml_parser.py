@@ -37,8 +37,17 @@ self.fields_text: a string representation of the fields in various formats (json
 
 
 import json, os, re, yaml
+from enum import Enum
 from colorama import Fore, Style
 import altered.hlp_printing as hlpp
+
+
+class Format(Enum):
+    JSON = 'json'
+    YAML = 'yaml'
+    YML = 'yml'
+    MARKDOWN = 'markdown'
+
 
 class YmlParser:
     meta_flag = '# meta:'
