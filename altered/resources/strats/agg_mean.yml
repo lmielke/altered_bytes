@@ -10,7 +10,9 @@ name: Weighted Mean Aggregation
 description: >
     This strategy generates a weighted average summary from a given <sample> of texts or answers. 
     Instead of taking a strict average, the focus is on synthesizing key points from all responses, 
-    with emphasis placed on the most relevant or repeated ideas. The result is a balanced summary 
+    with emphasis placed on the most relevant or repeated ideas. Pay more attention to common 
+    themes or ideas mentioned by multiple responses, while ensuring that unique details 
+    from each response are included where relevant. The result is a balanced summary
     that gives proportional weight to both common themes and unique insights, while still ensuring 
     that frequently mentioned or significant ideas receive more attention.
 
@@ -41,8 +43,7 @@ objective: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Using the provided RESPONSE SAMPLE`s, create a weighted summary that incorporates 
-    key points from all responses. Pay more attention to common themes or ideas mentioned 
-    by multiple responses, while ensuring that unique details from each response 
-    are included where relevant. 
+    Using the provided RESPONSE SAMPLE`s, create a weighted summary using the provided
+    stratgey and samples. Do not talk about or reference the original responses. The user
+    should only be provided with the final aggreated text.
     NOTE: Generously keep/include formulas and code snippets or shell commands.
