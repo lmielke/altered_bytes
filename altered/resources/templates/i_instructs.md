@@ -8,3 +8,7 @@
 {%- endif %}
 
 {%- endif %}
+
+Do not make any conversational comments!
+Do not repeat any text or tags provided in this prompt!
+Do not explain your reasoning unless specifically asked for!

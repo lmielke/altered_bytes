@@ -36,6 +36,7 @@ class Test_WebSearch(unittest.TestCase):
         # ws = WebSearch(name=self.name, data_dir=self.data_dir)
         ws = WebSearch(name=self.name, data_dir=self.data_dir)
         ws(self.search_query, num=self.num)
+        ws.results_to_table(verbose=self.verbose, max_files=6)
         ws.search_results.show(verbose=2)
 
 if __name__ == "__main__":

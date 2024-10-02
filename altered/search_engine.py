@@ -64,7 +64,7 @@ class WebSearch:
       r.raise_for_status()
       return r.json()
 
-    def prep_results(self, se_results:dict, se_contents:dict, urls:list, *args, search_query, **kwargs):
+    def prep_results(self, se_results:dict, se_contents:dict, urls:list, search_query:str, *args, **kwargs):
         """
         Filters the search results to only include relevant fields.
         """

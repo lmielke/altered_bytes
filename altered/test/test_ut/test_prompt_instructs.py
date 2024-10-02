@@ -3,6 +3,7 @@
 import os, re, shutil, sys, time, yaml
 import unittest
 from colorama import Fore, Style
+import altered.hlp_printing as hlpp
 
 # test package imports
 import altered.settings as sts
@@ -14,7 +15,7 @@ class Test_Instructions(unittest.TestCase):
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
         # The idea being that there is always an instructs strategy and a output strategy
-        cls.test_templates_names = ['agg_mean', 'qa_simple']
+        cls.test_templates_names = ['agg_mean', 'simple_qa']
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.renderer = Render(*args, **kwargs)
 
@@ -50,11 +51,11 @@ class Test_Instructions(unittest.TestCase):
 
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs.md',
+                                            template_name='i_instructs.md',
                                             context = {'instructs': strats},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.YELLOW}render result {self.test_templates_names = }{Fore.RESET}: \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
         with open(os.path.join(sts.test_data_dir, 'test_search_engine_cleaned.yml'), 'r') as f:
@@ -62,7 +63,7 @@ class Test_Instructions(unittest.TestCase):
 
         instr2 = Instructions(name='Test_Instructions')
         # test is using the qa template
-        strats = instr2(  strat_templates=['denoise_text', 'qa_simple'],
+        strats = instr2(  strat_templates=['denoise_text', 'simple_qa'],
                         # user_prompt='Why do horses neigh?',
                         user_prompt=out.get('user_prompt'),
                         search_query=out.get('search_query'),
@@ -71,11 +72,11 @@ class Test_Instructions(unittest.TestCase):
 
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='instructs.md',
+                                            template_name='i_instructs.md',
                                             context = {'instructs': strats},
                                             verbose=self.verbose,
                                             )
-        print(f"{Fore.CYAN}\n\nrender result {self.test_templates_names = }{Fore.RESET}: \n{rendered}")
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
 if __name__ == "__main__":

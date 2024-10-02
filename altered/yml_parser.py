@@ -184,7 +184,7 @@ class YmlParser:
         """
         json_str, code_block = '', []
         for line in self.fields_text.split('\n')[1:]:
-            # print(f"\n{line = }")
+            if line.startswith(self.meta_flag): continue
             if not line:
                 if code_block:
                     vs = '\n'.join(code_block[1:])

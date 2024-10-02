@@ -6,12 +6,14 @@ import os, yaml
 import altered.settings as sts
 from colorama import Fore, Style
 import altered.prompt_strategies as Strats
+import altered.prompt_io as Io
 from altered.prompt_user_prompt import UserPrompt
 from altered.yml_parser import YmlParser
 
 
 class Instructions:
-    default_strats = ['default_user_prompt', 'answer_simple']
+    default_strats = ['default_user_prompt', 'simple_answer']
+    max_words = 250
 
     def __init__(self, name, *args, **kwargs):
         self.name = name
@@ -33,21 +35,21 @@ class Instructions:
                     'user_prompt': user_prompt_context, 
                     'io': strat_io,
                 }
-        if num_predict is not None:
-            context['default_max_words'] = num_predict // 4
+        context['response_max_words'] = self.max_words if num_predict is None else \
+                                                                        num_predict // 4
         return context
 
-    def get_strats_names(self, *args, strat_templates:list=None, fmt:str=None, **kwargs):
+    def get_strats_names(self, *args, strat_templates:list=None, **kwargs):
         # we are calling the strat
         strat_templates = strat_templates or self.default_strats
-        strat_templates = strat_templates if fmt is not None else strat_templates[:1]
+        # strat_templates = strat_templates if fmt is not None else strat_templates[:1]
         s_names = {}
         for s_name in strat_templates:
             method, _ = s_name.split('_', 1)
             if os.path.exists(os.path.join(sts.strats_dir, f'{s_name}.yml')):
                 s_names['strat'] = {'method': method, 's_name': s_name}
             elif os.path.exists(os.path.join(sts.io_dir, f'{s_name}.yml')):
-                s_names['io'] = {'method': method, 's_name': s_name}
+                s_names['io'] = {'method': method, 'io_name': s_name}
         return s_names
 
     def run_strats(self, s_name:dict, *args, **kwargs):
@@ -57,13 +59,12 @@ class Instructions:
                                                         (s_name['s_name'], *args, **kwargs)
         return strat
 
-    def run_io(self, s_name:dict, *args, fmt:str='markdown', **kwargs):
-        print(f"{Fore.YELLOW}{s_name = }{Fore.RESET}")
-        if s_name is None:
+    def run_io(self, io_name:dict, *args, **kwargs):
+        if io_name is None:
             return
-        template_path = os.path.join(sts.io_dir, f'{s_name["s_name"]}.yml')
-        io = YmlParser(*args, fields_paths=[template_path], **kwargs).describe(fmt=fmt)
-        return io.strip()
+        io = getattr(Io, io_name['method'].capitalize())(*args, **kwargs)\
+                                                        (io_name['io_name'], *args, **kwargs)
+        return io
 
     def get_user_prompt(self, *args, **kwargs):
         user_prompt = UserPrompt(*args, **kwargs)(*args, **kwargs)

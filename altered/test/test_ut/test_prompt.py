@@ -13,7 +13,7 @@ class Test_Prompt(unittest.TestCase):
     def setUpClass(cls, *args, **kwargs):
         cls.alias = 'l3.2_0'
         cls.verbose = 0
-        cls.test_templates_names = ['qa_simple', 'agg_best']
+        cls.test_templates_names = ['simple_qa', 'agg_best']
         cls.name = 'ut_Test_Prompt'
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '

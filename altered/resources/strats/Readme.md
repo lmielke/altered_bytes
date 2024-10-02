@@ -22,10 +22,10 @@ Strategies are called using the __'strat_templates'__ argument like:
 
 ```python
 # List of names to call the strategies with
-strat_templates = ['qa_simple', 'agg_best']
+strat_templates = ['simple_qa', 'agg_best']
 ```
 For each of these names there is a corresponding strategy file.yml inside the __'strats'__ 
-and/or __'io'__ directory.  i.e. __'.../resource_dir/io/qa_simple.yml'__
+and/or __'io'__ directory.  i.e. __'.../resource_dir/io/simple_qa.yml'__
 Normally a thought uses exacly on single methodical strategy and one single I/O strategy.
 
 ## Default behavior

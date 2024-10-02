@@ -7,12 +7,11 @@ from colorama import Fore, Style
 import altered.settings as sts
 from altered.yml_parser import YmlParser
 
-from altered.renderer_fields import StrategyFields
+from altered.prompt_strats_fields import StrategyFields
 
 
 class Strategy:
-    s_types = {'outputs', 'instructs'}
-    jinja_var = r'(^\w+)(?::\s*\\)(\{\{ \w+ \}\})(\s*$)'
+
 
     def __init__(self, *args, **kwargs):
         self.fields = None
@@ -33,8 +32,8 @@ class Strategy:
         self.template_name = strat_template_name
         self.template_file_name = f'{strat_template_name}.yml'
         self.template_path = os.path.join(sts.strats_dir, self.template_file_name)
-        self.s_type, key = strat_template_name.split('_', 1)
-        self.fields = StrategyFields(key=key, s_type=self.s_type)
+        self.s_type, s_meth = strat_template_name.split('_', 1)
+        self.fields = StrategyFields(s_meth=s_meth, s_type=self.s_type)
 
     def load_strat(self, *args, fmt='markdown', **kwargs):
         loader = YmlParser(*args, fields_paths=[self.template_path], **kwargs)
@@ -44,16 +43,12 @@ class Strategy:
         }
         for k, vs in loader.data.items():
             setattr(self.fields, k, vs)
-        self.fields.fmt_comment = f"<!--, #..., >..."
-        self.fields.fmt = fmt
 
-    def mk_context(self, *args, fmt:str=None, **kwargs):
-        if fmt is not None:
-            self.fields.fmt = fmt
+    def mk_context(self, *args, **kwargs):
         return self.fields.__dict__
 
-    def add_strat(self, key, value):
-        setattr(self.fields, key, value)
+    def add_strat(self, s_meth, value):
+        setattr(self.fields, s_meth, value)
         self.fields.__post_init__()  # Re-run validation after adding a new field
 
 
@@ -73,8 +68,7 @@ class Agg(Strategy):
         num_responses = len(kwargs['responses'])
         self.fields.inputs_tag = self.inputs_tag
         self.fields.inputs_intro = (
-            f"Below is the {self.inputs_tag} of {num_responses} "
-            f"of an LLM's responses "
+            f"Below is the {self.inputs_tag} of {num_responses} different texts, "
         )
         
         if not kwargs.get('prompts'):
@@ -92,7 +86,7 @@ class Agg(Strategy):
             self.fields.inputs_data = self.mk_sample_single_prompt(*args, **kwargs)
         elif len(kwargs['prompts']) > 1:
             self.fields.inputs_header = f"Answers and prompts:"
-            self.fields.inputs_intro += f"intending to answer {num_responses} prompts."
+            self.fields.inputs_intro += f"intending to answer {len(kwargs['prompts'])} prompts."
             self.fields.inputs_data = self.mk_sample_multi_prompt(*args, **kwargs)
         else:
             self.fields.inputs_data = self.mk_sample_no_prompt(*args, **kwargs)
