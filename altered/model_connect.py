@@ -116,7 +116,6 @@ class ModelConnect:
             context['service_endpoint'] = msts.config.defaults.get('service_endpoint') \
                                             if service_endpoint is None else service_endpoint
             context['prompts'] = messages
-            context['prompt_summary'] = prompt_summary
             context['keep_alive'] = msts.config.defaults.get('keep_alive')
             context['options'] = {  
                                     'temperature': temperature,
@@ -130,6 +129,9 @@ class ModelConnect:
                 context['fmt'] = fmt
                 context['stream'] = False
                 context['repeats'] = repeats
+                context['prompt_summary'] = prompt_summary
+                print(f"{Fore.RED}ModelConnect.prep_context.context:{Fore.RESET} \n{context['prompt_summary']}")
+                exit()
         # print(f"{Fore.YELLOW}ModelConnect.prep_context.context:{Fore.RESET} \n{context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context

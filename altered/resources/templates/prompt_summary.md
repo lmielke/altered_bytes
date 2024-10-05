@@ -1,4 +1,3 @@
-{{ prompt_summary }}
 {%- if prompt_summary %}
 # 1. Prompt Summary
 ## Original Question/Problem Statement

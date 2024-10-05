@@ -66,7 +66,7 @@ class Endpoints:
         return {'responses': responses}
 
     def aggate_responses(self, ep, strat, *args, prompts:list, responses:list,
-                                                        prompt_summary:dict=None,
+                                                        prompt_summary:str=None,
                                                         verbose:int=0,
                                                         fmt:str=None,
                                                         **kwargs, ):
@@ -84,6 +84,7 @@ class Endpoints:
         responses = [r.get('response') for r in responses]
         # during aggregation we do not want higher response diversity
         kwargs['options']['temperature'] = 0.0
+        print(f"\n\n{Fore.RED}aggregate_responses:{Fore.RESET} {prompt_summary = }")
         promts = prompts if prompt_summary is None else \
                                                 [prompt_summary for _ in range(len(prompts))]
         print(f"\n\n{Fore.RED}aggregate_responses:{Fore.RESET} {prompts = }, {responses = }")
