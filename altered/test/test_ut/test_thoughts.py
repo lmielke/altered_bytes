@@ -10,7 +10,7 @@ from colorama import Fore
 from altered.thoughts import Chat
 Chat.chats_dir = os.path.join(sts.test_data_dir, 'thoughts')
 
-verbose = 2
+verbose = 3
 
 class Test_Chat(unittest.TestCase):
     @classmethod

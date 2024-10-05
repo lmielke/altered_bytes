@@ -66,6 +66,7 @@ class Endpoints:
         return {'responses': responses}
 
     def aggate_responses(self, ep, strat, *args, prompts:list, responses:list,
+                                                        prompt_summary:dict=None,
                                                         verbose:int=0,
                                                         fmt:str=None,
                                                         **kwargs, ):
@@ -83,16 +84,20 @@ class Endpoints:
         responses = [r.get('response') for r in responses]
         # during aggregation we do not want higher response diversity
         kwargs['options']['temperature'] = 0.0
+        promts = prompts if prompt_summary is None else \
+                                                [prompt_summary for _ in range(len(prompts))]
         aggs = []
         for i, strat in enumerate(strat_templates):
-            print(f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET} {strat_templates = } {strat = }, {kwargs = }")
+            print(  f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET}"
+                    f" {strat_templates = } {strat = }, {kwargs = }"
+                )
             strats = self.instructs(    *args,
-                                        strat_templates=[strat],
-                                        prompts=prompts,
-                                        rm_tags=True,
-                                        responses=responses,
-                                        fmt='json' if strat == 'agg_std' else fmt,
-                                        **kwargs,
+                                                strat_templates=[strat],
+                                                prompts=prompts,
+                                                rm_tags=True,
+                                                responses=responses,
+                                                fmt='json' if strat == 'agg_std' else fmt,
+                                                **kwargs,
                                     )
             rendered = self.renderer.render(
                                         template_name='i_instructs.md',

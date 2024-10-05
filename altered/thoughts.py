@@ -90,6 +90,7 @@ class Chat:
                             'service_endpoint': 'get_generates',
                             'repeats': repeats,
                             'verbose': verbose,
+                            'prompt_summary': self.p.context.get('prompt_summary'),
                         }
         ignore_fields = {'context',}
         server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})

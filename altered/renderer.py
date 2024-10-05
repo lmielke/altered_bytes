@@ -6,7 +6,7 @@ import altered.hlp_printing as hlpp
 import altered.settings as sts
 
 class Render:
-    fields = ['prompt_title', 'context', 'user_prompt', 'instructs']
+    fields = ['prompt_title', 'context', 'user_prompt', 'instructs', 'prompt_summary']
     default_context_path = os.path.join(sts.resources_dir, 'kwargs', 
                                         'renderer_default_context.yml')
 

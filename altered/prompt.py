@@ -16,6 +16,8 @@ default_aggreg = 'default_user_prompt'
 
 class Prompt:
 
+    template_name = 'prompt.md'
+
 
     def __init__(self, name, *args, **kwargs):
         self.name = name
@@ -29,7 +31,8 @@ class Prompt:
 
     def __call__(self, *args, **kwargs):
         self.mk_prompt(*args, **kwargs)
-        self.render_prompt(*args, **kwargs)
+        self.mk_prompt_summary(*args, **kwargs)
+        self.data = self.render_prompt(*args, **kwargs)
         return self
 
 
@@ -43,13 +46,34 @@ class Prompt:
                             'instructs': self.get_instructs(*args, **kwargs),
                         }
 
-    def render_prompt(self, *args, context:dict=None, **kwargs):
-        self.data = self.RD.render(*args, 
-                                                    template_name='prompt.md', 
-                                                    context=self.context, 
-                                                    **kwargs,
-                    )
-        hlpp.pretty_prompt(self.data, *args, **kwargs)
+    def render_prompt(self, *args, context:dict=None, template_name:str=None, _context:dict=None, **kwargs):
+        context = _context if _context is not None else self.context
+        template_name = template_name if template_name is not None else self.template_name
+        data = self.RD.render(*args, template_name=template_name, context=context, **kwargs, )
+        hlpp.pretty_prompt(data, *args, **kwargs)
+        return data
+
+    def mk_prompt_summary(self, *args, context:dict=None, **kwargs):
+        """
+        prompt_summary can be used to create a short propmt for aggreation and other tasks
+        """
+        p_sum = {}
+        if self.context['instructs'].get('user_prompt', {}).get('user_prompt') is not None:
+            p_sum['question'] = self.context['instructs']['user_prompt']['user_prompt']
+        else:
+            p_sum['question'] = self.context['instructs']['strats'].get('description')
+        p_sum['objective'] = (
+                            f"{self.context['instructs']['strats'].get('objective')}\n"
+                            f"{self.context['instructs']['strats'].get('your_task')}"
+                                            )
+        for k, v in p_sum.copy().items():
+            p_sum[k] = v.replace("'<user_prompt>'", 'question')
+        template = 'prompt_summary.md'
+        _context = {'prompt_summary': p_sum}
+        self.context['prompt_summary'] = self.render_prompt(*args, _context=_context,
+                                                                    template_name=template, 
+                                                                    **kwargs,
+                                                                )
 
     def get_context(self, *args, **kwargs):
         context_dict = self.C(*args, **kwargs)
