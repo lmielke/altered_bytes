@@ -12,6 +12,8 @@ from altered.prompt_io_fields import IoFields
 
 class Io:
     
+    template_name = 'i_instructs_io.md'
+
 
     def __init__(self, *args, **kwargs):
         self.fields = None

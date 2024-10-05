@@ -21,6 +21,7 @@ class CleanWebSearch(WebSearch):
     default_repeats = {'num': 1, 'agg': 'agg_mean'}
 
     def __init__(self, *args, **kwargs):
+        print(f"{Fore.MAGENTA}{Style.BRIGHT}CleanWebSearch {kwargs = }{Style.RESET_ALL}")
         super().__init__(*args, **kwargs)
         self.assi = SingleModelConnect(*args, **kwargs)
         self.alias = 'l3.2_0'

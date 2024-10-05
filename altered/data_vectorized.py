@@ -38,6 +38,7 @@ class VecDB(Data):
     # vec_fields_path is the path to the fields file for the table creator
     vec_fields_path = os.path.join(sts.data_dir, "data_VecDB_required_fields.yml")
     service_endpoint = 'get_embeddings'
+    embed_match_len = 30
 
 
     def __init__(self, *args, name:str, u_fields_paths:list=[], **kwargs ):
@@ -49,8 +50,11 @@ class VecDB(Data):
         super().__init__(*args, name=name, u_fields_paths=u_fields_paths, **kwargs, )
         self.dtype = np.float32
         self.assi = SingleModelConnect(*args, **kwargs)
-        self.setup_storage(*args, **kwargs)
-        self.ldf.set_index('hash', inplace=True, drop=False)
+        # self.vectors = self.load_vector_data(*args, **kwargs)
+        if self.vectors is None:
+            self.setup_storage(*args, **kwargs)
+        print(f"{Fore.BLUE}VecDB.__init__.show: {kwargs = }{Fore.RESET}")
+        self.show(verbose=2)
 
     def load_vec_fields(self, *args, fields_paths:list=None, u_fields_paths:list=[], **kwargs):
         """
@@ -58,10 +62,19 @@ class VecDB(Data):
         whatever fields come from upstram objects such as search_engine.py
         these fielspaths will be used in Data to load the fields
         """
-        
         fields_paths = fields_paths if fields_paths is not None else [self.vec_fields_path]
         fields_paths.extend(u_fields_paths)
         return fields_paths
+
+    def load_from_disk(self, *args, **kwargs) -> None:
+        super().load_from_disk(*args, **kwargs)
+        self.vectors = self.fs.load_from_disk(*args, file_ext='npy', **kwargs)
+        return self.vectors
+
+    def save_to_disk(self, *args, **kwargs) -> None:
+        self.fs.save_to_disk(data=self.vectors, *args, **kwargs)
+        # Data class has no save_to_disk, so we call it directly
+        super().save_to_disk(*args, **kwargs)
 
     def setup_storage(self, *args, verbose:int=0, **kwargs):
         """
@@ -81,12 +94,20 @@ class VecDB(Data):
         """
         # Create an initial record for the storage
         # define self.vector
-        print(f"{Fore.CYAN}VecDB.setup_storage: {Fore.RESET} {kwargs = }, {verbose = }")
+        if verbose >= 2:
+            print(f"{Fore.CYAN}VecDB.setup_storage: {Fore.RESET} {kwargs = }, {verbose = }")
         embedding = np.array(self.embedds(self.name, *args, verbose=verbose, **kwargs))
         normalized = self.normalize(embedding)
         self.vectors = np.stack((embedding, normalized)).astype(self.dtype)[None, ...]
-        self.ldf.at[0, 'hash'] = self.hashify(normalized)
-        self.ldf.at[0, 'tools'] = str(self)
+        self.ldf.set_index('hash', inplace=True, drop=False)
+        # To update the row where the index is NA
+        self.ldf.loc[self.ldf.index.isna(), 'hash'] = self.hashify(normalized)
+        self.ldf.loc[self.ldf.index.isna(), 'tools'] = str(self)
+        self.ldf.loc[self.ldf.index.isna(), 'content'] = 'zero init'
+        if 'embedd_match' in self.columns:
+            # we convert the first 30 elements to a list for display
+            embedd_match = json.dumps(self.vectors[0, 0, :self.embed_match_len].tolist())
+            self.ldf.at[0, 'embedd_match'] = embedd_match
         if verbose:
             self.explain(self.vectors)
 
@@ -99,7 +120,7 @@ class VecDB(Data):
         Returns:
             A hash string representing the vector.
         """
-        return hashlib.sha256(vector[:30].tobytes()).hexdigest()[:num]
+        return hashlib.sha256(vector[:self.embed_match_len].tobytes()).hexdigest()[:num]
 
     def embedds(self, contents: List[str], *args, model:str=None, **kwargs) -> np.ndarray:
         """
@@ -122,17 +143,6 @@ class VecDB(Data):
                                 **kwargs
                 ).get('responses')[0].get('embedding')
 
-    def update_vector_store(self, vector: np.ndarray, *args, **kwargs) -> None:
-        """
-        Updates the vector store with a new vector and its normalized version.
-        Args:
-            vector: The vector to add.
-        """
-        new = np.stack((vector, self.normalize(vector).astype(self.dtype)))[None, ...]
-        self.vectors = np.concatenate((self.vectors, new), axis=0)
-        # we return the normalized vector for further processing
-        return self.vectors[-1, 1]
-
     def normalize(self, vector: np.ndarray, ord: int = 2):
         """
         Normalizes a vector using the L1 norm for cosine similarity calculations.
@@ -144,19 +154,33 @@ class VecDB(Data):
         """
         return vector / np_norm(vector, ord)
 
+    def mk_new_vector(self, record:str, *args, **kwargs):
+        embedded = self.embedds(record, *args, **kwargs)
+        normalized = self.normalize(embedded)
+        return np.stack((embedded, normalized))[None, ...]
+
     def append(self, record:Dict[str, Any], *args, **kwargs) -> None:
-        # first we update the vectors with the newly embedded content token
-        normalized =    self.update_vector_store(
-                                    np.array(
-                                        self.embedds( record['content'], *args, **kwargs)
-                                    ), *args, **kwargs,
-                                )
-        # then we add the record to the storage
-        # record = {k: record.get(k, None) for k, vs in self.fields.items()}
-        # we generate a hash to match records from self.vectors agains self.data
-        record['name'], record['hash'] = self.name, self.hashify(normalized)
+        # first we create a new vector to be added to self.vectors
+        new_vec = self.mk_new_vector(record['content'], *args, **kwargs)
+        # then we update the record to be added, with the generated hash (normalized)
+        record['name'], record['hash'] = self.name, self.hashify(new_vec[0, 1])
+        # we want to avoid table inconsistencies (unlikely but possible)
+        if self.check_hash_exists_in_df(record['hash'], *args, **kwargs): return
+        # Here we update the database DataFrame
         super().append(record, *args, **kwargs)
+        # finally we update the vectors with the newly embedded content token
+        self.vectors = np.concatenate((self.vectors, new_vec), axis=0)
         self.ldf.set_index('hash', inplace=True, drop=False)
+
+    def check_hash_exists_in_df(self, hash, *args, **kwargs):
+        # currently self.ldf sometimes looses its 'hash' index, its not yet clear why.
+        if hash in self.ldf['hash'].values:
+            print(  f"{Fore.RED}IndexError: Record already exists!{Fore.RESET}\n"
+                    f"{hash} in self.ldf['hash'].values\n"
+                    f"{Fore.RED}Record has not been saved.{Fore.RESET}")
+            return True
+        else:
+            return False
 
     def get(self, query:str, *args, num:int=5, **kwargs):
         start = time.time()
@@ -228,35 +252,8 @@ class VecDB(Data):
         distances = np_norm(self.vectors[top, 0, :] - v, axis=1)[:n]
         return top[np.argsort(distances)], distances
 
-    def save_to_disk(self, *args, verbose:int=0, **kwargs,) -> None:
-        """
-        NOTE:
-        The parent save_to_disk method also performs a cleanup of the data directory.
-        cleanup uses max_files:int=sts.max_files, exts:set={'csv', 'npy'}, verbose:int=0,
-        """
-        # super takes care of saving self.data (pd.DataFrame) to disk and returns the path
-        data_saved_path = super().save_to_disk(*args, verbose=verbose, **kwargs)
-        # we save the self.vectors (np.ndarray) to disk using the parents file_path
-        v_save_path = f"{os.path.splitext(data_saved_path)[0]}.{self.mem_file_ext}"
-        np.save(v_save_path, self.vectors)
-        if verbose >= 1:
-            print(f"{Fore.MAGENTA}VecDB.save_to_disk:{Fore.RESET} {v_save_path = }")
-
-    def load_from_disk(self, *args, data_file_name:str=None, verbose:int=0, **kwargs) -> None:
-        if data_file_name is None: return
-        data_load_path = super().load_from_disk(*args, 
-                                                        data_file_name=data_file_name,
-                                                        verbose=verbose,
-                            **kwargs)
-        # we save the self.vectors (np.ndarray) to disk using the parents file_path
-        npy_load_path = f"{os.path.splitext(data_load_path)[0]}.{self.mem_file_ext}"
-        if verbose: 
-            print(f"{Fore.YELLOW}VecDB.load_from_disk:{Fore.RESET} {npy_load_path = }")
-        with open(npy_load_path, 'rb') as f:
-            self.vectors = np.load(f)
-
     def __str__(self, *args, **kwargs):
-        return f"VecDB(name={self.name}, fields=fields_dict, )"
+        return f"VecDB(name={self.name}, fields=self.columns.keys(), )"
 
     def explain(self, vectors: np.ndarray, *args, **kwargs):
         """

@@ -4,6 +4,7 @@ content: >
     argument is the index of the\nelement before which to insert, so a.insert(0, x) inserts at
     the front of\nthe list, and a.insert(len(a), x) is equivalent to a.append(x).
 fmt: markdown
+data_dir: C:/Users/lars/python_venvs/packages/altered_bytes/altered/test/data
 user_prompt: What are list comprehensions in Python?
 search_query: Python list comprehensions
 name: test_search_engine_cleaned

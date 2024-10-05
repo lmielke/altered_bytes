@@ -4,6 +4,11 @@
 # The type of the search result.
 hash: null
 
+# meta: {"name": "content", "type": "string", "default": "", "example": "# This is content text..."}
+# Content to be embedded/hashified and stored in the vector space, content is also 
+# used for LLM IO and search IO. Its in the sence THE generic text field of the application..
+content: null
+
 # meta: {"name": "tools", "type": "string", "default": "", "example": ["powershell", "python"]}
 # The type of the search result.
 tools: null

@@ -23,7 +23,8 @@ time_stamp = lambda: dt.now().strftime(time_strf)
 # name of table data when stored to disk
 data_dir = os.path.join(resources_dir, "data")
 max_files, data_file_exts = 100, {'csv', 'npy'}
-data_regex = r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.[a-z]{3,4}$"
+time_stamp_regex = r"\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}"
+data_regex = rf"^{time_stamp_regex}\.[a-z]{3,4}$"
 
 ignore_dirs = {
                 ".git",

@@ -12,6 +12,8 @@ from altered.prompt_strats_fields import StrategyFields
 
 class Strategy:
 
+    template_name = 'i_instructs_strats.md'
+
 
     def __init__(self, *args, **kwargs):
         self.fields = None

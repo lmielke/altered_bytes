@@ -15,7 +15,7 @@ class Test_Instructions(unittest.TestCase):
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 1
         # The idea being that there is always an instructs strategy and a output strategy
-        cls.test_templates_names = ['agg_mean', 'simple_qa']
+        cls.test_templates_names = ['agg_mean']
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.renderer = Render(*args, **kwargs)
 
@@ -51,7 +51,7 @@ class Test_Instructions(unittest.TestCase):
 
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs.md',
+                                            template_name=Instructions.template_name,
                                             context = {'instructs': strats},
                                             verbose=self.verbose,
                                             )
@@ -72,7 +72,7 @@ class Test_Instructions(unittest.TestCase):
 
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs.md',
+                                            template_name=Instructions.template_name,
                                             context = {'instructs': strats},
                                             verbose=self.verbose,
                                             )

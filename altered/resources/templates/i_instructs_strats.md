@@ -17,10 +17,8 @@
 <!-- </{{ instructs.strats.inputs_tag }}> -->
 {% endif%}
 
-{%- if instructs.io %}
 ## Response Data and Format
 {% include "i_instructs_io.md" ignore missing %}
-{% endif%}
 
 ## Your Task
 {{ instructs.strats.your_task }}

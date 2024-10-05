@@ -14,6 +14,7 @@ from altered.yml_parser import YmlParser
 class Instructions:
     default_strats = ['default_user_prompt', 'simple_answer']
     max_words = 250
+    template_name = 'i_instructs.md'
 
     def __init__(self, name, *args, **kwargs):
         self.name = name
@@ -21,7 +22,7 @@ class Instructions:
     def __call__(self, *args, **kwargs):
         s_names = self.get_strats_names(*args, **kwargs)
         strat_context = self.run_strats(s_names.get('strat'), *args, **kwargs)
-        strat_io = self.run_io(s_names.get('io'), *args, **kwargs)
+        strat_io = self.run_io(*args, **kwargs)
         user_prompt_context = self.get_user_prompt(*args, **kwargs)
         self.check_context(s_names, user_prompt_context, *args, **kwargs)
         return self.mk_context(strat_context, user_prompt_context, strat_io, *args, **kwargs)
@@ -48,8 +49,6 @@ class Instructions:
             method, _ = s_name.split('_', 1)
             if os.path.exists(os.path.join(sts.strats_dir, f'{s_name}.yml')):
                 s_names['strat'] = {'method': method, 's_name': s_name}
-            elif os.path.exists(os.path.join(sts.io_dir, f'{s_name}.yml')):
-                s_names['io'] = {'method': method, 'io_name': s_name}
         return s_names
 
     def run_strats(self, s_name:dict, *args, **kwargs):
@@ -59,11 +58,11 @@ class Instructions:
                                                         (s_name['s_name'], *args, **kwargs)
         return strat
 
-    def run_io(self, io_name:dict, *args, **kwargs):
-        if io_name is None:
+    def run_io(self, *args, io_template:str=None, **kwargs):
+        if io_template is None:
             return
-        io = getattr(Io, io_name['method'].capitalize())(*args, **kwargs)\
-                                                        (io_name['io_name'], *args, **kwargs)
+        io = getattr(Io, io_template.split('_', 1)[0].capitalize())(*args, **kwargs)\
+                                                        (io_template, *args, **kwargs)
         return io
 
     def get_user_prompt(self, *args, **kwargs):

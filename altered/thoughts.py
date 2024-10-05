@@ -39,6 +39,8 @@ class Chat:
         self.response = Response(*args, **kwargs)
         # Data represents the chat data structure, where each line is a chat element
         self.data = Data(*args, name=self.name, **kwargs)
+        print(f"{Fore.GREEN}{Style.BRIGHT}Chat.__init__.show {kwargs = }{Style.RESET_ALL}")
+        self.data.show(verbose=2)
 
     def run(self, *args, **kwargs):
         # First we create the inital user_promt to run the chat
@@ -63,6 +65,7 @@ class Chat:
         # we create the next record to update the chat
         for role in self.roles:
             self.data.append(self.mk_data_record(*args, role=role, **kwargs))
+        print(f"{Fore.GREEN}{Style.BRIGHT}Chat.next_chat_item {Style.RESET_ALL}")
         self.show(*args, **kwargs)
 
     def post(self, *args, **kwargs):

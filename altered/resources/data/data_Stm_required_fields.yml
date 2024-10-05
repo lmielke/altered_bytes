@@ -1,0 +1,14 @@
+# data_Rag_required_fields.yml
+# Contains the fields rag needs to navigate the content
+
+# meta: {"name": "strat_templates", "type": "string", "default": "", "example": ["agg_mean", "denoise_text"]}
+# Contains the strategies that generated a thought or memory
+strat_templates: null
+
+# meta: {"name": "io_template", "type": "string", "default": "", "example": "simple_qa"}
+# Contains the io template that generated a thought or memory format
+io_template: null
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "json"}
+# Contains the format of the thought or memory
+fmt: null

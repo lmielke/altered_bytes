@@ -74,7 +74,7 @@ class Endpoints:
         aggregation strategy. If the aggreation condition applies a std is always estimated
         and appended to the end.
         """
-        if len(responses) < 2 or (not strat) or (not str(strat).startswith('agg_')):
+        if len(responses) < 2 or ( not strat ) or ( not str(strat).startswith('agg_') ):
             return []
         strat_templates = [strat, ]
         # because we aggregate, we also append a std estimate

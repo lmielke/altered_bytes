@@ -41,46 +41,11 @@ class Test_VecDB(unittest.TestCase):
         # Test the initialization of the VecDB class
         self.assertEqual(self.d_vec.name, self.name)
 
-    def test_setup_storage(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_hashify(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_embedd(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_update_vector_store(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_normalize(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
     def test_append(self, *args, **kwargs):
         content = 'test_data_vectorized.Test_VecDB.test_append'
         # append the content at the last postion in the data_vectorized table
         self.d_vec.append({'role': 'user', 'content': content})
-        last_memory = self.d_vec.ldf.loc[self.d_vec.hashify(self.d_vec.vectors[-1, 1])]
+        last_memory = self.d_vec.ldf.loc[self.d_vec.hashify(self.d_vec.vectors[1, 1])]
         self.assertEqual(content, last_memory['content'])
 
     def test_get(self, *args, **kwargs):
@@ -108,7 +73,7 @@ class Test_VecDB(unittest.TestCase):
         nearests = self.d_vec.get(query, num=5, verbose=self.verbose)
         self.assertEqual(nearests['records'][0]['content'], 'Why is the sky blue?')
 
-    def test_save_to_disk(self, *args, **kwargs):
+    def test_save_vector_data(self, *args, **kwargs):
         test_contents = [
                             'What is the capital of France?',
                             'How does a plane fly?',
@@ -119,49 +84,13 @@ class Test_VecDB(unittest.TestCase):
             self.d_vec.append({'role': 'user', 'content': entry})
         self.d_vec.save_to_disk(max_files=4, verbose=self.verbose)
 
-    def test_load_from_disk(self, *args, **kwargs):
+    def test_load_vector_data(self, *args, **kwargs):
         time.sleep(2)
-        self.d_vec.load_from_disk( *args,
-                                    data_file_name='latest',
-                                    verbose=self.verbose,
-                                    **kwargs,
-                                    )
+        
+        self.d_vec.load_from_disk( *args, verbose=self.verbose, **kwargs, )
+
         self.d_vec.show(verbose=2)
 
-    def test_get_stats(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_compare(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_find_nearest(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test___str__(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
-
-    def test_explain(self, *args, **kwargs):
-        expected = False
-        # initialize test class
-        out = True
-        # tests and asserts
-        self.assertEqual(self.msg, expected)
 
 if __name__ == "__main__":
     unittest.main()

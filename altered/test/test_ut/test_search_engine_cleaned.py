@@ -40,7 +40,7 @@ class Test_CleanWebSearch(unittest.TestCase):
         test_data['verbose'] = self.verbose
         del test_data['content']
         print(f"test__call__.test_data: \n{test_data}")
-        search = CleanWebSearch(**test_data, data_dir=sts.test_data_dir,)
+        search = CleanWebSearch(**test_data)
         r_cleaned = search(**test_data)
         search.results_to_table(verbose=self.verbose, max_files=6)
         search.search_results.show(verbose=1)

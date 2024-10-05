@@ -19,6 +19,8 @@ class Test_Chat(unittest.TestCase):
         cls.test_io_path = os.path.join(sts.resources_dir, 'io', 'thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
+        # cls.chat = Chat(name='ut_chat')
+        cls.chat = Chat(name='ut_chat', verbose=verbose, data_dir=cls.test_data_dir)
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
@@ -32,14 +34,13 @@ class Test_Chat(unittest.TestCase):
         return out
 
     def test___init__(self, *args, **kwargs):
-        chat = Chat(name='ut_chat')
+        pass
 
     def test_run(self, *args, **kwargs):
-        chat = Chat(name='ut_chat', verbose=verbose, data_dir=self.test_data_dir)
         # we use YmlParser here to load the test_data kwargs from a YAML file
         yml = YmlParser(fields_paths=[self.test_io_path])
         yml.add_labels(name='Unittest', labels=self.test_io_path, description="run chat")
-        chat.run(*args, **yml.data, max_files=6)
+        self.chat.run(*args, **yml.data, max_files=6)
 
 
 if __name__ == "__main__":

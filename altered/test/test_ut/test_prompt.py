@@ -5,15 +5,16 @@ import unittest
 
 # test package imports
 import altered.settings as sts
-
+import altered.hlp_printing as hlpp
 from altered.prompt import Prompt
 
 class Test_Prompt(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.alias = 'l3.2_0'
-        cls.verbose = 0
-        cls.test_templates_names = ['simple_qa', 'agg_best']
+        cls.alias = 'l3.2_1'
+        cls.verbose = 1
+        cls.test_templates_names = ['agg_best']
+        cls.test_io_template = 'simple_qa'
         cls.name = 'ut_Test_Prompt'
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
@@ -34,7 +35,7 @@ class Test_Prompt(unittest.TestCase):
 
     def test___call__(self, *args, **kwargs):
         _context = {
-                    'search_query': 'list comprehensions in Python',
+                    # 'search_query': 'list comprehensions in Python',
                     # 'strategy': 'prompt_aggregations.mean',
                     # 'search_results': [
                     #                     {'source': 'https://www.stackoverflow.com/some_topic', 'content': 'Search Query is None because this is unittest'},
@@ -51,7 +52,8 @@ class Test_Prompt(unittest.TestCase):
                     'init_prompt': {'role': 'user', 'content': 'Hello, how can you help me today?'},
                     'name': self.name,
                     'strat_templates': self.test_templates_names,
-                    'user_prompt': 'Why do horses neigh?',
+                    'io_template': self.test_io_template,
+                    'user_prompt': 'Why is the sky blue?',
                     'prompts': [
                                 'Why is the sky blue?',
                                 'How many stars are in the sky?',
@@ -65,7 +67,7 @@ class Test_Prompt(unittest.TestCase):
                     'verbose': self.verbose,
                     }
         prompt = Prompt(name='ut_Test_Prompt', *args, verbose=self.verbose, alias=self.alias)(**_context, fmt='json', alias=self.alias)
-        print(prompt.data)
+        hlpp.pretty_prompt(prompt.data, *args, verbose=2, **kwargs)
 
 
 

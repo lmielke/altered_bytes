@@ -10,9 +10,9 @@ class Test_Data(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.verbose = 0
+        cls.verbose = 2
         cls.test_data_dir = sts.test_data_dir
-        cls.test_file_name = 'data__data_load_fields_default.yml'
+        cls.test_file_name = 'data_Data_load_fields_default.yml'
         cls.fields_path = os.path.join(sts.data_dir, cls.test_file_name)
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.name = 'UT_Test_Data'
@@ -55,9 +55,11 @@ class Test_Data(unittest.TestCase):
         # Test saving the DataFrame to disk
         data = Data(name=self.name, fields_paths=[self.fields_path], data_dir=sts.test_data_dir)
         data.create_table()
-        data.save_to_disk()
-        expected_file = f"{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
-        file_path = os.path.join(data.data_dir, expected_file)
+        expected_file = f"{self.name}_{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
+        print(f"{expected_file = }")
+        data.save_to_disk( data_file_name=expected_file, verbose=self.verbose)
+        file_path = os.path.join(data.fs.data_dir, expected_file)
+        print(f"{file_path = }")
         self.assertTrue(os.path.exists(file_path))
 
     def test_load_from_disk(self, *args, **kwargs):
@@ -66,7 +68,7 @@ class Test_Data(unittest.TestCase):
         data.create_table()
         data.save_to_disk()
         data_file_name = f"{data.time_stamp.strftime(sts.time_strf)[:-7]}.csv"
-        data.load_from_disk(data_file_name=data_file_name)
+        data.fs.load_from_disk(data_file_name=data_file_name, file_ext='csv',)
         self.assertFalse(data.ldf.empty)
 
     def test_cleanup_data_dir(self, *args, **kwargs):
@@ -74,9 +76,10 @@ class Test_Data(unittest.TestCase):
         data = Data(name=self.name, fields_paths=[self.fields_path], data_dir=sts.test_data_dir)
         data.create_table()
         data.save_to_disk()
-        data.cleanup_data_dir(max_files=1)
-        file_list = [f for f in os.listdir(data.data_dir) if f.endswith('.csv')]
-        self.assertLessEqual(len(file_list), 1)
+        max_files = 4
+        data.fs.cleanup_data_dir(max_files=max_files)
+        file_list = [f for f in os.listdir(data.fs.data_dir) if f.endswith('.csv')]
+        self.assertLessEqual(len(file_list), max_files)
 
     def test_append(self, *args, **kwargs):
         # Test appending a new record to the DataFrame

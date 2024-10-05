@@ -10,6 +10,7 @@ from colorama import Fore, Style
 import random as rd
 import math
 from datetime import datetime as dt
+import warnings
 import pandas as pd
 
 class ModelConnect:
@@ -147,14 +148,18 @@ class ModelConnect:
         context = self.prep_context(*args, **model_params.get('model_file'), verbose=verbose, 
                                             **kwargs, )
         url, server = msts.config.get_url(*args, **kwargs), model_params.get('server')
-        if verbose >= 2:
+        if verbose:
             print(      f"{Fore.MAGENTA}ModelConnect.post: "
-                        f"{url}, {context['model']}, {server = }{Fore.RESET}")
+                        f"{url}, {context['model']}, {server = }, "
+                        f"{context.get('repeats', 'no repeats for embeddings')}, "
+                        f"{len(context['prompts']) = }{Fore.RESET}"
+                        )
+        elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')
-
+        # chat-gpt and ollama use different methods, Here we call ollama method.
         r = self._ollama(url, context, *args, verbose=verbose, **kwargs )
         if verbose:
-            print(f"{Fore.MAGENTA}ModelConnect.post:{Fore.RESET} {r['num_results'] = }")
+            print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r['num_results'] = }")
         r['model'], r['server'] = model_params.get('model_file').get('name'), server
         self.get_stats(r, context, *args, **kwargs)
         return r
@@ -173,7 +178,7 @@ class ModelConnect:
         r.raise_for_status()
         r_dict = r.json()
         for i, (field, response) in enumerate(r_dict.copy().items()):
-            r_dict['num_results'] = len(r_dict)
+            r_dict['num_results'] = len(r_dict['responses'])
         return r_dict
 
     def get_stats(self, r, context, *args, context_length:int=2000, **kwargs) -> dict:
@@ -198,9 +203,11 @@ class ModelConnect:
         record_df = pd.DataFrame([{k: r[k] for k in self.columns}], columns=self.columns)
         summary_df = pd.DataFrame([self.times], columns=self.columns)
         # Use pd.concat to add the new row to the DataFrame
-        self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
-        self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
-        print(f"\n{Fore.MAGENTA}self.times_df:{Fore.RESET} \n{self.times_df}\n")
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
+            self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
+        print(f"\n{Fore.CYAN}self.times_df:{Fore.RESET} \n{self.times_df}\n")
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """

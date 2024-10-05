@@ -9,7 +9,9 @@ class Context:
 
     def __init__(self, name:str, context:str={}, *args, **kwargs):
         self.context = context
+        print(f"{Fore.CYAN}{Style.BRIGHT}Context.__init__.in {name = }:\n{kwargs = }{Style.RESET_ALL}")
         self.se = ContextSearch(*args, name=name, **kwargs)
+        print(f"{Fore.CYAN}{Style.BRIGHT}Context.__init__.out {name = }:\n{kwargs = }{Style.RESET_ALL}")
 
     def __call__(self, *args, **kwargs):
         self.prep_data(*args, **kwargs)

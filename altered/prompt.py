@@ -11,20 +11,21 @@ from altered.model_connect import SingleModelConnect
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
-default_aggreg = 'agg_mean'
+default_aggreg = 'default_user_prompt'
 
 
 class Prompt:
 
 
     def __init__(self, name, *args, **kwargs):
-        print(f"{Fore.YELLOW}Prompt Initiated{Fore.RESET} {kwargs = }")
         self.name = name
+        print(f"{Fore.BLUE}{Style.BRIGHT}Prompt.__init__.in {kwargs = }{Style.RESET_ALL}")
         self.C = Context(name, *args, **kwargs)
         self.I = Instructions(name, *args, **kwargs)
         self.RD = Render(*args, **kwargs)
         self.data = None
         self.warnings = {}
+        print(f"{Fore.BLUE}{Style.BRIGHT}Prompt.__init__.out {kwargs = }{Style.RESET_ALL}")
 
     def __call__(self, *args, **kwargs):
         self.mk_prompt(*args, **kwargs)
@@ -57,8 +58,6 @@ class Prompt:
     def get_instructs(self, *args, **kwargs):
         instructs = self.I(*args, **kwargs)
         return instructs
-
-
 
 
 class Response:

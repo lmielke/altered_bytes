@@ -58,7 +58,7 @@ class Test_Strategy(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs_strats.md',
+                                            template_name=Strategy.template_name,
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
@@ -110,7 +110,7 @@ class Test_Agg(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs_strats.md',
+                                            template_name=Strategy.template_name,
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
@@ -132,7 +132,7 @@ class Test_Agg(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs_strats.md',
+                                            template_name=Strategy.template_name,
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
@@ -174,7 +174,7 @@ class Test_Reduce(unittest.TestCase):
         # print(f"\n{strats['method']['inputs'] = }")
         # here we give the output of the __call__ test to renderer to veryfy the correctness
         rendered = self.renderer.render(
-                                            template_name='i_instructs_strats.md',
+                                            template_name=Strategy.template_name,
                                             context = {'instructs': {'strats': strats}},
                                             verbose=self.verbose,
                                             )
