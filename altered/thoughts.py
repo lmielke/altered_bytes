@@ -70,6 +70,7 @@ class Chat:
 
     def post(self, *args, **kwargs):
         server_params = self.mk_model_params(*args, **kwargs)
+        print(f"{Fore.YELLOW}{server_params.keys() = }{Fore.RESET}")
         # we post one or multiple user prompts to the AI model (repeats == num of prompt reps)
         return self.assi.post([self.p.data], *args, **server_params, )
 

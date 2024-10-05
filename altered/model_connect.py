@@ -71,6 +71,7 @@ class ModelConnect:
                                                         num_predict:int=None,
                                                         repeats:int=sts.repeats,
                                                         fmt:str='markdown',
+                                                        prompt_summary:dict=None,
                                                         **kwargs,
         ) -> dict:
         # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
@@ -96,14 +97,14 @@ class ModelConnect:
         num_ctx = self.get_context_length(messages, context_length, *args, **kwargs)
         messages = self.to_msgs(messages) if name.startswith('gpt') else messages
         return fmt, messages, name, temperature, num_ctx, num_predict,\
-                     repeats, service_endpoint
+                     repeats, service_endpoint, prompt_summary
 
     def prep_context(self, *args, name:str, verbose:int=0, **kwargs, ) -> dict:
         """
         Prepares the context based on the method name and model.
         """
         fmt, messages, name, temperature, num_ctx, num_predict,\
-        repeats, service_endpoint = \
+        repeats, service_endpoint, prompt_summary = \
                      self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
@@ -115,6 +116,7 @@ class ModelConnect:
             context['service_endpoint'] = msts.config.defaults.get('service_endpoint') \
                                             if service_endpoint is None else service_endpoint
             context['prompts'] = messages
+            context['prompt_summary'] = prompt_summary
             context['keep_alive'] = msts.config.defaults.get('keep_alive')
             context['options'] = {  
                                     'temperature': temperature,

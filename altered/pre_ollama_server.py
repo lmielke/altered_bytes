@@ -86,6 +86,7 @@ class Endpoints:
         kwargs['options']['temperature'] = 0.0
         promts = prompts if prompt_summary is None else \
                                                 [prompt_summary for _ in range(len(prompts))]
+        print(f"\n\n{Fore.RED}aggregate_responses:{Fore.RESET} {prompts = }, {responses = }")
         aggs = []
         for i, strat in enumerate(strat_templates):
             print(  f"\n\n{Fore.YELLOW}aggregate_responses:{Fore.RESET}"
