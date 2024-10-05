@@ -130,8 +130,6 @@ class ModelConnect:
                 context['stream'] = False
                 context['repeats'] = repeats
                 context['prompt_summary'] = prompt_summary
-                print(f"{Fore.RED}ModelConnect.prep_context.context:{Fore.RESET} \n{context['prompt_summary']}")
-                exit()
         # print(f"{Fore.YELLOW}ModelConnect.prep_context.context:{Fore.RESET} \n{context}")
         # keep_alive seems to be in seconds (docs say minutes)
         return context

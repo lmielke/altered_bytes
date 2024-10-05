@@ -85,7 +85,7 @@ class Endpoints:
         # during aggregation we do not want higher response diversity
         kwargs['options']['temperature'] = 0.0
         print(f"\n\n{Fore.RED}aggregate_responses:{Fore.RESET} {prompt_summary = }")
-        promts = prompts if prompt_summary is None else \
+        prompts = prompts if prompt_summary is None else \
                                                 [prompt_summary for _ in range(len(prompts))]
         print(f"\n\n{Fore.RED}aggregate_responses:{Fore.RESET} {prompts = }, {responses = }")
         aggs = []
