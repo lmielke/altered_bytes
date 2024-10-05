@@ -5,4 +5,4 @@
 
 ## Original Objective
 {{ prompt_summary.objective }}
-{%- endif %}
+{% endif %}

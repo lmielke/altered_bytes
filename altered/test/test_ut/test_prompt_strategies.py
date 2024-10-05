@@ -138,6 +138,28 @@ class Test_Agg(unittest.TestCase):
                                             )
         hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
+        agg5 = Agg()
+        # test is using the qa template
+        strats = agg5(  'agg_std', *args,
+                        fmt='json',
+                        prompts=[],
+                        responses=[
+                                    'The sky is blue because of Rayleigh scattering.',
+                                    'There are 100 billion stars in the Milky Way galaxy.',
+                                    'Airplanes fly because of Bernoullis...',
+                        ],
+                        )
+        # for i, (k, v) in enumerate(strats.items()):
+        #     print(f"\n{Fore.YELLOW}{i}{Fore.RESET} {k = }: {v}")
+        # print(f"\n{strats['method']['inputs'] = }")
+        # here we give the output of the __call__ test to renderer to veryfy the correctness
+        rendered = self.renderer.render(
+                                            template_name=Strategy.template_name,
+                                            context = {'instructs': {'strats': strats}},
+                                            verbose=self.verbose,
+                                            )
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
+
 
 class Test_Reduce(unittest.TestCase):
 

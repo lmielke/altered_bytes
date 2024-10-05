@@ -8,10 +8,21 @@ name: Std Aggregation
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy calculates the standard deviation of similarity between a given <sample> of texts or answers. 
-    The goal is to measure the degree of variance between the texts, ranging from identical (low variance) 
-    to highly divergent (high variance). The output is a JSON string that provides a standard deviation score 
-    from 0 (virtually identical) to 6 (no commonalities), along with a short justification for the score.
+    This strategy calculates the standard deviation of similarity between a given <sample> 
+    of texts or answers. The goal is to measure the degree of variance between the texts, 
+    ranging from identical (low variance) to highly divergent (high variance). 
+    The output is a JSON string that provides a standard deviation score
+    from 0 (virtually identical) to 6 (no commonalities), along with a short justification 
+    for the score.
+    Here is a more detailed explanation of the various std scores:
+    0: The texts are virtually identical.
+    1: The texts are virtually identical in topic and context, but differ in wording.
+    2: The texts handle the same topic, but show minor variations in context and signifficant variations in wording.
+    3: The texts handle the same topic, but show signifficant variations in both, context and wording.
+    4. The texts show signifficant variations in context and wording. Also at least one text is completely off topic.
+    5. The texts are partially related however, there is multiple texts that talk about different topics.
+    6. The texts are completely unrelated.
+
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when solving a task
@@ -25,26 +36,25 @@ example: >
     Expected Output:
       {
         'std': 2, 
-        'reasoning': 'The texts are similar in describing the same action but differ slightly in wording and emphasis on the dog’s condition.'
+        'reasoning': 'The texts are similar in describing the same action but differ slightly 
+        in wording and emphasis on the dog’s condition.'
       }
       
-      In this case, the responses share a common theme but vary in their descriptions, leading to a moderate variance score of 2.
+      In this case, the responses share a common theme but vary in their descriptions, 
+      leading to a moderate variance score of 2.
 
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    Read and understand the following <sample> texts! Then, read and understand the provided 
-    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
-    based on the provided responses.
-    Then, calculate the standard deviation of similarity between the texts, providing a 
-    score from 0 (virtually identical) to 6 (no commonalities), along with a short justification 
-    explaining the reasoning behind the chosen score. The output should be a JSON string in the 
-    format {'std': <int>, 'reasoning': '<justification>'}.
+    Objective is to derrive a semantic standard deviation between 0 and 6 of the 
+    provided RESPONSE SAMPLE`s using the outlined stratey. The reader intends to understand 
+    the degree of variation or similarity between the provided responses.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Using the provided RESPONSE SAMPLE`s, calculate a standard deviation score between 0 and 6 to 
-    reflect the degree of similarity or variance. Include a brief justification for the score, 
-    explaining how much the responses have in common or differ. The output should be in the 
-    format: {'std': <int>, 'reasoning': '<justification_str>'}.
+    1. Read and understand provided RESPONSE SAMPLE`s! 
+    2. Then, read and understand the provided prompts or, (if no prompt was provided), 
+    re-construct the prompt or problem statement based on the provided responses.
+    3. Derrive the semantic std along with a brief justification for the score, 
+    The output must be in the JSON format: {'std': <int>, 'reasoning': '<justification_str>'}.

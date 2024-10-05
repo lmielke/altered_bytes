@@ -92,8 +92,8 @@ class Response:
     def __call__(self, *args, **kwargs):
         return self.extract(self.validate(*args, **kwargs), *args, **kwargs)
 
-    def extract(self, r:dict, *args, repeats:int=1, strat_templates:str=None, **kwargs) -> dict:
-        strat_templates = [default_aggreg] if repeats != 1 and strat_templates is None else strat_templates
+    def extract(self, r:dict, *args, repeats:int=sts.repeats, strat_templates:str=None, **kwargs) -> dict:
+        print(f"{Fore.RED}{strat_templates = }{Fore.RESET}")
         # r comes as a dictionary with 'results' containing a list of dictionaries
         if not r.get('responses') or type(r.get('responses')) != list:
             raise ValueError(f"Error: No valid responses returned from the AI model.")
@@ -106,7 +106,7 @@ class Response:
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
             if result.get('strat_template') is not None:
-                if strat_templates[0] == result.get('strat_template'):
+                if repeats['agg'] == result.get('strat_template'):
                     record.update(result)
                     break
         else:
