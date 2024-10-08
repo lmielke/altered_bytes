@@ -18,6 +18,8 @@ io_dir = os.path.join(resources_dir, io_dir_name)
 test_dir = os.path.join(package_dir, "test")
 test_data_dir = os.path.join(test_dir, "data")
 
+logs_dir = os.path.join(resources_dir, "logs")
+
 time_strf = "%Y-%m-%d_%H-%M-%S-%f"
 time_stamp = lambda: dt.now().strftime(time_strf)
 # name of table data when stored to disk

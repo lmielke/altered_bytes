@@ -139,7 +139,7 @@ defaults:
     server: while-ai_0
   # altered_bytes default server for generate responses
   get_generates:
-    model: llama3.2
+    model: llama3.1:70b
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:

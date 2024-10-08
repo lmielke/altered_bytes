@@ -19,6 +19,8 @@ pandas = "*"
 beautifulsoup4 = "*"
 playwright = "*"
 openai = "*"
+pywin32 = "*"
+pynput = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

@@ -7,7 +7,7 @@ user_prompt: How do I monitor my GPUs performance?
 
 # meta: {"name": "alias", "type": "string", "default": "", "example": "l3:8b_1"}
 # alias is the model (l3:8b) _ server (1) combination to be used to connect to the model
-alias: l3.2_1
+alias: null
 
 # meta: {"name": "num_predict", "type": "string", "default": "", "example": 100}
 # num_predict is the max number of tokens to be generated for the response

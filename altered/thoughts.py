@@ -39,7 +39,6 @@ class Chat:
         self.response = Response(*args, **kwargs)
         # Data represents the chat data structure, where each line is a chat element
         self.data = Data(*args, name=self.name, **kwargs)
-        print(f"{Fore.GREEN}{Style.BRIGHT}Chat.__init__.show {kwargs = }{Style.RESET_ALL}")
         self.data.show(verbose=2)
 
     def run(self, *args, **kwargs):

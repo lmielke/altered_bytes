@@ -6,6 +6,10 @@ Here you find all available context information possibly relevant for this promp
 {% include "i_context_chat_history.md" ignore missing %}
 {%- endif %}
 
+{%- if context.activities is not none and context.activities %}
+{% include "i_context_activities.md" ignore missing %}
+{%- endif %}
+
 {%- if context.search_results is not none and context.search_results %}
 {% include "search_results.md" ignore missing %}
 {%- endif %}

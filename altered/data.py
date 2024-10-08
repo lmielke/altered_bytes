@@ -26,8 +26,6 @@ class Data:
         self.load_from_disk(*args, **kwargs)
         self.create_table(*args, **kwargs)
         self.add_init_record(*args, **kwargs)
-        print(f"{Fore.YELLOW}{Style.BRIGHT}Data.__init__.show: {name = }, {kwargs = }{Style.RESET_ALL}")
-        self.show(verbose=2)
 
     def load_fields(self, *args, fields_paths: list = None, 
                     u_fields_paths: list = None, **kwargs):

@@ -1,0 +1,166 @@
+content,prompt,role,source,model,name,category,sub_category,timestamp
+,,user,,,ut_chat,,,2024-10-05 18:34:46.352980
+How do I monitor my GPUs performance?,"
+[34m# Prompt for ut_chat[39m
+This is a LLM (Large Language Model) prompt, asking the LLM to answer a given quesiton, or to solve a problem. 
+The LLM prompt consists of 3 blocks.
+1. Context Information '<[44mcontext[0m>': Relevant available information for you to better understand the problem.
+2. User Prompt '<[43muser_prompt[0m>': The recent user Question or Instruction.
+3. Instructions '<[46mINST[0m>': __Master instructions__ for the _LLM_ to follow right now.
+
+<[44mcontext[0m>
+
+[34m# 1. Context Information[39m
+Here you find all available context information possibly relevant for this prompt.
+</[44mcontext[0m>
+
+<[43muser_prompt[0m>
+
+[34m# 2. User Prompt[39m
+How do I monitor my GPUs performance?
+
+</[43muser_prompt[0m>
+
+<[46mINST[0m>
+
+[34m# 3. Instructions (INST)[39m
+
+[34m## Description: Simple Answer[39m
+You were provided with a '<[43muser_prompt[0m>' or question in the text above.  Use all available sources of information from <[44mcontext[0m> and <[43muser_prompt[0m> to  prepare a high quality response.
+
+[34m## Example[39m
+None
+
+[34m## Objective[39m
+The '<[43muser_prompt[0m>' must be answered or the user problem be solved.
+
+[34m## Response Data and Format[39m
+
+### Default Response Layout:
+The requested response format is MARKDOWN text, like shown below:
+
+```markdown
+[34m# Answer[39m
+Your strait to the point answer here without comments or conversational text.
+```
+
+[34m## Your Task[39m
+Answer the '<[43muser_prompt[0m>' directly! 
+
+Do not make any conversational comments!
+Do not repeat any text or tags provided in this prompt!
+Do not explain your reasoning unless specifically asked for!
+</[46mINST[0m>
+",user,None,llama3.1:70b,ut_chat,None,None,2024-10-05 18:35:48.040461
+"# Answer
+```json
+{
+  ""std"": 1,
+  ""reasoning"": ""The texts are virtually identical in topic and context, but differ slightly in wording.""
+}
+```
+This score indicates that the responses share a common theme and provide similar information, with minor variations in phrasing.","[33mStrategy Prompt[0m using agg_std:
+
+[34m# 3. Instructions (INST)[39m
+
+[34m## Description: Std Aggregation[39m
+This strategy calculates the standard deviation of similarity between a given <[46msample[0m>  of texts or answers. The goal is to measure the degree of variance between the texts,  ranging from identical (low variance) to highly divergent (high variance).  The output is a JSON string that provides a standard deviation score from 0 (virtually identical) to 6 (no commonalities), along with a short justification  for the score. Here is a more detailed explanation of the various std scores:
+ 0: The texts are virtually identical.
+ 1: The texts are virtually identical in topic and context, but differ in wording.
+ 2: The texts handle the same topic, but show minor variations in context and signifficant variations in wording.
+ 3: The texts handle the same topic, but show signifficant variations in both, context and wording.
+ 4. The texts show signifficant variations in context and wording. Also at least one text is completely off topic.
+ 5. The texts are partially related however, there is multiple texts that talk about different topics.
+ 6. The texts are completely unrelated.
+
+
+[34m## Example[39m
+Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.
+  - ""Response 1: The quick brown fox jumps over the lazy dog.""
+  - ""Response 2: A fox swiftly leaps over a sleeping dog with grace and speed.""
+  - ""Response 3: The nimble fox hops over a lethargic dog.""
+Expected Output:
+ ```JSON
+  {
+    'std': 2, 
+    'reasoning': 'The texts are similar in describing the same action but differ signifficantly in wording and emphasis on the dog condition.'
+  }
+```
+  In this case, the responses share a common theme but vary in their descriptions, 
+  leading to a relatively small variance score of 2.
+
+[34m## Objective[39m
+Objective is to derrive a semantic standard deviation between 0 and 6 of the  provided RESPONSE SAMPLE`s using the outlined stratey. The reader intends to understand  the degree of variation or similarity between the provided responses.
+
+[34m## Answers to a single prompt:[39m
+Below is the sample of 3 different texts, intending to answer the same single prompt.
+
+### Input Data
+<!-- <[46msample[0m> -->
+
+Original Prompt for all Samples:
+
+[34m# 1. Prompt Summary[39m
+[34m## Original Question/Problem Statement[39m
+How do I monitor my GPUs performance?
+
+[34m## Original Objective[39m
+The question must be answered or the user problem be solved.
+Answer the question directly! 
+
+Samples of Provided Answers to the Original Prompt:
+
+__[2m[37mRESPONSE SAMPLE[0m[0m 1__
+[34m# Answer[39m
+To monitor your GPU's performance, you can use tools such as:
+* NVIDIA GeForce Experience (for NVIDIA GPUs)
+* AMD Radeon Software (for AMD GPUs)
+* GPU-Z (a free tool that supports both NVIDIA and AMD GPUs)
+* HWiNFO (a free tool that provides detailed information about your system's hardware, including the GPU)
+* Linux command-line tools like `nvidia-smi` (for NVIDIA GPUs) or `radeontop` (for AMD GPUs)
+
+These tools can provide you with real-time monitoring of your GPU's performance, temperature, and other metrics.
+
+__[2m[37mRESPONSE SAMPLE[0m[0m 2__
+[34m# Answer[39m
+To monitor your GPU's performance, you can use tools such as:
+* NVIDIA GeForce Experience (for NVIDIA GPUs)
+* AMD Radeon Settings (for AMD GPUs)
+* GPU-Z (a free tool that supports both NVIDIA and AMD GPUs)
+* HWiNFO (a system monitoring tool that also provides GPU information)
+
+These tools provide real-time monitoring of your GPU's temperature, usage, memory usage, and other performance metrics.
+
+__[2m[37mRESPONSE SAMPLE[0m[0m 3__
+[34m# Answer[39m
+You can monitor your GPU's performance using tools such as:
+* NVIDIA GeForce Experience (for NVIDIA GPUs)
+* AMD Radeon Software (for AMD GPUs)
+* GPU-Z (a free, standalone tool that supports both NVIDIA and AMD GPUs)
+* Linux command-line tools like `nvidia-smi` or `aticonfig`
+These tools can provide information on GPU usage, temperature, memory usage, and more.
+
+<!-- </[46msample[0m> -->
+
+[34m## Response Data and Format[39m
+
+### Default Response Layout:
+The requested response format is MARKDOWN text, like shown below:
+
+```markdown
+[34m# Answer[39m
+Your strait to the point answer here without comments or conversational text.
+```
+
+[34m## Your Task[39m
+1. Read and understand provided RESPONSE SAMPLE`s!  2. Then, read and understand the provided prompts or, (if no prompt was provided),  re-construct the prompt or problem statement based on the provided responses. 3. Derrive the semantic std along with a brief justification for the score,  The output must be in JSON format:
+ ```JSON
+  {
+    'std': <int>, 
+    'reasoning': '<justification_str>'
+  }
+```
+
+Do not make any conversational comments!
+Do not repeat any text or tags provided in this prompt!
+Do not explain your reasoning unless specifically asked for!",assistant,None,llama3.1:70b,ut_chat,None,None,2024-10-05 18:35:48.040461

@@ -53,8 +53,6 @@ class VecDB(Data):
         # self.vectors = self.load_vector_data(*args, **kwargs)
         if self.vectors is None:
             self.setup_storage(*args, **kwargs)
-        print(f"{Fore.BLUE}VecDB.__init__.show: {kwargs = }{Fore.RESET}")
-        self.show(verbose=2)
 
     def load_vec_fields(self, *args, fields_paths:list=None, u_fields_paths:list=[], **kwargs):
         """
