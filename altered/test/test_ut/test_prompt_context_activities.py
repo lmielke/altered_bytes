@@ -2,15 +2,16 @@
 test_prompt_context_activities.py
 """
 
-
 import os, json
 import unittest
+from unittest.mock import patch
 from colorama import Fore, Style
 # test package imports
 import altered.settings as sts
 from altered.renderer import Render
 import altered.hlp_printing as hlpp
 from altered.prompt_context_activities import ContextActivities
+
 
 class Test_ContextActivities(unittest.TestCase):
 
@@ -90,6 +91,14 @@ class Test_ContextActivities(unittest.TestCase):
                                             verbose=self.verbose,
                                             )
         hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
+
+
+    def test_load_git_diffs_unmocked(self):
+        # Initialize the ContextActivities instance
+        context_activities = ContextActivities()
+
+        # Call load_git_diffs with 2 changes
+        context_activities.load_git_diffs(num_changes=2)
 
 if __name__ == "__main__":
     unittest.main()

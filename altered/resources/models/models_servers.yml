@@ -135,11 +135,11 @@ servers:
 defaults:
   # default ollama server that comes with ollama
   generate:
-    model: llama3.1:70b
+    model: llama3.2
     server: while-ai_0
   # altered_bytes default server for generate responses
   get_generates:
-    model: llama3.1:70b
+    model: llama3.2
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:

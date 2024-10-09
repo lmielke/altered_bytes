@@ -1,10 +1,12 @@
 """
-prompt.py
-
+prompt_context.py
+This is the last change I made.
 """
 from altered.prompt_context_search import ContextSearch
 from altered.prompt_context_activities import ContextActivities
+from altered.prompt_context_os_system import ContextOsSystem
 from colorama import Fore, Style
+
 
 class Context:
 
@@ -12,6 +14,7 @@ class Context:
         self.context = context
         self.se = ContextSearch(*args, name=name, **kwargs)
         self.ca = ContextActivities(*args, **kwargs)
+        self.os = ContextOsSystem(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
         self.prep_data(*args, **kwargs)
@@ -21,6 +24,7 @@ class Context:
         self.context['chat_history'] = self.get_history(*args, **kwargs)
         self.context['init_prompt'] = self.get_init_prompt(*args, **kwargs)
         self.context.update(self.se.get_search_results(*args, **kwargs))
+        self.context.update(self.os.mk_context(*args, **kwargs))
         if num_activities:
             self.context.update(self.ca.get_activities_results(*args, 
                                                     num_activities=num_activities, **kwargs))

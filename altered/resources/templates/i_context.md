@@ -1,6 +1,11 @@
 {%- if context %}
 
 # 1. Context Information
+
+{%- if context.os_infos is not none and context.os_infos %}
+{% include "i_context_os_system.md" ignore missing %}
+{%- endif %}
+
 Here you find all available context information possibly relevant for this prompt.
 {%- if context.chat_history %}
 {% include "i_context_chat_history.md" ignore missing %}

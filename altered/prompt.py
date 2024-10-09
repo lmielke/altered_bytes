@@ -104,7 +104,7 @@ class Response:
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):
             if result.get('strat_template') is not None:
-                if result.get('strat_template') == 'agg_std':#repeats['agg']:
+                if result.get('strat_template') == repeats['agg']:
                     record.update(result)
                     break
         else:

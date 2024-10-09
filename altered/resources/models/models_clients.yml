@@ -1,0 +1,12 @@
+# models.clients.yml
+while-ai-2:
+  psversiontable:
+    PSVersion: 7.2.23
+    PSEdition: Core
+    GitCommitId: 7.2.23
+    OS: Microsoft Windows 10.0.19045
+    Platform: Win32NT
+    PSCompatibleVersions: {1.0, 2.0, 3.0, 4.0}
+    PSRemotingProtocolVersion: 2.3
+    SerializationVersion: 1.1.0.1
+    WSManStackVersion: 3.0
