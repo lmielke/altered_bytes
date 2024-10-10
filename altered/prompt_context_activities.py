@@ -17,6 +17,7 @@ class ContextActivities:
     template_name = 'i_context_activities.md'
     logs_dir = sts.logs_dir
     log_name = 'activity_log'
+    trigger = 'activities'
 
     def __init__(self, *args, log_file_path:str=None, **kwargs):
         """
@@ -54,10 +55,11 @@ class ContextActivities:
         else:
             self.context['activities'] = []
 
-    def get_activities_results(self, *args, num_activities:int=5, **kwargs):
+    def get_activities_results(self, *args, num_activities:int=5, activities:bool=False, **kwargs):
         """
         Retrieve the most recent 'num_activities' activities.
         """
+        if not activities: return {}
         return { 
                 'activities': self.context['activities'][-num_activities:],
                 'ps_history': self.context['ps_history'][-num_activities*2:],

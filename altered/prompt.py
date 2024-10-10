@@ -8,6 +8,7 @@ from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
 from altered.model_connect import SingleModelConnect
+from altered.promt_stats import PromptStats
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
@@ -24,6 +25,7 @@ class Prompt:
         self.C = Context(name, *args, **kwargs)
         self.I = Instructions(name, *args, **kwargs)
         self.RD = Render(*args, **kwargs)
+        self.stats = PromptStats(*args, **kwargs)
         self.data = None
         self.warnings = {}
 
@@ -43,6 +45,7 @@ class Prompt:
                             'context': self.get_context(*args, **kwargs),
                             'instructs': self.get_instructs(*args, **kwargs),
                         }
+        self.stats.get_stats(*args, data_dict=self.context, **kwargs)
 
     def render_prompt(self, *args, context:dict=None, template_name:str=None, _context:dict=None, **kwargs):
         context = _context if _context is not None else self.context

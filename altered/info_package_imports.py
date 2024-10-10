@@ -192,7 +192,10 @@ class PackageInfo:
             graph_filepath = os.path.join(sts.logs_dir, "Digraph.gv")
             graph.render(filename=graph_filepath, format="pdf")
             graph.view()
-        return dot_source
+        return {
+                'digraph': dot_source,
+                'root_file_name': f"'{root_file_name}'",
+                }
 
 
 def set_params(*args, **kwargs):

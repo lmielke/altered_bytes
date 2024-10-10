@@ -43,6 +43,10 @@ class Test_Prompt(unittest.TestCase):
                     #                     {'source': 'https://www.python.org/some_topic', 'content': 'Python list comprehensions'},
                     # ],
                     'num_activities': 3,
+                    'activities': True,
+                    'sys_info': True,
+                    'package_infos': True,
+                    'root_file_name': 'prompt_instructs.py',
                     'chat_history': [
                             {'role': 'user', 'content': 'Hello, how can you help me today?'},
                             {'role': 'assistant', 'content': 'Id be happy to assist you. What kind of help do you need?'},
