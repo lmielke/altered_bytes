@@ -41,8 +41,8 @@ class ContextPackageData:
         """
         Load installed packages using Pipenv.
         """
-        with open(os.path.join(sts.project_dir, 'Pipfile'), 'rb') as pipfile:
-            return tomllib.load(pipfile)
+        with open(os.path.join(sts.project_dir, 'Pipfile'), 'rb') as f:
+            return f.read()
 
     def load_from_pip(self, *args, **kwargs) -> dict:
         """

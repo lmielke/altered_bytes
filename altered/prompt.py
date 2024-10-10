@@ -35,7 +35,6 @@ class Prompt:
         self.data = self.render_prompt(*args, **kwargs)
         return self
 
-
     def mk_prompt(self, *args, **kwargs):
         """
         Constructs the final prompt as to be send to the AI model.
@@ -45,7 +44,7 @@ class Prompt:
                             'context': self.get_context(*args, **kwargs),
                             'instructs': self.get_instructs(*args, **kwargs),
                         }
-        self.stats.get_stats(*args, data_dict=self.context, **kwargs)
+        print(self.stats(2, *args, data_dict=self.context, **kwargs))
 
     def render_prompt(self, *args, context:dict=None, template_name:str=None, _context:dict=None, **kwargs):
         context = _context if _context is not None else self.context
