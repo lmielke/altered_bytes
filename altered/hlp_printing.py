@@ -38,6 +38,7 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     # we color markdown headers level 1 and 2 ('# Some Text' and '## Some Text') with BLUE
     p = re.sub(r'^# (.+)$', f"{Fore.BLUE}# \\1{Fore.RESET}", p, flags=re.MULTILINE)
     p = re.sub(r'^## (.+)$', f"{Fore.BLUE}## \\1{Fore.RESET}", p, flags=re.MULTILINE)
+    p = re.sub(r'^```(\w+)?$', f"{Fore.MAGENTA}``` \\1{Fore.RESET}", p, flags=re.MULTILINE)
     if verbose >= 2:
         print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")
     return p

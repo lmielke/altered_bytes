@@ -1,5 +1,4 @@
 # OS System Infos
-
 The following section shows the USER's Operating System and System Information.
 
 ## Operating System
@@ -16,9 +15,9 @@ The following section shows the USER's Operating System and System Information.
 **Disk Size**: {{ context.os_infos.disk_size }}
 
 ## GPU(s)
-{% for key, value in context.os_infos.gpu_info.items() %}
+{%- for key, value in context.os_infos.gpu_info.items() %}
 **{{ key }}**: {{ value }}
-{% endfor %}
+{%- endfor %}
 
 ## Network
 **Hostname**: {{ context.os_infos.hostname }}
@@ -34,3 +33,4 @@ The following section shows the USER's Operating System and System Information.
 **PS Remoting Protocol Version**: {{ context.os_infos.psversiontable.PSRemotingProtocolVersion }}
 **Serialization Version**: {{ context.os_infos.psversiontable.SerializationVersion }}
 **WSMan Stack Version**: {{ context.os_infos.psversiontable.WSManStackVersion }}
+

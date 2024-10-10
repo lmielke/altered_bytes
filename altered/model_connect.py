@@ -151,10 +151,10 @@ class ModelConnect:
                                             **kwargs, )
         url, server = msts.config.get_url(*args, **kwargs), model_params.get('server')
         if verbose:
-            print(      f"{Fore.MAGENTA}ModelConnect.post: "
+            print(      f"{Fore.MAGENTA}ModelConnect.post: {Fore.RESET}"
                         f"{url}, {context['model']}, {server = }, "
                         f"{context.get('repeats', 'no repeats for embeddings')}, "
-                        f"{len(context['prompts']) = }{Fore.RESET}"
+                        f"{len(context['prompts']) = }"
                         )
         elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')

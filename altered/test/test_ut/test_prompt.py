@@ -47,6 +47,7 @@ class Test_Prompt(unittest.TestCase):
                     'sys_info': True,
                     'package_infos': True,
                     'root_file_name': 'prompt_instructs.py',
+                    'file_match_regex': 'settings.*',
                     'chat_history': [
                             {'role': 'user', 'content': 'Hello, how can you help me today?'},
                             {'role': 'assistant', 'content': 'Id be happy to assist you. What kind of help do you need?'},

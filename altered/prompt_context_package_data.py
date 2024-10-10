@@ -22,8 +22,12 @@ class ContextPackageData:
         self.tree = Tree(*args, **kwargs)
 
     def get_package_data(self, *args, **kwargs) -> dict:
-        package_data = self.pg_data.analyze_package_imports(*args, show=False, **kwargs)
-        return package_data
+        pg_data = self.pg_data.analyze_package_imports(*args, show=False, **kwargs)
+        if pg_data.get('digraph'):
+            pg_data['digraph'] = '\n'.join([line.split('[')[0] for line in 
+                    pg_data.get('digraph', '').split('\n') if 'fillcolor' not in line])
+
+        return pg_data
 
     def get_requirements(self, *args, pg_manager:str='pipenv', **kwargs) -> dict:
         """

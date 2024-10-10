@@ -7,9 +7,9 @@ import altered.settings as sts
 
 class Tree:
     default_ignores = {'.git', 'altered.egg-info', 'build', '__pycache__', 'logs'}
+    file_types = {'.py': 'Python', '.yml': 'YAML', '.md': 'Markdown', '.txt': 'Text'}
 
-    def __init__(self, *args, style=None, ignores: list = None, file_match_regex: str = None, 
-        **kwargs):
+    def __init__(self, *args, style=None, ignores:list=None, **kwargs):
         """
         Initialize the Tree object with custom symbols and optional file matching regex.
 
@@ -20,7 +20,6 @@ class Tree:
         """
         self.indent = "    "
         self.ignores = set(ignores) if ignores is not None else self.default_ignores
-        self.file_match_regex = file_match_regex
         self.matched_files: Set[str] = set()
         self.disc_sym = "    | ..."  # Symbol indicating skipped directories
 
@@ -42,7 +41,7 @@ class Tree:
             return f"{indent_level}|-- {subdir}/\n{indent_level}{self.disc_sym}\n"
         return ""
 
-    def find_match(self, root: str, file: str):
+    def find_match(self, root: str, file: str, file_match_regex:str, *args, **kwargs):
         """
         Check if a file matches the provided regex and, if so, add it to matched files.
 
@@ -50,10 +49,10 @@ class Tree:
             root (str): The path to the current directory.
             file (str): The name of the file to check.
         """
-        if self.file_match_regex and re.search(self.file_match_regex, file):
+        if file_match_regex and re.search(file_match_regex, file):
             self.matched_files.add(os.path.join(root, file))
 
-    def mk_tree(self, *args, project_dir:str=sts.project_dir, max_depth:int=2, **kwargs) -> str:
+    def mk_tree(self, *args, project_dir:str=sts.project_dir, max_depth:int=2, file_match_regex:str=None, **kwargs) -> str:
         """
         Generate an uncolorized string representation of the directory tree and collect
         matched files.
@@ -85,11 +84,10 @@ class Tree:
 
             # Add directory to the tree
             tree_structure += f"{indent_level}|-- {subdir}/\n"
-
             for file in files:
                 tree_structure += f"{indent_level}{self.indent}|-- {file}\n"
-                self.find_match(root, file)
-
+                if file_match_regex:
+                    self.find_match(root, file, file_match_regex, *args, **kwargs)
         return tree_structure
 
     def __call__(self, *args, **kwargs):
@@ -105,10 +103,25 @@ class Tree:
             dict: A dictionary with 'tree' and 'file_matches' keys.
         """
         tree_output = self.mk_tree(*args, **kwargs)
+        selected_files = self.load_matched_files(*args, **kwargs)
         return {
             'tree': tree_output,
-            'file_matches': self.matched_files
+            'file_matches': self.matched_files,
+            'selected_files': selected_files,
         }
+
+    def load_matched_files(self, *args, **kwargs):
+        selected_files = []
+        for file_path in self.matched_files:
+            with open(file_path, 'r') as file:
+                selected_files.append(
+                        {
+                            'file_path': file_path,
+                            'file_type': self.file_types.get(os.path.splitext(file_path)[1]),
+                            'file_content': file.read(), 
+                        }
+                                        )
+        return selected_files
 
     def parse_tree(self, tree: str, *args, **kwargs):
         """

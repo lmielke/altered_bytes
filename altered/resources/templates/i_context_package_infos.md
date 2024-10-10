@@ -1,5 +1,4 @@
 # Package Data
-
 The following section shows package information to be used.
 
 ## Package Import Structure starting at {{ context.package_infos.root_file_name }}
@@ -16,3 +15,15 @@ The following section shows package information to be used.
 ```text
 {{ context.package_infos.tree }}
 ```
+
+{% if context.package_infos.selected_files %}
+## Selected Files
+{% for file in context.package_infos.selected_files %}
+### File {{ loop.index }}:  {{ file.file_path }}
+```{{ file.file_type }}
+
+{{ file.file_content }}
+
+```
+{% endfor %}
+{% endif %}

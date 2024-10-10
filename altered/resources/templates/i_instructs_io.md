@@ -4,7 +4,7 @@ The following '{{ instructs.io.fmt.upper() }}' template answers a simple 'Hi, wh
 
 ```{{ instructs.io.fmt.lower() }}
 
-{{ instructs.io.method.body }}
+{{ instructs.io.io_method.body }}
 ```
 
 Respond with a '{{ instructs.io.fmt.upper() }}' string containing all entries shown in the Response Layout.

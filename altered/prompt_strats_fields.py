@@ -8,14 +8,14 @@ from jinja2 import Environment, FileSystemLoader, Template, nodes
 import altered.settings as sts
 
 template_path = os.path.join(sts.templates_dir, 'i_instructs_strats.md')
-tech_fields = {'s_meth', 's_type', 'method'}
+tech_fields = {'s_meth', 's_type', 'strats_method'}
 
 @dataclass
 class StrategyFields:
     # technical fields
     s_meth: str
     s_type: str
-    method: Dict[str, Any] = field(default_factory=dict)
+    strats_method: Dict[str, Any] = field(default_factory=dict)
     # strats .yml fields
     name: str = None
     description: str = None

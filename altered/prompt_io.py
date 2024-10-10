@@ -39,7 +39,7 @@ class Io:
 
     def load_io(self, *args, fmt='markdown', **kwargs):
         loader = YmlParser(*args, fields_paths=[self.template_path], **kwargs)
-        self.fields.method = {
+        self.fields.io_method = {
             'body': loader.describe(fmt=fmt),
             'meta': loader.fields.get('meta'),
         }

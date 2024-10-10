@@ -8,14 +8,14 @@ from jinja2 import Environment, FileSystemLoader, Template, nodes
 import altered.settings as sts
 
 template_path = os.path.join(sts.templates_dir, 'i_instructs_io.md')
-tech_fields = {'io_meth', 'io_type', 'method'}
+tech_fields = {'io_meth', 'io_type', 'io_method'}
 
 @dataclass
 class IoFields:
     # technical fields
     io_meth: str
     io_type: str
-    method: Dict[str, Any] = field(default_factory=dict)
+    io_method: Dict[str, Any] = field(default_factory=dict)
     # dynamic fields
     fmt: str = 'markdown'
     fmt_comment: Optional[str] = None
