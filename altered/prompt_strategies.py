@@ -66,32 +66,31 @@ class Agg(Strategy):
         self.fields.check_values(*args, **kwargs)
         return strat
 
-    def mk_prompt_agg_instruct(self, *args, **kwargs) -> dict:
-        num_responses = len(kwargs['responses'])
+    def mk_prompt_agg_instruct(self, *args, responses:List[str], **kwargs) -> dict:
         self.fields.inputs_tag = self.inputs_tag
         self.fields.inputs_intro = (
-            f"Below is the {self.inputs_tag} of {num_responses} different texts, "
+            f"Below is the {self.inputs_tag} of {len(responses)} different texts, "
         )
         
         if not kwargs.get('prompts'):
             self.fields.inputs_intro += (
                 f"that need to be aggregated. "
-                f"Note, that there is no prompt associated with these responses. "
-                f"Therefore you have to infer the prompt from other information, "
+                f"Note, that there is no 'prompt' associated with these responses. "
+                f"Therefore you have to infer the 'prompt' from other information, "
                 f"i.e. the responses, name or search query."
             )
             self.fields.inputs_header = f"Texts to aggregate:"
-            self.fields.inputs_data = self.mk_sample_no_prompt(*args, **kwargs)
+            self.fields.inputs_data = self.mk_sample_no_prompt(*args, responses=responses, **kwargs)
         elif len(kwargs['prompts']) == 1:
             self.fields.inputs_header = f"Answers to a single prompt:"
             self.fields.inputs_intro += f"intending to answer the same single prompt."
-            self.fields.inputs_data = self.mk_sample_single_prompt(*args, **kwargs)
+            self.fields.inputs_data = self.mk_sample_single_prompt(*args, responses=responses, **kwargs)
         elif len(kwargs['prompts']) > 1:
             self.fields.inputs_header = f"Answers and prompts:"
             self.fields.inputs_intro += f"intending to answer {len(kwargs['prompts'])} prompts."
-            self.fields.inputs_data = self.mk_sample_multi_prompt(*args, **kwargs)
+            self.fields.inputs_data = self.mk_sample_multi_prompt(*args, responses=responses, **kwargs)
         else:
-            self.fields.inputs_data = self.mk_sample_no_prompt(*args, **kwargs)
+            self.fields.inputs_data = self.mk_sample_no_prompt(*args, responses=responses, **kwargs)
         
         return self.fields.__dict__
 

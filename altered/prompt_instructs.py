@@ -70,7 +70,6 @@ class Instructions:
         return user_prompt
 
     def check_context(self, s_names:dict, user_prompt_context:dict, *args, **kwargs):
-        print(f"{Fore.YELLOW}{s_names = }, {user_prompt_context = }{Fore.RESET}")
         if s_names.get('strat').get('method') == 'default' and \
                                             user_prompt_context.get('user_prompt') is None:
             msg = f"{Fore.RED}ERROR:{Fore.RESET} default strat requires a user_prompt"

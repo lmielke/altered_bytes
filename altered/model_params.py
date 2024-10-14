@@ -23,6 +23,7 @@ class ModelParams:
         self.servers = self.config.get('servers', {})
         self.models = self.config.get('models', {})
         self.defaults = self.config.get('defaults', {})
+        self.overwrites = self.config.get('overwrites', {})
         self.last_update = dt.now().strftime('%Y-%m-%d')
         self.api_key = self.get_api_key(*args, **kwargs)
         self.services = self.get_services(*args, **kwargs)

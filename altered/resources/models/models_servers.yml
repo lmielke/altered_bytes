@@ -133,6 +133,7 @@ servers:
     - llama3.1
     - dolphin-llama3.1
 defaults:
+  # defaults kick in if no parameter was supplied
   # default ollama server that comes with ollama
   generate:
     model: llama3.2
@@ -152,3 +153,8 @@ services:
   google_se:
     url: https://www.googleapis.com/customsearch/v1
     key_path: os.environ.get('secrets')/9_secrets/google_search_engine/se_keys.yml
+overwrites:
+  # overwrites will take precedence over defaults and parameters
+  get_embeddings:
+    model: llama3.1
+    server: while-ai_1

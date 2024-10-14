@@ -1,10 +1,11 @@
 # strats_sum_part.yml
 
-git_commit_msg_prompt: >
+sum_part: >
         Summarize above <context> Text to be summarized </context> in less than 50 words!
+        The text should inform an un-informed user, in simple easy to understand sentences.
         Respond in json format.
         Below you see an Example to be used as a template:
-                {"commit_msg": "# Modifications\n
+                {"summary": "# Modifications\n
                                 ## Message Formatting\n
                                 - Modified ...
                                 - New paramter ...

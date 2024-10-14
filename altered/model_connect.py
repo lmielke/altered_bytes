@@ -6,7 +6,7 @@ import altered.settings as sts
 from typing import Dict, Union, Tuple
 from openai import OpenAI
 import json, re, requests, time
-from colorama import Fore, Style
+from colorama import Fore, Style, Back
 import random as rd
 import math
 from datetime import datetime as dt
@@ -32,13 +32,17 @@ class ModelConnect:
                         'server_time': 0.0,
                         'total_time': 0.0,
                         }
-        self.columns = ['network_up_time', 'server_time', 'network_down_time', 'total_time',
-                        'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_prompt',
-                        'num_ctx_response', 'server', 'model']
-        self.times_df = pd.DataFrame(columns=self.columns)
+        self.columns = [
+            'network_up_time', 'server_time', 'network_down_time', 'total_time',
+            'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_prompt',
+            'num_ctx_response', 'server', 'model'
+        ]
+        # Create an initial DataFrame with one row filled with None values and an index of [0]
+        self.times_df = pd.DataFrame([{col: None for col in self.columns}], index=[0])
 
     @staticmethod
-    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1) -> float:
+    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1
+        ) -> float:
         if temp is not None:
             return temp
         bias = math.log(scale, 1000)
@@ -48,7 +52,8 @@ class ModelConnect:
         print(f"{Fore.YELLOW}Warning: {Fore.RESET}temp: {rd_temp:.2f}, {bias = }, {scale = }")
         return rd_temp
 
-    def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs) -> int:
+    def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs
+        ) -> int:
         # we estimate the context length based on the messages length
         # num_ctx will be get_num_ctx for the longest message in messages
         num_ctx = max(max([len(msg) // 3 for msg in messages]), self.min_context_len)
@@ -76,8 +81,8 @@ class ModelConnect:
         ) -> dict:
         # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
         if service_endpoint in ['get_embeddings', 'get_generates']:
-            # for embeddings and generate[s]! messages is a list, to allow for multiple messages to be embedded
-            # with a single server call
+            # for embeddings and generate[s]! messages is a list, to allow for 
+            # multiple messages to be embedded with a single server call
             msg = ( 
                     f"{Fore.YELLOW}WARNING{Fore.RESET}: "
                     f"Expected messages to be a list, "
@@ -163,7 +168,7 @@ class ModelConnect:
         if verbose:
             print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r['num_results'] = }")
         r['model'], r['server'] = model_params.get('model_file').get('name'), server
-        self.get_stats(r, context, *args, **kwargs)
+        self.get_stats(r, context, *args, verbose=verbose, **kwargs)
         return r
 
     def _ollama(self, url, context: dict, *args, **kwargs, ) -> dict:
@@ -183,33 +188,34 @@ class ModelConnect:
             r_dict['num_results'] = len(r_dict['responses'])
         return r_dict
 
-    def get_stats(self, r, context, *args, context_length:int=2000, **kwargs) -> dict:
+    def get_stats(self, r, context, *args, context_length: int = 2000, verbose: int = 0, 
+        **kwargs) -> dict:
         """
-        we add the current model times  to the total times
-        we create a pandas dataframe containing all times for each call of get_stats
-        also we calculate and update the cumulative times at each call
+        We add the current model times to the total times.
+        We create a pandas dataframe containing all times for each call of get_stats.
+        Also, we calculate and update the cumulative times at each call.
         """
-        r['network_down_time'] = time.time() - (r['network_down_time'])
+        # Calculate network times
+        r['network_down_time'] = time.time() - r['network_down_time']
         time_delta = (r['network_down_time'] - r['network_up_time']) / 2
         r['network_up_time'] += time_delta
         r['network_down_time'] -= time_delta
         r['total_time'] = r['network_down_time'] + r['network_up_time'] + r['server_time']
-        for col in self.times:
-            self.times[col] += r.get(col)
-        # we append the times to self.times_df
-        r['time_stamp'] = dt.now()
+        # Prepare the new record for the current stats
         r['num_ctx_prompt'] = context['options']['num_ctx']
-        all_responses = [resp.get('response', []) for resp in r.get('responses')]
+        all_responses = [resp.get('response', []) for resp in r.get('responses', [])]
         r['num_ctx_response'] = self.get_context_length(all_responses, context_length)
-        # Convert the dictionary into a DataFrame and add it as a row
-        record_df = pd.DataFrame([{k: r[k] for k in self.columns}], columns=self.columns)
-        summary_df = pd.DataFrame([self.times], columns=self.columns)
-        # Use pd.concat to add the new row to the DataFrame
-        with warnings.catch_warnings():
-            warnings.simplefilter(action='ignore', category=FutureWarning)
-            self.times_df = pd.concat([self.times_df.iloc[:-1], record_df], ignore_index=True)
-            self.times_df = pd.concat([self.times_df, summary_df], ignore_index=True)
-        print(f"\n{Fore.CYAN}self.times_df:{Fore.RESET} \n{self.times_df}\n")
+        r['time_stamp'] = dt.now()
+        # Update the cumulative times
+        for col in self.times: self.times[col] += r.get(col, 0)
+        # Overwrite the last row (totals row) with the new record
+        self.times_df.iloc[-1] = {k: r.get(k, None) for k in self.columns}
+        # Update cumulative times row directly as the new last row
+        self.times_df.loc[len(self.times_df)] = {col: self.times.get(col, 0) 
+                                                                    for col in self.columns}
+        if verbose:
+            print(f"\n{Fore.MAGENTA}ModelConnect.get_stats:{Fore.RESET}")
+            hlpp.pretty_print_df(self.times_df, *args, sum_color=Fore.MAGENTA, **kwargs)
 
     def openAI(self, context: dict, *args, **kwargs) -> dict:
         """

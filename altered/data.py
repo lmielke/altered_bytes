@@ -93,8 +93,7 @@ class Data:
         self.add_new_categories(record)
         with warnings.catch_warnings():
             warnings.simplefilter(action='ignore', category=FutureWarning)
-            # Update the DataFrame in place using `loc`
-            self.ldf.loc[record_idx] = {k: v for k, v in record.items() if k != 'hash'}
+            self.ldf.loc[record_idx] = {k: v for k, v in record.items()}
 
     def add_new_categories(self, record: Dict[str, Any]) -> None:
         """

@@ -8,7 +8,7 @@
 
 
 <user_prompt>
-{% include "i_instructs_user_prompt.md" ignore missing %}
+{% include "i_user_prompt.md" ignore missing %}
 </user_prompt>
 
 

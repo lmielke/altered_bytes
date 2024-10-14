@@ -21,7 +21,6 @@ class CleanWebSearch(WebSearch):
     default_repeats = {'num': 1, 'agg': 'agg_mean'}
 
     def __init__(self, *args, **kwargs):
-        print(f"{Fore.MAGENTA}{Style.BRIGHT}CleanWebSearch {kwargs = }{Style.RESET_ALL}")
         super().__init__(*args, **kwargs)
         self.assi = SingleModelConnect(*args, **kwargs)
         self.alias = 'l3.2_0'
@@ -44,6 +43,7 @@ class CleanWebSearch(WebSearch):
                 self.r[-1]['short'] = ''
             else:
                 self.r[i]['short'] = clean.get('response').strip()
+            self.r[i]['source'] = self.r[i].get('link')
         return self.r
 
     def cleaning(self, *args, alias='l3:8b_1', **kwargs):
@@ -75,9 +75,4 @@ class CleanWebSearch(WebSearch):
                                                     'prompt_title': 'Clean Up Search Results',
                                                     },
                                         )
-        hlpp.pretty_prompt(rendered, *args, **kwargs)
-
-        # exit()
-
-
         return rendered

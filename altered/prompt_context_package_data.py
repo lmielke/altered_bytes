@@ -21,8 +21,13 @@ class ContextPackageData:
         self.pg_data = PackageInfo(*args, **kwargs)
         self.tree = Tree(*args, **kwargs)
 
-    def get_package_data(self, *args, **kwargs) -> dict:
-        pg_data = self.pg_data.analyze_package_imports(*args, show=False, **kwargs)
+    def get_package_data(self, *args, root_file_name:str=None, **kwargs) -> dict:
+        if root_file_name is None:
+            return {}
+        pg_data = self.pg_data.analyze_package_imports(*args, 
+                                                        root_file_name=root_file_name,
+                                                        show=False, **kwargs
+                    )
         if pg_data.get('digraph'):
             pg_data['digraph'] = '\n'.join([line.split('[')[0] for line in 
                     pg_data.get('digraph', '').split('\n') if 'fillcolor' not in line])
@@ -68,9 +73,9 @@ class ContextPackageData:
     def mk_context(self, *args, package_infos: bool = False, **kwargs):
         if not package_infos:
             return {}
-        self.context = {
-                            'package_infos': self.get_package_data(*args, **kwargs),
-        }
+        else:
+            self.context['package_infos'] = {}
+        self.context['package_infos'].update(self.get_package_data(*args, **kwargs))
         self.context['package_infos'].update(self.get_requirements(*args, **kwargs))
         self.context['package_infos'].update(self.tree(*args, **kwargs))
         return self.context

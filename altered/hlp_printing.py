@@ -39,8 +39,9 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     p = re.sub(r'^# (.+)$', f"{Fore.BLUE}# \\1{Fore.RESET}", p, flags=re.MULTILINE)
     p = re.sub(r'^## (.+)$', f"{Fore.BLUE}## \\1{Fore.RESET}", p, flags=re.MULTILINE)
     p = re.sub(r'^```(\w+)?$', f"{Fore.MAGENTA}``` \\1{Fore.RESET}", p, flags=re.MULTILINE)
+    p = re.sub(r'(.*)(https?://[^\s\'_\"]+)(.*)', f"\\1{Fore.MAGENTA}\\2{Fore.RESET}\\3", p)
     if verbose >= 2:
-        print(f"\n\n{Fore.CYAN}# pretty_prompt:{Fore.RESET} \n{p}")
+        print(f"\n\n{Fore.CYAN}-> hlp_printing.pretty_prompt:{Fore.RESET} \n{p}")
     return p
 
 def pretty_dict(name:str, d:dict, *args, **kwargs):
@@ -148,3 +149,19 @@ def unroll_print_dict(d:dict, unroll_key:str='prompts', *args, **kwargs):
                 print(f"{start}\t\t{Fore.MAGENTA}{i}{Fore.RESET}: {prompt[:150]}")
         else:
             print(f"\t{k = }: {vs}")
+
+def pretty_print_df(df, *args, color:object=Fore.MAGENTA, sum_color:object=None, **kwargs):
+    """
+    Takes a datafram and prints it in a colored pretty format
+    df.columns will be the collumns of the table
+    """
+    tbl = tb(df, headers='keys', tablefmt='simple')
+    len_tbl = len(tbl.split('\n'))
+    for i, line in enumerate(tbl.split('\n')):
+        if i <= 1:
+            print(f"{color}{line}{Fore.RESET}")
+        elif sum_color and i == len_tbl - 1:
+            print(f"{sum_color}{'_ ' * (len(line) // 2)}{Style.RESET_ALL}")
+            print(f"{line}")
+        else:
+            print(line)

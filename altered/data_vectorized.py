@@ -32,7 +32,7 @@ class VecDB(Data):
     - NumPy array for storing the embeddings of the data.
     """
     mem_file_ext = 'npy'
-    embedding_model = 'llama3.1'
+    embedding_model = msts.config.overwrites.get('get_embeddings').get('model')
     # default_data_dir handles where table data are stored and loaded
     default_data_dir = os.path.join(sts.resources_dir, 'vec_db')
     # vec_fields_path is the path to the fields file for the table creator
@@ -130,7 +130,7 @@ class VecDB(Data):
         """
         # add this for getting the embedding directly
         assert contents, f"{Fore.RED}ERROR: VecDB.embedds: Contents is empty !{Fore.RESET}"
-        if model is not None and model != self.embedding_model:
+        if (self.embedding_model != model) and (model is not None):
             print(  f"{Fore.YELLOW}WARNING: VecDB.embedds.embedding_model: "
                     f"{model} != {self.embedding_model} {Fore.RESET}"
                     f"continuing with {self.embedding_model = }")
@@ -253,7 +253,7 @@ class VecDB(Data):
     def __str__(self, *args, **kwargs):
         return f"VecDB(name={self.name}, fields=self.columns.keys(), )"
 
-    def explain(self, vectors: np.ndarray, *args, **kwargs):
+    def explain(self, vectors:np.ndarray, *args, verbose:int=0, **kwargs):
         """
         Explains the key properties of a NumPy array in an informative way.
 
@@ -275,5 +275,6 @@ class VecDB(Data):
         }
 
         # Print the explanation in a formatted way
-        hlpp.dict_to_table(f'{self.name}.explain', explains, *args, **kwargs)
-        print('\n')
+        if verbose >= 2:
+            hlpp.dict_to_table(f'{self.name}.explain', explains, *args, **kwargs)
+            print('\n')

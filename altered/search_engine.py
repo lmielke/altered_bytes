@@ -3,7 +3,8 @@ import requests
 import pandas as pd
 from colorama import Fore
 
-from altered.data_vectorized import VecDB
+# from altered.data_vectorized import VecDB
+from altered.data import Data
 from altered.model_params import config as config
 import altered.settings as sts
 import altered.hlp_printing as hlpp
@@ -26,7 +27,7 @@ class WebSearch:
         self.api_key = config.services.get('google_se').get('api_key')
         self.cse_id = config.services.get('google_se').get('cse_id')
         self.g_url = config.services.get('google_se').get('url')
-        self.search_results = VecDB(*args, 
+        self.search_results = Data(*args, 
                     name=name, 
                     u_fields_paths=[self.search_fields_path], 
                     data_dir = data_dir if data_dir is not None else self.default_data_dir,

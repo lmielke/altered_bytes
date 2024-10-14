@@ -24,14 +24,14 @@ class ContextActivities:
         Initialize the class with the path to the most recent activity log file.
         If no specific log_file_path is provided, it will find the most recent log file.
         """
-        self.log_file_path = self.find_most_recent_log(*args, **kwargs) \
+        self.log_file_path = self.find_most_recent_act_log(*args, **kwargs) \
                                                 if log_file_path is None else log_file_path
         self.context = {}
         self.load_activities(*args, **kwargs)
         self.load_ps_history(*args, **kwargs)
         self.load_git_diffs(*args, **kwargs)
 
-    def find_most_recent_log(self, *args, **kwargs):
+    def find_most_recent_act_log(self, *args, **kwargs):
         """
         Search the logs directory for the most recent log file based on the timestamp in the filename.
         """
@@ -55,11 +55,11 @@ class ContextActivities:
         else:
             self.context['activities'] = []
 
-    def get_activities_results(self, *args, num_activities:int=5, activities:bool=False, **kwargs):
+    def get_activities_results(self, *args, num_activities:int=0, **kwargs):
         """
         Retrieve the most recent 'num_activities' activities.
         """
-        if not activities: return {}
+        if not num_activities: return {}
         return { 
                 'activities': self.context['activities'][-num_activities:],
                 'ps_history': self.context['ps_history'][-num_activities*2:],

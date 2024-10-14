@@ -1,0 +1,13 @@
+hash,content,tools,name,prompt,role,category,sub_category,source,model,timestamp
+0e82ab6db77f4e15,zero init,"VecDB(name=UT_Test_VecDB, fields=self.columns.keys(), )",UT_Test_VecDB,,user,,,,,2024-10-14 17:17:37.677873
+00a0828f863daa8e,test_data_vectorized.Test_VecDB.test_append,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:38.177911
+feda106821ee11d2,What is the capital of France?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:38.396663
+2f988e8e1aed4f8e,How does a plane fly?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:38.599917
+e5627e1432707d85,Why is the sky blue?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:38.802992
+bae141f1acd0559b,What is the meaning of life?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:39.006016
+4a9404fdc7158da4,What causes earthquakes?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:39.209132
+5b10007ea1c04bd9,How do computers work?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:39.412258
+8edf33b1229b3e30,Explain the theory of relativity.,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:39.616435
+4cd37963de017074,What is quantum mechanics?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:39.819633
+c8b8f8a24c727e7b,How do magnets work?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:40.038285
+c9de6ea68749d01b,Why do we dream?,,UT_Test_VecDB,,user,,,,,2024-10-14 17:17:40.241513

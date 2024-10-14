@@ -1,32 +1,32 @@
-# OS System Infos
+## OS System Infos
 The following section shows the USER's Operating System and System Information.
 
-## Operating System
+### Operating System
 **OS**: {{ context.os_infos.os }}
 
-## CPU
+### CPU
 **CPU Name**: {{ context.os_infos.cpu_type.Name }}
 **CPU Load**: {{ context.os_infos.cpu_type.LoadPercentage }}%
 
-## Memory
+### Memory
 **RAM Size**: {{ context.os_infos.ram_size }}
 
-## Storage
+### Storage
 **Disk Size**: {{ context.os_infos.disk_size }}
 
-## GPU(s)
+### GPU(s)
 {%- for key, value in context.os_infos.gpu_info.items() %}
 **{{ key }}**: {{ value }}
 {%- endfor %}
 
-## Network
+### Network
 **Hostname**: {{ context.os_infos.hostname }}
 **IP Address**: {{ context.os_infos.ip_address }}
 
-## User
+### User
 **Username**: {{ context.os_infos.username }}
 
-## PowerShell Version Information
+### PowerShell Version Information
 **PS Version**: {{ context.os_infos.psversiontable.PSVersion }}
 **PS Edition**: {{ context.os_infos.psversiontable.PSEdition }}
 **Platform**: {{ context.os_infos.psversiontable.Platform }}

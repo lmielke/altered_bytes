@@ -7,8 +7,8 @@ from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
+from altered.prompt_stats import PromptStats
 from altered.model_connect import SingleModelConnect
-from altered.promt_stats import PromptStats
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
@@ -35,16 +35,21 @@ class Prompt:
         self.data = self.render_prompt(*args, **kwargs)
         return self
 
-    def mk_prompt(self, *args, **kwargs):
+    def mk_prompt(self, *args, verbose:int=0, **kwargs):
         """
         Constructs the final prompt as to be send to the AI model.
         """
+        instructs = self.get_instructs(*args, verbose=verbose, **kwargs)
+        user_prompt = instructs.get('user_prompt', {})
+        del instructs['user_prompt']
         self.context = { 
-                            'prompt_title': f"Prompt for {self.name}",
-                            'context': self.get_context(*args, **kwargs),
-                            'instructs': self.get_instructs(*args, **kwargs),
+                            'prompt_title': self.name,
+                            'context': self.get_context(*args, verbose=verbose, **kwargs),
+                            'instructs': instructs,
+                            'user_prompt': user_prompt,
                         }
-        print(self.stats(2, *args, data_dict=self.context, **kwargs))
+        if verbose:
+            print(self.stats(2, *args, data_dict=self.context, **kwargs))
 
     def render_prompt(self, *args, context:dict=None, template_name:str=None, _context:dict=None, **kwargs):
         context = _context if _context is not None else self.context
@@ -92,8 +97,7 @@ class Response:
     def __call__(self, *args, **kwargs):
         return self.extract(self.validate(*args, **kwargs), *args, **kwargs)
 
-    def extract(self, r:dict, *args, repeats:int=sts.repeats, strat_templates:str=None, **kwargs) -> dict:
-        print(f"{Fore.RED}{strat_templates = }{Fore.RESET}")
+    def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
         if not r.get('responses') or type(r.get('responses')) != list:
             raise ValueError(f"Error: No valid responses returned from the AI model.")

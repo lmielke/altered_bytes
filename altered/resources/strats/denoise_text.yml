@@ -10,7 +10,8 @@ name: De-Noise Text Strategy
 description: >
     This strategy reduces a single "Noisy Text" to a single "De-Noised Text"
     by removing redundant, non-relevant, or overly emphasized information.
-    The process includes:
+    Noisy texts can be search results, forum posts, or other long badly written texts.
+    De-Noising includes:
     1. **Text De-noising**: Remove irrelevant details such as advertisements, 
         cookie disclaimers, or metadata that detract from the core message.
         Remove headers that sound relevant but contain no relevant content. (parsing errors)
@@ -18,12 +19,10 @@ description: >
         overly emphasized ideas or long exhaustive explanations.
     3. **Relevance Filtering**: Retain only content relevant to the main topic, like formulas,
         code snipptest and core ideas, while omitting tangential or background details.
-    4. **Conciseness Enhancement**: Keep it short and to the point.
-    5. **Content Pruning**: Focus on trimming away non-essential texts while keeping 
+    4. **Content Pruning**: Focus on trimming away non-essential texts while keeping 
         the most important parts intact.
-    6. **Formula and Code Retention**: It is essential to preserve formulas, code snippets, 
+    5. **Formula and Code Retention**: It is essential to preserve formulas, code snippets, 
         or other technical details that are relevant to the topic.
-
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when solving a task
@@ -33,16 +32,35 @@ example: >
     
     - Example "Noisy Text":
         The quick, agile fox leaps with great grace and speed over the lazy, 
-        lethargic, motionless [still, stiff] dog who doesn't even twitch. 
-        copyright: dogs.com
+        lethargic, motionless [still, stiff] dog who doesn't even twitch. The dog even ...
+        This might not be the case if the dog is awake and doesnt like foxes. Here is why, ...
+        copyright: dogs.com, dogs have silly ears and a wagging tail.
+        You can get more information about foxes on foxes.com.
         The fox's nimble movements showcase its sharp reflexes and unmatched agility.
-        Meanwhile, a rabbit watches from the bushes.
+        Meanwhile, a rabbit watches from the bushes. Rabbits are ...
+        Here is a formula I found regarding the agility ratio. I am not completely conviced...
         Formula: fox_agility = dog_agility * 2 - turtle_agility
-        Impressum: WeAreFoxes Ltd Fox RD 1234
+        Impressum: WeAreFoxes Ltd Fox RD 1234, ...
+        cookie disclaimer: We use cookies to improve your browsing experience. Please, ...
     
-    - Example "De-Noised Text":
-      "Due to its agility, the quick fox leaps over the lazy dog.
-      Formula: fox_agility = dog_agility * 2 - turtle-agility"
+    - Example nicely formatted "De-Noised Text":
+        # Foxes meet Dogs
+        This text explores the behavior of foxes and dogs when they meet.
+        # Behavioral Properties
+        ## Foxes behavioral properties
+        Foxes are agile and graceful animals.
+        ## Dog's behavioral properties
+        Dogs are sometimes lazy and motionless.
+        # What happens when Foxes meet dogs
+        Due to its agility, the quick fox leaps over the lazy dog.
+        ## Foxses meet dog formula:
+        The relationship between the fox's and dog's agility can be described as follows:
+        ```python
+        fox_agility = dog_agility * 2 - turtle-agility
+        ```
+        # Sources
+        - dogs.com
+        - foxes.com
       
       This examle output retains the core idea of the fox leaping over the dog while removing 
       redundant details such as over-emphasizing the fox's agility or the dog's lethargy, 
@@ -53,15 +71,13 @@ example: >
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    The <noisy_text> tag below contains a single "Noisy Text",
-    that includes redundant, non-relevant, or overly emphasized information. 
-    This text must be cleaned into "De-Noised Text" while following the rules of the
-    template/example shown above.
+    The provided <noisy_text> must be cleaned/denoised using the rules shown above. 
+    The result should be a concise nicely formatted WikiPedia style article 
+    containing only the most relevant information.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Clean the "Noisy Text" provided inside the <noisy_text> ... </noisy_text> tags ! 
-    Higlight highly relevant information, but be also generous keeping medium relevance information.
+    Clean the text provided inside the <noisy_text> ... </noisy_text> tags ! 
     In particular keep and highlight contained __formulas__ and __code snippets__ 
     when relevant to the topic.

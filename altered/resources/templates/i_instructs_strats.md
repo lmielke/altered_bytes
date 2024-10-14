@@ -1,8 +1,10 @@
 ## Description: {{ instructs.strats.name }}
 {{ instructs.strats.description }}
 
+{%- if instructs.strats.example %}
 ## Example
 {{ instructs.strats.example }}
+{%- endif %}
 
 ## Objective
 {{ instructs.strats.objective }}
@@ -17,8 +19,8 @@
 <!-- </{{ instructs.strats.inputs_tag }}> -->
 {% endif%}
 
-## Response Data and Format
-{% include "i_instructs_io.md" ignore missing %}
+## Response Layout and Format:
+{%- include "i_instructs_io.md" ignore missing %}
 
 ## Your Task
 {{ instructs.strats.your_task }}

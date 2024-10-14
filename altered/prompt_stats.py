@@ -2,14 +2,14 @@ from typing import Any, Dict
 from colorama import Fore, Style, Back
 from tabulate import tabulate as tb
 import numpy as np
-import re
+import re, time
 
 class PromptStats:
 
     # Token length divisor describes the ratio tokens to characters (default is 3)
     tkd = 3
     sub_total_prefix = "Sub-Total: "
-    sample_len = 150
+    sample_len = 100
 
     def __init__(self, *args, **kwargs) -> None:
         """
@@ -43,7 +43,7 @@ class PromptStats:
         return self.color_table(up_to, *args, **kwargs)
 
     def _process_level(self, level: int=0, *args, data_dict: Dict[Any, Any], 
-                                                p_key: str = 'root', **kwargs) -> int:
+                                                pk: str = 'root', **kwargs) -> int:
         """
         Recursively processes the dictionary and calculates both token and character lengths.
         
@@ -61,7 +61,7 @@ class PromptStats:
             k_len = len(str(k))  # Length of the k (in characters)
             if isinstance(vs, dict):
                 # Recursively process nested dictionaries
-                vs_len = self._process_level(level+1, *args, data_dict=vs, p_key=k, **kwargs)
+                vs_len = self._process_level(level+1, *args, data_dict=vs, pk=k, **kwargs)
             else:
                 # Handle non-dictionary values (including None)
                 vs_len = len(str(vs)) if vs else 0
@@ -70,12 +70,14 @@ class PromptStats:
             vs_str = (f"{str(vs)[:self.sample_len]}..."if vs and 
                             len(str(vs)) > self.sample_len else str(vs) if vs else 'None')
             if self.results.get(level):
-                self.results[level][k] = (kv_len, kv_len // self.tkd, vs_str, p_key)
+                self.results[level][f"{pk}.{k}"] = (kv_len, kv_len // self.tkd, vs_str, pk)
             else:
-                self.results[level] = {k: (kv_len, kv_len // self.tkd, vs_str, p_key)}
+                self.results[level] = {f"{pk}.{k}": (kv_len, kv_len // self.tkd, vs_str, pk)}
+        if self.results.get(level):
+            self.results[level][f"{pk}.len(key)"] = (len(pk), len(pk) // self.tkd, pk, pk)
         return l_len
 
-    def construct_table(self, up_to: int, level: int = 0, p_key: str = 'root', *args, **kwargs
+    def construct_table(self, up_to:int, level:int=0, pk:str='root.root', *args, **kwargs
         ) -> None:
         """
         Constructs the table up to the specified level, recursively including nested keys 
@@ -84,20 +86,17 @@ class PromptStats:
         Args:
             up_to: The maximum level to construct.
             level: Current recursion level (default is 0).
-            p_key: Parent key for filtering (default is 'root').
+            pk: Parent key for filtering (default is 'root').
             *args, **kwargs: Accepts and ignores additional arguments.
         """
         found, indent = False, '    ' * level
         for key, (num_char, num_tk, text, ll_p_key) in self.results[level].items():
-            if not ll_p_key == p_key:
+            if not ll_p_key == pk.split('.')[1]:
                 continue
-            else:
-                ll_p_key = f"{ll_p_key}." if not ll_p_key == 'root' else ''
             found = True
             if level >= up_to:
                 self.total += np.array([num_char, num_tk], dtype=int)
-                self.tbl_data.append([f"{indent}{ll_p_key}{key}", num_char, num_tk, text, 
-                                                                                    level])
+                self.tbl_data.append([f"{indent}{key}", num_char, num_tk, text, level])
             else:
                 tbl_ix = len(self.tbl_data)
                 r_found = self.construct_table(up_to, level + 1, key, *args, **kwargs)
@@ -106,7 +105,7 @@ class PromptStats:
                 else:
                     prefix = ''
                     self.total += np.array([num_char, num_tk], dtype=int)
-                self.tbl_data.insert(tbl_ix, [f"{indent}{ll_p_key}{key} {prefix}", num_char, 
+                self.tbl_data.insert(tbl_ix, [f"{indent}{key} {prefix}", num_char, 
                                                                     num_tk, text, level])
         if level == 0:
             self.tbl_data.append(['Total', self.total[0], self.total[1], '', 0])
@@ -137,6 +136,9 @@ class PromptStats:
                             else f"{self.lc[row[-1]]}{item}{Style.RESET_ALL}" 
                                 for i, item in enumerate(row)
                     ]
+            elif 'len(key)' in row[0]:
+                # we color every element in gray
+                colored_row = [f"{Style.DIM}{item}{Fore.RESET}" for item in row]
             elif up_to == row[-1]:
                 # Apply cyan color to subtotal rows
                 colored_row = [f"{self.llc}{item}{Fore.RESET}" if type(item) != int 

@@ -1,14 +1,24 @@
 # data_Rag_required_fields.yml
 # Contains the fields rag needs to navigate the content
 
-# meta: {"name": "strat_templates", "type": "string", "default": "", "example": ["agg_mean", "denoise_text"]}
-# Contains the strategies that generated a thought or memory
-strat_templates: null
+# meta: {"name": "mgm_summary", "type": "string", "default": "", "example": "This file contains..."}
+# Contains a management summary of content, typically arround 10 lines or 100 words of text.
+# The text should contain relevant keywords, a concise summary of the content and the main takeaways.
+mgm_summary: null
 
-# meta: {"name": "io_template", "type": "string", "default": "", "example": "simple_qa"}
-# Contains the io template that generated a thought or memory format
-io_template: null
+# meta: {"name": "teaser", "type": "string", "default": "", "example": "LLM´s will take over the..."}
+# Short and concise teaser to quickly inform the reader about the content, typically about
+# 2-3 lines or 20-30 words of text.
+teaser: null
 
-# meta: {"name": "fmt", "type": "string", "default": "", "example": "json"}
-# Contains the format of the thought or memory
-fmt: null
+# meta: {"name": "keywords", "type": "string", "default": "", "example": ["LLM", "GPT", "Terminator", "..."]}
+# relevant synonyms/keywords (about 3 - 5 words or acronyms) to simplify sql-like DB interaction
+keywords: null
+
+# meta: {"name": "origin", "type": "category", "default": "", "example": ["search", "simple_answer", "..."]}
+# Stores the origin of the entry. Which thought process genereted the entry?
+origin: null
+
+# meta: {"name": "embedd_match", "type": "string", "default": "", "example": ["LLM", "GPT", "Terminator", "..."]}
+# Stores first n digits of the embedding. Used to map the hash backwards to the vector store.
+embedd_match: null

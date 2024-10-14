@@ -1,7 +1,7 @@
 """
-chat.py
+thought.py
 This class orchestrates the communication between the user and the AI assistant.
-It stores and manages the chat history and creates the chat message for the next prompt and
+It stores and manages the thought history and creates the thought message for the next prompt and
 receives the response from the AI LLM. 
 
 Run like: pipenv run python -m altered.pre_ollama_server
@@ -17,61 +17,46 @@ import altered.settings as sts
 from altered.model_connect import SingleModelConnect
 from altered.prompt import Prompt, Response
 from altered.data import Data
+from altered.thought import Thought
 
 
-class Chat:
+class Thoughts(Thought):
 
     exit_terms = {'/bye', '/quit'}
     roles = ('user', 'assistant')
     # default_data_dir handles where table data are stored and loaded
-    default_chats_dir = os.path.join(sts.resources_dir, 'data')
+    default_thoughts_dir = os.path.join(sts.resources_dir, 'data')
 
 
     def __init__(self, name:str, *args, **kwargs):
-        # name of the chat can be used to locate/reference the saved chat
-        self.name = re.sub(r'\W+', '_', name.lower())
-        self.assi = SingleModelConnect(*args, **kwargs)
+        super().__init__(name, *args, **kwargs)
         # initial user_promt provided by the user
         self.running = False
         self.init_prompt = None
-        # prompt constructor for LLM interaction
-        self.prompt = Prompt(name, *args, **kwargs)
-        self.response = Response(*args, **kwargs)
-        # Data represents the chat data structure, where each line is a chat element
+        # Data represents the thought data structure, where each line is a thought element
         self.data = Data(*args, name=self.name, **kwargs)
         self.data.show(verbose=2)
 
     def run(self, *args, **kwargs):
-        # First we create the inital user_promt to run the chat
-        # the chat loop starts here
-        # self.mk_data_record(running, *args, **kwargs)
-        self.prep_chat(*args, **kwargs)
+        # First we create the inital user_promt to run the thought
+        self.prep_thoughts(*args, **kwargs)
+        # the thoughts loop starts here
         while self.running:
-            self.running = self.next_chat_item(*args, **kwargs)
+            self.r = self.think(*args, **kwargs)
+            self.append(*args, **kwargs)
+            self.show(*args, **kwargs)
         # exit uses /bye or /quit
-        print(f"{Fore.YELLOW}Chat ended{Fore.RESET}")
+        print(f"{Fore.YELLOW}Thoughts ended{Fore.RESET}")
         self.data.save_to_disk(*args, **kwargs)
 
-    def prep_chat(self, *args, user_prompt:str, role:str='user', **kwargs):
+    def prep_thoughts(self, *args, user_prompt:str, role:str='user', **kwargs):
         self.running = True
         self.init_prompt = {'role': role, 'content': user_prompt}
 
-    def next_chat_item(self, *args, **kwargs):
-        # we call the prompt with history since all other context is handled by prompt
-        self.p = self.prompt(*args, context=self.mk_context(*args, **kwargs), **kwargs, )
-        # response handles post model cleanup
-        self.r = self.response(self.post(*args, **kwargs), *args, **kwargs)
-        # we create the next record to update the chat
+    def append(self, *args, **kwargs):
         for role in self.roles:
             self.data.append(self.mk_data_record(*args, role=role, **kwargs))
-        print(f"{Fore.GREEN}{Style.BRIGHT}Chat.next_chat_item {Style.RESET_ALL}")
-        self.show(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        server_params = self.mk_model_params(*args, **kwargs)
-        print(f"{Fore.YELLOW}{server_params.keys() = }{Fore.RESET}")
-        # we post one or multiple user prompts to the AI model (repeats == num of prompt reps)
-        return self.assi.post([self.p.data], *args, **server_params, )
+        print(f"{Fore.GREEN}{Style.BRIGHT}Thoughts.think {Style.RESET_ALL}")
 
     def mk_data_record(self, *args, role:str, user_prompt:str, **kwargs):
         record = {c: str(self.r.get(c)) for c in self.data.columns}
@@ -84,24 +69,12 @@ class Chat:
             record['prompt'] = hlpp.pretty_prompt(record['prompt'])
         return record
 
-    def mk_model_params(self, *args, repeats:dict=None, verbose:int=0, **kwargs, ):
-        # Construct model parameters specific to this Chat (see ModelConnect.get_params())
-        server_params = {
-                            'service_endpoint': 'get_generates',
-                            'repeats': repeats,
-                            'verbose': verbose,
-                            'prompt_summary': self.p.context.get('prompt_summary'),
-                        }
-        ignore_fields = {'context',}
-        server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})
-        return server_params
-
     def mk_context(self, *args, **kwargs):
         context = {}
-        # we add the chat history to the context
+        # we add the thought history to the context
         history = self.data.mk_history(*args, **kwargs)
         if history:
-            context['chat_history'] = history
+            context['thought_history'] = history
         # we add the initial prompt to the context
         context['init_prompt'] = self.init_prompt
         return context

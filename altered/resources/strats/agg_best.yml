@@ -9,10 +9,8 @@ name: Best Answer/Text
 # description of the strategy
 description: >
     This strategy selects the __'best'__ text or answer from a given <sample> of texts. 
-    The task involves identifying the most thorough and well-rounded description
-    for a topic or selecting the best answer to its specific question or problem. 
-    The selected output should have the strongest supporting details and 
-    the most comprehensive coverage of the topic or __'best'__ answer the given problem.
+    The selected text should have the strongest supporting details and 
+    the most comprehensive coverage of arguments answering the given problem.
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when soliving a task
@@ -32,14 +30,13 @@ example: >
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    Read and understand the following <sample> texts! Then, read and understand the provided 
-    prompts or, (if no prompt was provided), re-construct the prompt or problem statement 
-    based on the provided responses.
-    Then, based on the propmt or problem statement, select the text that __'best'__ addresses 
-    the inferred problem with detailed and insightful information! You may add one single 
-    aspect provided by one of the other responses, if it further improves the selected text.
+    Based on the propmt or problem statement as well as the provided texts, 
+    the text that __'best'__ addresses the stated or inferred problem must be selected!
+    One single aspect from the other texts may be added to the response, 
+    if this significantly improves the selected text.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Using the provided RESPONSE SAMPLE`s select the one, that __'best'__ anwers the prompt !
+    Using the prompt and the provided RESPONSE SAMPLE`s select and return the single one     text, 
+    that __'best'__ fits the prompts objective !

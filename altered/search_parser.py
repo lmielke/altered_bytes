@@ -33,7 +33,7 @@ class Parser:
         """
         Fetches content from a URL using requests.
         """
-        print(f"\tRequests, Fetching content from {Fore.YELLOW}{url} ...{Fore.RESET}")
+        print(f"\tRequests, Fetching content from {Fore.MAGENTA}{url} ...{Fore.RESET}")
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()
         return self.extract_content(response.content)
@@ -42,7 +42,7 @@ class Parser:
         """
         Fetches content from a URL using Playwright to render JavaScript.
         """
-        print(f"\tPlaywright, Fetching content from {Fore.YELLOW}{url} ...{Fore.RESET}")
+        print(f"\tPlaywright, Parsing: {Fore.MAGENTA}{url} ...{Fore.RESET}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
