@@ -18,7 +18,7 @@ from altered.prompt_instructs import Instructions
 
 class CleanWebSearch(WebSearch):
 
-    default_repeats = {'num': 1, 'agg': 'agg_mean'}
+    default_repeats = {'num': 1, 'agg': None}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,10 +37,12 @@ class CleanWebSearch(WebSearch):
         # Note, self.cleaning is doing a ollama call
         cleaned = self.cleaning(*args, repeats=repeats, **kwargs)
         for i, clean in enumerate(cleaned):
+            print(f"\n\n{Fore.RED}CleanWebSearch {i}:{Fore.RESET} {clean = }")
             if clean.get('strat_template') is not None:
                 self.r.append(self.r[0].copy())
                 self.r[-1]['content'] = clean.get('response').strip()
                 self.r[-1]['short'] = ''
+                self.r[-1]['strat_template'] = clean.get('strat_template')
             else:
                 self.r[i]['short'] = clean.get('response').strip()
             self.r[i]['source'] = self.r[i].get('link')

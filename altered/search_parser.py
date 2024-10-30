@@ -22,7 +22,7 @@ class Parser:
         """
         try:
             if use_pwr:
-                return self.fetch_with_playwright(url)
+                return self.fetch_with_playwright(url, *args, **kwargs)
             else:
                 return self.fetch_with_requests(url, timeout=timeout)
         except Exception as e:
@@ -38,7 +38,7 @@ class Parser:
         response.raise_for_status()
         return self.extract_content(response.content)
 
-    def fetch_with_playwright(self, url: str) -> str:
+    def fetch_with_playwright(self, url: str, *args, **kwargs) -> str:
         """
         Fetches content from a URL using Playwright to render JavaScript.
         """
@@ -50,37 +50,39 @@ class Parser:
             page.wait_for_load_state('networkidle')  # Wait for network to be idle
             content = page.content()
             browser.close()
+            return self.extract_content(content, *args, **kwargs)
 
-            return self.extract_content(content)
-
-    def extract_content(self, html_content:str, *args, **kwargs) -> str:
+    def extract_content(self, html_content:str, *args, verbose:int=0, **kwargs) -> str:
         """
         Extracts both paragraph text and code snippets from the HTML content.
         """
         soup = BeautifulSoup(html_content, 'html.parser')
-
         # Extract text from <p>, <pre>, and <code> tags
         paragraphs = [p.get_text() for p in soup.find_all('p')]
         code_blocks = [code.get_text() for code in soup.find_all(['pre', 'code'])]
-
         # Combine the paragraphs and code blocks
         combined_content = '\n'.join(paragraphs + code_blocks)
         combined_content = self.clean_text(combined_content, *args, **kwargs)
+        if verbose >= 2:
+            print(f"\nsearch_parser.extract_content:")
+            print(f"{Fore.MAGENTA}{combined_content}{Fore.RESET}")
         return combined_content if combined_content else "No readable content found."
 
-    def parse_urls(self, urls:dict, max_workers:int=5, *args, **kwargs,
-        ) -> dict:
+    def parse_urls(self, urls:dict, *args, max_workers:int=5, verbose:int=0, **kwargs, ) -> dict:
         """
         Parses multiple URLs in parallel and updates the provided dictionary with parsed content.
         """
         def process_url(url):
-            return url, self.parse_site(url, *args, **kwargs)
+            return url, self.parse_site(url, *args, verbose=verbose, **kwargs)
         url_contents = {}
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(process_url, url): url for url in urls}
             for future in as_completed(future_to_url):
                 url, parsed_content = future.result()
                 url_contents[url] = parsed_content
+        if verbose >= 2:
+            print(f"search_parser.parse_urls:")
+            print(f"{Fore.MAGENTA}{url_contents}{Fore.RESET}")
         return url_contents
 
     def clean_text(self, text:str, *args, **kwargs) -> str:
@@ -94,7 +96,7 @@ class Parser:
                         'Cookies, device or similar online',
                         'Uses other forms of storage',
                         }
-        cleaned, extender, last_line = [], '', ''
+        cleaned, extender, last_line, cleaned_len = [], '', '', 0
         for line in text.split('\n'):
             line = line.strip()
             if not line or line == last_line:
@@ -110,8 +112,12 @@ class Parser:
                 continue
             elif extender:
                 cleaned.append(f" {extender}")
+                cleaned_len += len(extender)
                 extender = ''
                 continue
             last_line = line
             cleaned.append(line)
-        return '\n'.join(cleaned)[2000:20000]
+            cleaned_len += len(line)
+            if cleaned_len > sts.global_max_token_len:
+                break
+        return '\n'.join(cleaned)

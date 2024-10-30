@@ -159,7 +159,7 @@ class ModelConnect:
             print(      f"{Fore.MAGENTA}ModelConnect.post: {Fore.RESET}"
                         f"{url}, {context['model']}, {server = }, "
                         f"{context.get('repeats', 'no repeats for embeddings')}, "
-                        f"{len(context['prompts']) = }"
+                        f"{len(context['prompts']) = }, {kwargs.get('fmt') = }"
                         )
         elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')
@@ -188,7 +188,7 @@ class ModelConnect:
             r_dict['num_results'] = len(r_dict['responses'])
         return r_dict
 
-    def get_stats(self, r, context, *args, context_length: int = 2000, verbose: int = 0, 
+    def get_stats(self, r, context, *args, context_length: int = 8000, verbose: int = 0, 
         **kwargs) -> dict:
         """
         We add the current model times to the total times.

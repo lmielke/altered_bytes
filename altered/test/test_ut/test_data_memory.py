@@ -36,12 +36,12 @@ class Test_Memory(unittest.TestCase):
         self.memory.save_to_disk(verbose=self.verbose, max_files=4, data_file_name="memory",)
 
     def test_find_memories(self, *args, **kwargs):
-        memories = self.memory.find_memories(memory_path=self.data_dir)
+        memories = self.memory.find_memories(memory_dir=self.data_dir)
         print(f"test_data_memory: {memories = }")
         print(f"test_data_memory: {self.memory.columns.keys()}")
 
     def test_load_memories(self, *args, **kwargs):
-        memories = self.memory.find_memories(memory_path=self.data_dir)
+        memories = self.memory.find_memories(memory_dir=self.data_dir)
         self.memory.load_memories(memories)
 
 if __name__ == "__main__":

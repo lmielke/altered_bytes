@@ -9,7 +9,7 @@ from altered.search_parser import Parser
 class Test_Parser(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
-        cls.verbose = 0
+        cls.verbose = 2
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
 
@@ -37,7 +37,7 @@ class Test_Parser(unittest.TestCase):
         """
         parser = Parser()
         test_url = self.test_data['urls'][0]  # Use one of the URLs from the test data
-        parsed_content = parser.parse_site(test_url)
+        parsed_content = parser.parse_site(test_url, *args, verbose=self.verbose)
 
         # Check if the parsed content is not empty and contains text
         self.assertTrue(len(parsed_content) > 0)
@@ -51,7 +51,7 @@ class Test_Parser(unittest.TestCase):
         url_dict = {url: None for url in self.test_data['urls']}  # Create a dict with URLs and None values
 
         # Call the method and get the parsed content
-        parsed_url_dict = parser.parse_urls(url_dict, max_workers=3)
+        parsed_url_dict = parser.parse_urls(url_dict, max_workers=3, verbose=self.verbose)
 
         # Check if all URLs have been parsed (i.e., the None values have been replaced)
         for url, content in parsed_url_dict.items():

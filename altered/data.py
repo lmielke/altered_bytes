@@ -54,10 +54,10 @@ class Data:
         return _record
 
     def create_table(self, *args, **kwargs) -> None:
-        if not self.ldf.empty:
-            return
         self.dtypes = {field: properties['type'] 
                        for field, properties in self.columns.items()}
+        if not self.ldf.empty:
+            return
         columns = {field: pd.Series(dtype=dtype) for field, dtype in self.dtypes.items()}
         self.ldf = pd.DataFrame(columns).astype(self.dtypes)
 
@@ -113,7 +113,8 @@ class Data:
         df = self.ldf.copy()
         for column in df.columns:
             if df[column].dtype in ['object', 'string']:
-                max_len = df[column].dropna().str.len().max()
+                df[column] = df[column].astype(str)
+                max_len = df[column].str.len().max()
                 if pd.notna(max_len) and max_len > sts.table_max_chars:
                     df[column] = df[column].apply(lambda x: hlpp.wrap_text(x) \
                                                                     if pd.notna(x) else x)

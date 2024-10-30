@@ -1,0 +1,28 @@
+# kwargs_thought__thought_run.yml
+# This file contains the fields needed to start a simple thought/chat.
+
+# meta: {"name": "user_prompt", "type": "string", "default": "", "example": "Hello, Who are you?"}
+# user_prompt question/problem statement that founds/initiates the thought/chat
+user_prompt: How do I monitor my GPUs performance?
+
+# meta: {"name": "alias", "type": "string", "default": "", "example": "l3:8b_1"}
+# alias is the model (l3:8b) _ server (1) combination to be used to connect to the model
+alias: null
+
+# meta: {"name": "num_predict", "type": "string", "default": "", "example": 100}
+# num_predict is the max number of tokens to be generated for the response
+num_predict: 500
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "repeats", "type": "int", "default": "", "example": 1}
+# repeats is a prompt repeat counter (model is prompted multiple times to improve the response)
+repeats:
+  num: 3
+  agg: agg_mean
+
+# meta: {"name": "verbose", "type": "int", "default": 0, "example": 3}
+# verbose is a internal technical field to control the verbosity of the computation
+verbose: 2

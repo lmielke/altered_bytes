@@ -1,5 +1,5 @@
 {%- if instructs.io %}
-The following '{{ instructs.io.fmt.upper() }}' template answers a simple 'Hi, who are you?' example question. This template must be used to create the LLM response to your question.
+Belows template example '{{ instructs.io.name }}' answers a hypothetical '{{ instructs.io.example }}' question. This '{{ instructs.io.fmt.upper() }}' template must be used to create the LLM response to your question.
 
 ```{{ instructs.io.fmt.lower() }}
 

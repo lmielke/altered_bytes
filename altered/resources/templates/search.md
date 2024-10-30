@@ -9,9 +9,9 @@
 </context>
 
 
-<user_prompt>
+<user_comment>
     None
-</user_prompt>
+</user_comment>
 
 <INST>
 {% include "i_instructs.md" ignore missing %}

@@ -8,7 +8,7 @@ context:
     - role: assistant
       content: Hello! How can I assist you today?
   rag_selection:
-    os_infos: Windows 10
+    sys_info: Windows 10
     project_infos: altered_bytes infos
   unittest info: This is test_renderer.
 # a single string containing the last user interaction
@@ -17,8 +17,8 @@ user_prompt: Why is the sky blue?
 instruct:
   assi_role: You are a helpful assistant.
   intro:  >
-    You have been provided with a <user_prompt> ...some text... </user_prompt>. 
-    Answer the <user_prompt> directly. 
+    You have been provided with a <user_comment> ...some text... </user_comment>. 
+    Answer the <user_comment> directly. 
   prompt_aggregations: >
       Provide a comprehensive summary that captures the summary of all ideas
       provided by all input responses, include all aspects regardless of their relevance.\n

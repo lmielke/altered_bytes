@@ -57,3 +57,5 @@ models_config_path = os.path.join(resources_dir, 'models/models_servers.yml')
 
 # server params
 repeats = {'num': 1, 'agg': None}
+
+global_max_token_len = 15_000

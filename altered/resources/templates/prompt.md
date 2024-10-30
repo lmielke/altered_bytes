@@ -2,14 +2,13 @@
 
 {% block content %}
 
-<context>
 {% include "i_context.md" ignore missing %}
-</context>
 
+{% include "i_deliverable.md" ignore missing %}
 
-<user_prompt>
-{% include "i_user_prompt.md" ignore missing %}
-</user_prompt>
+<user_comment>
+{% include "i_user_comment.md" ignore missing %}
+</user_comment>
 
 
 <INST>

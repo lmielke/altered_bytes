@@ -11,13 +11,17 @@ mgm_summary: null
 # 2-3 lines or 20-30 words of text.
 teaser: null
 
+# meta: {"name": "source", "type": "string", "default": "", "example": ["cmd", "C:/...", "http://www.something..."]}
+# Source or sources involved in the creation of the content. Typically a command, path or html link.
+source: null
+
 # meta: {"name": "keywords", "type": "string", "default": "", "example": ["LLM", "GPT", "Terminator", "..."]}
 # relevant synonyms/keywords (about 3 - 5 words or acronyms) to simplify sql-like DB interaction
 keywords: null
 
-# meta: {"name": "origin", "type": "category", "default": "", "example": ["search", "simple_answer", "..."]}
-# Stores the origin of the entry. Which thought process genereted the entry?
-origin: null
+# meta: {"name": "context", "type": "category", "default": "", "example": ["search", "simple_answer", "..."]}
+# Stores the context of the entry. Which thought process genereted the entry?
+context: null
 
 # meta: {"name": "embedd_match", "type": "string", "default": "", "example": ["LLM", "GPT", "Terminator", "..."]}
 # Stores first n digits of the embedding. Used to map the hash backwards to the vector store.

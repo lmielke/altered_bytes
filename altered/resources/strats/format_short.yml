@@ -1,0 +1,107 @@
+# denoise_text.yml
+# Strategy for reducing a single long text by removing redundant or irrelevant information.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Format Text ..."}
+# name of the strategy
+name: Format
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    Below is a __Strategy__ called __"Format"__ that re-writes a "Unformatted Text" 
+    to a "Formatted Text". 
+    unformatted texts can be search results, forum posts, or other long badly written texts.
+    The Formatted Text will include:
+    1. **Text De-noising**: Removal of irrelevant details such as advertisements, 
+        cookie disclaimers, or metadata that detract from the core message.
+        Removal headers that sound relevant but contain no relevant content. (parsing errors)
+    2. **Redundancy Cleansing**: Identificatin and elimination of repetitive information, 
+        overly emphasized ideas or long exhaustive explanations.
+    3. **Formula and Code Retention**: Preservation and emphasizing of formulas, code snippets, 
+        or other technical details that are relevant to the topic.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to precede when solving a task
+example: >
+    Next is an illustrative Format example, to be used as a formating guide. Do NOT include
+    any text from this example in your answer.
+    
+    Assume the example prompt: "What happens when foxes meet dogs?".
+    - Example "Unformatted Text":
+        The quick, agile fox leaps with great grace and speed over the lazy, 
+        lethargic, motionless [still, stiff] dog who doesn't even twitch. The dog even ...
+        This might not be the case if the dog is awake and doesnt like foxes. Here is why, ...
+        copyright: dogs.com, dogs have silly ears and a wagging tail.
+        You can get more information about foxes on foxes.com.
+        The fox's nimble movements showcase its sharp reflexes and unmatched agility.
+        Meanwhile, a rabbit watches from the bushes. Rabbits are ...
+        Here is a formula I found regarding the agility ratio. I am not completely conviced...
+        Example Formula: fox_agility = dog_agility * 2 - turtle_agility
+        Impressum: WeAreFoxes Ltd Fox RD 1234, ...
+        cookie disclaimer: We use cookies to improve your browsing experience. Please, ...
+    
+    - Example nicely "Formatted Text":
+        # Foxes meet Dogs
+        This text explores the behavior of foxes and dogs when they meet.
+        # Behavioral Properties
+        ## Foxes behavioral properties
+        Foxes are agile and graceful animals.
+        ## Dog's behavioral properties
+        Dogs are sometimes lazy and motionless.
+        # What happens when Foxes meet dogs
+        Due to its agility, the quick fox leaps over the lazy dog.
+        ## The source text contained a Foxses meet dog formula:
+        The relationship between the fox's and dog's agility can be described as follows:
+        ```some code
+        # this is a hypothetical formula example
+        fox_agility = dog_agility * 2 - turtle-agility
+        # Do not use this formula in your answer, use formulas from your source text instead.   
+        ```
+        # Sources are web-sites or links
+        - dogs.com
+        - foxes.com
+      
+      This now nicely formatted text retains the core idea of the fox leaping over the dog 
+      while removing redundant details such as over-emphasizing the fox's agility or 
+      the dog's lethargy, which are not essential to the main message.
+      Note: Formulas/Code-snippets often provide valuable insights, so if possible, keep them.
+      However, the mentioning of the rabbit is not relevant given the scenario question.
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
+    The provided <unformatted_text> must be cleaned/formatted using the rules shown above. 
+    The result should be a concise nicely formatted WikiPedia style article 
+    containing only the most relevant information.
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    Format the text provided inside the <unformatted_text> ... </unformatted_text> tags,
+    using the provided strategy!
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format and will over-write the kwargs fmt param (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will veryfy the model response from this strategy
+validations:
+    expected_len:
+        - 0.5
+        - 1.5
+    illegal_terms:
+        - Foxes
+        - foxes
+        - Dogs
+        - dogs
+        - Foxes meet Dogs
+        - fox_agility
+    illegal_ends:
+        - Do not explain your reasoning unless specifically asked for!
+    required_terms:
+        - '#'  # for headers
+    start_terms:
+        - Here is the formatted ...
+        - The formatted text ...
+

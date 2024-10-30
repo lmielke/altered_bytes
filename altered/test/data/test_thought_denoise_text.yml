@@ -1,0 +1,60 @@
+# test_thought_denoise_text.yml
+user_prompt: How do I monitor my GPU Performance?
+fmt: json
+alias: l3.2_0
+search_query: monitor GPU Performance
+strat_template: format_short
+strat_input_data: >
+  Stack Exchange network consists of 183 Q&A communities including Stack Overflow, the largest, most trusted online community for developers
+  to learn, share their knowledge, and build their careers.
+  Now available on Stack Overflow for Teams! AI features where you work: search, IDE, and chat.
+  Ask questions, find answers and collaborate at work with Stack Overflow for Teams.
+    Explore Teams Teams
+  Connect and share knowledge within a single location that is structured and easy to search.
+  I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information.
+  In Windows Task Manager, it can show GPU memory.
+  So, is there a way to get those in powershell
+  Windows uses Performance Counters to track this type of thing. You can get the values in powershell via Get-Counter. Depending on your GPU
+  and drivers, you may have more specific counters available, but these examples should always be available:
+  I found these counter names by running Get-Counter -ListSet 'GPU*', and taking the Counter values from there. It looks like GPU engine usage
+  is broken down into 4 types:
+  I'm just summing engtype_3D in the example, since it is the only one with usage on my system. These values all match up with what displays
+  in windows Task Manager, so it should be accurate enough.
+  To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+  Site design / logo © 2024 Stack Exchange Inc;
+  user contributions licensed under
+    CC BY-SA. rev 2024.10.17.16978
+  List of Partners (vendors)
+    Get-Process Get-CimInstance Win32_Process Get-WmiObject Win32_VideoController Get-Counter
+  $p = Get-Process dwm
+  ((Get-Counter "\GPU Process Memory(pid_$($p.id)*)\Local Usage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB"}
+  ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%"}
+    # Outputs:
+  Process dwm GPU Engine Usage 0.47%
+  # Example to get total GPU usage counters:
+  $GpuMemTotal = (((Get-Counter "\GPU Process Memory(*)\Local Usage").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+  Write-Output "Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB"
+  $GpuUseTotal = (((Get-Counter "\GPU Engine(*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue | measure
+  -sum).sum
+  Write-Output "Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%"
+    # Outputs:
+  Total GPU Engine Usage: 0.77%
+  # Example to get GPU usage counters for a specific process:
+  $p = Get-Process dwm
+  ((Get-Counter "\GPU Process Memory(pid_$($p.id)*)\Local Usage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB"}
+  ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%"}
+    # Outputs:
+  Process dwm GPU Engine Usage 0.47%
+  # Example to get total GPU usage counters:
+  $GpuMemTotal = (((Get-Counter "\GPU Process Memory(*)\Local Usage").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+  Write-Output "Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB"
+  $GpuUseTotal = (((Get-Counter "\GPU Engine(*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue | measure
+  -sum).sum
+  Write-Output "Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%"
+    # Outputs:
+  Total GPU Engine Usage: 0.77%
+  Get-Counter -ListSet 'GPU*'

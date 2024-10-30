@@ -6,7 +6,7 @@ import altered.hlp_printing as hlpp
 import altered.settings as sts
 
 class Render:
-    fields = ['prompt_title', 'context', 'user_prompt', 'instructs', 'prompt_summary']
+    fields = ['prompt_title', 'context', 'deliverable', 'user_comment', 'instructs', 'prompt_summary']
     default_context_path = os.path.join(sts.resources_dir, 'kwargs', 
                                         'renderer_default_context.yml')
 
@@ -31,8 +31,9 @@ class Render:
         context = context if context else self.context
         if verbose >= 3: hlpp.dict_to_table('Render.render.context', context)
         # we sort the keys to make sure the fields are in the correct order
-        self.document = template.render({k: context.get(k) for k in self.fields})
-        self.document = Render.render_from_string(self.document, context, *args, **kwargs)
+        sorted = {k: context.get(k) for k in self.fields}
+        self.document = template.render(sorted)
+        self.document = Render.render_from_string(self.document, sorted, *args, **kwargs)
         self.document = Render.correct_ansi_codes(self.document, *args, **kwargs)
         return self.document
 
@@ -67,4 +68,5 @@ class Render:
         ansi_escapes = re.compile(r'\\033\[((?:\d+;)*\d+)?([a-zA-Z])')
         text = ansi_escapes.sub(lambda m: f'\033[{m.group(1) or ""}{m.group(2)}', text)
         text = text.replace('\n'*3, '\n'*2)
+        text = text.replace('<lb>', '\n')
         return text

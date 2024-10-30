@@ -8,7 +8,7 @@ import altered.settings as sts
 from colorama import Fore, Style
 import altered.hlp_printing as hlpp
 from altered.prompt_strategies import Strategy
-from altered.prompt_strategies import Agg, Denoise
+from altered.prompt_strategies import Agg, Denoise, Denoisetext
 # we use renderer to veryfy the validity of results
 from altered.renderer import Render
 
@@ -161,7 +161,7 @@ class Test_Agg(unittest.TestCase):
         hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
 
-class Test_Reduce(unittest.TestCase):
+class Test_Denoise(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls, *args, **kwargs):
@@ -202,7 +202,44 @@ class Test_Reduce(unittest.TestCase):
                                             )
         hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
 
+class Test_DenoiseText(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        cls.verbose = 1
+        cls.test_data_file_path = os.path.join(sts.io_dir, 'qa.yml')
+        cls.test_data = cls.mk_test_data(*args, **kwargs)
+        cls.renderer = Render(*args, **kwargs)
+
+    @classmethod
+    def tearDownClass(cls, *args, **kwargs):
+        pass
+
+    @classmethod
+    def mk_test_data(cls, *args, **kwargs):
+        out = None
+        with open(os.path.join(sts.test_data_dir, "test_prompt_strategies_denoise_text.yml"), "r") as f:
+            out = yaml.safe_load(f)
+        return out
+
+    def test___call__(self, *args, **kwargs):
+        denoise_1 = Denoisetext()
+        # test is using the qa template
+        strats = denoise_1(  'denoisetext_text', *args,
+                        fmt='json',
+                        text=self.test_data['text_0'],
+                        )
+        # for i, (k, v) in enumerate(strats.items()):
+        #     print(f"\n{Fore.YELLOW}{i}{Fore.RESET} {k = }: {v}")
+        # print(f"\n{strats['method']['inputs'] = }")
+        # here we give the output of the __call__ test to renderer to veryfy the correctness
+        rendered = self.renderer.render(
+                                            template_name=Strategy.template_name,
+                                            context = {'instructs': {'strats': strats}},
+                                            verbose=self.verbose,
+                                            )
+        hlpp.pretty_prompt(rendered, *args, verbose=2, **kwargs)
+
 
 if __name__ == "__main__":
     unittest.main()
-This is a test.

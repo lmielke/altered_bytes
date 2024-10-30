@@ -1,7 +1,9 @@
 """
-info_os_system.py
+info_sys_info.py
 """
 import os, platform, psutil, subprocess, re, socket, yaml
+import concurrent.futures
+from typing import Dict, Any
 from colorama import Fore, Style
 import altered.settings as sts
 
@@ -137,16 +139,101 @@ class SysInfo:
             return subprocess.getoutput("whoami").strip()
         return "Unknown User"
 
-    def get_system_info(self, *args, **kwargs) -> dict:
-        return {
-            **self.get_os_info(),
-            "cpu_type": self.get_cpu_info(),
-            "ram_size": self.get_ram_info(),
-            "disk_size": self.get_disk_info(),
-            "gpu_info": self.get_gpu_info(),
-            **self.get_network_info(),
-            "username": self.get_user_info()
+    def get_system_info(self, *args, **kwargs) -> Dict[str, Any]:
+        """
+        Retrieve system information in parallel.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing various system information.
+        """
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_os = executor.submit(self.get_os_info)
+            future_cpu = executor.submit(self.get_cpu_info)
+            future_ram = executor.submit(self.get_ram_info)
+            future_disk = executor.submit(self.get_disk_info)
+            future_gpu = executor.submit(self.get_gpu_info)
+            future_network = executor.submit(self.get_network_info)
+            future_user = executor.submit(self.get_user_info)
+
+            # Wait for all futures to complete
+            concurrent.futures.wait([future_os, future_cpu, future_ram, future_disk, future_gpu, future_network, future_user])
+
+        # Combine results
+        system_info = {
+            **future_os.result(),
+            "cpu_type": future_cpu.result(),
+            "ram_size": future_ram.result(),
+            "disk_info": future_disk.result(),
+            "gpu_info": future_gpu.result(),
+            **future_network.result(),
+            "username": future_user.result()
         }
+
+        return system_info
+
+    
+    def get_disk_info(self, *args, **kwargs) -> dict:
+        """
+        Retrieves information about all logical disks, including total size and free space.
+        Returns a dictionary where keys are the drive letters or mount points.
+        """
+        disk_info = {}
+
+        if self.os_type == "Windows":
+            try:
+                # Using PowerShell to get disk information
+                output = subprocess.check_output(
+                    ["powershell", "-Command",
+                     "Get-CimInstance -ClassName Win32_LogicalDisk | Select-Object DeviceID, Size, FreeSpace"],
+                    universal_newlines=True
+                )
+                lines = output.strip().splitlines()
+
+                if len(lines) > 2:
+                    # Skip the header and parse each line
+                    for line in lines[2:]:
+                        disk_data = re.split(r'\s+', line.strip())  # Split by whitespace
+                        if len(disk_data) >= 2:
+                            drive_letter = disk_data[0].strip()
+                            if len(disk_data) == 3:
+                                total_size = int(disk_data[1])
+                                free_space = int(disk_data[2])
+                            else:
+                                total_size = int(disk_data[1])
+                                free_space = None  # If free space is not provided, set to 0
+
+                            disk_info[drive_letter] = {
+                                "TotalSizeGB": round(total_size / (1024 ** 3), 2),
+                                "FreeSpaceGB": round(free_space / (1024 ** 3), 2)
+                            }
+            except Exception as e:
+                disk_info["Error"] = f"Error fetching disk info: {str(e)}"
+
+        elif self.os_type == "Linux":
+            try:
+                # Using df command to get disk information
+                output = subprocess.check_output("df -h --output=target,size,avail", shell=True, universal_newlines=True)
+                lines = output.strip().splitlines()
+
+                if len(lines) > 1:
+                    # Skip the header and parse each line
+                    for line in lines[1:]:
+                        disk_data = re.split(r'\s{2,}', line.strip())  # Split by two or more spaces
+                        if len(disk_data) >= 3:
+                            mount_point = disk_data[0].strip()
+                            total_size = disk_data[1].strip()
+                            free_space = disk_data[2].strip()
+
+                            disk_info[mount_point] = {
+                                "TotalSize": total_size,
+                                "FreeSpace": free_space
+                            }
+            except subprocess.CalledProcessError:
+                disk_info["Error"] = "Error fetching disk info on Linux"
+
+        return disk_info
+
+        
 
 # Example usage
 if __name__ == "__main__":

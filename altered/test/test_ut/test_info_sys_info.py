@@ -1,7 +1,8 @@
-# test_info_os_system.py
+# test_info_sys_info.py
 
 import os, platform, re, socket, unittest, yaml
-from altered.info_os_system import SysInfo
+import logging
+from altered.info_sys_info import SysInfo
 
 class Test_SysInfo(unittest.TestCase):
 
@@ -80,10 +81,40 @@ class Test_SysInfo(unittest.TestCase):
 
     def test_get_system_info(self, *args, **kwargs):
         system_data = self.sys_info.get_system_info()
-        expected_keys = ['os', 'cpu_type', 'ram_size', 'disk_size', 'gpu_info', 'hostname', 'ip_address', 'username']
+        expected_keys = ['os', 'cpu_type', 'ram_size', 'disk_info', 'gpu_info', 'hostname', 'ip_address', 'username']
         
         for key in expected_keys:
             self.assertIn(key, system_data, f"Missing key: {key}")
+
+    def test_get_disk_info(self, *args, **kwargs):
+        disk_info = self.sys_info.get_disk_info()
+        
+        # Log the disk info for debugging purposes
+        logging.debug(f"Disk info retrieved: {disk_info}")
+        
+        # Check if disk info is None
+        self.assertIsNotNone(disk_info, "Disk info is None, no data retrieved")
+        
+        # Check that the disk info is not empty
+        self.assertTrue(len(disk_info) > 0, "Disk info is empty")
+        
+        # Check that each entry in the disk info has 'TotalSizeGB' and 'FreeSpaceGB'
+        for disk, info in disk_info.items():
+            if isinstance(info, dict):
+                self.assertIn("TotalSizeGB", info, f"TotalSizeGB is missing for disk: {disk}")
+                self.assertIn("FreeSpaceGB", info, f"FreeSpaceGB is missing for disk: {disk}")
+                print(f"{info['FreeSpaceGB'] = }")
+                # Verify the format of the size values (e.g., "10.5", "500.0", etc.)
+                size_regex = re.compile(r'\d+(\.\d+)?')
+                self.assertRegex(str(info["TotalSizeGB"]), size_regex, f"TotalSizeGB format incorrect for disk {disk}: {info['TotalSizeGB']}")
+                self.assertRegex(str(info["FreeSpaceGB"]), size_regex, f"FreeSpaceGB format incorrect for disk {disk}: {info['FreeSpaceGB']}")
+            elif isinstance(info, str):
+                # Handle case where disk data might be returned as a simple string
+                logging.warning(f"Unexpected value type as string for disk: {disk}. Value: {info}")
+                self.fail(f"Unexpected value type for disk info: string, expected dict for disk: {disk}")
+            else:
+                self.fail(f"Unexpected value type for disk info: {type(info)}, expected dict for disk: {disk}")
+
 
 if __name__ == "__main__":
     unittest.main()

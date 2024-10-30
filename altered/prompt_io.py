@@ -47,6 +47,8 @@ class Io:
             setattr(self.fields, k, vs)
         self.fields.fmt_comment = f"<!--, #..., >..."
         self.fields.fmt = fmt
+        self.fields.name = loader.fields_name
+        self.fields.example = loader.fields_example.get('example')
 
     def mk_context(self, *args, fmt:str=None, **kwargs):
         if fmt is not None:

@@ -8,8 +8,8 @@ name: Simple Answer
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    You were provided with a '<user_prompt>' or question in the text above. 
-    Use all available sources of information from <context> and <user_prompt> to 
+    You were provided with a '<user_comment>' or question in the text above. 
+    Use all available sources of information from <context> and <user_comment> to 
     prepare a high quality response.
 
 
@@ -19,9 +19,9 @@ example: null
 
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective is what we want to achieve
-objective: The '<user_prompt>' must be answered or the user problem be solved.
+objective: The '<user_comment>' must be answered or the user problem be solved.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Answer the '<user_prompt>' directly! 
+    Answer the '<user_comment>' directly! 

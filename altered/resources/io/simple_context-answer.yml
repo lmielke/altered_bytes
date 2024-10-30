@@ -1,0 +1,12 @@
+# simple_answer.yml
+# The provided Q&A yml example string contains a single field (answer).
+# file_meta: {"example": "How can I list my existing hard disks on my computer?"}
+
+# meta: {"name": "context", "type": "string", "default": "", "example": "In the text above I found the following relevant informations. 1. OS:Windows10, 2. PS Version 7.2 (Core): Some cmds do not work with 7.2 or higher."}
+# The context field contains a short summary of relevant infos found in the text above along with a short argument why this is relevant.
+context: \{{ context }}
+
+# meta: {"name": "answer", "type": "string", "default": "", "example": "Based on the provided context, you can list your existing hard disks using <lb> ```pwershell<lb>Get-CimInstance -ClassName Win32_LogicalDisk<lb> ```<lb>"}
+# The answer field contains the specific model response, considering the context provided.
+answer: \{{ answer }}
+

@@ -3,15 +3,15 @@
 
 # meta: {"name": "name", "type": "string", "default": "", "example": "De-Noise Text ..."}
 # name of the strategy
-name: De-Noise Text Strategy
+name: Clean
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy reduces a single "Noisy Text" to a single "De-Noised Text"
+    This strategy reduces a single "Unformatted Text" to a single "Formatted Text"
     by removing redundant, non-relevant, or overly emphasized information.
-    Noisy texts can be search results, forum posts, or other long badly written texts.
-    De-Noising includes:
+    Poluted texts can be search results, forum posts, or other long badly written texts.
+    Text Cleaning includes:
     1. **Text De-noising**: Remove irrelevant details such as advertisements, 
         cookie disclaimers, or metadata that detract from the core message.
         Remove headers that sound relevant but contain no relevant content. (parsing errors)
@@ -30,7 +30,7 @@ example: >
     Here is an illustrative example, to be used as a template or guide:
     Assume the example scenario: "What happens when foxes meet dogs?".
     
-    - Example "Noisy Text":
+    - Example "Unformatted Text":
         The quick, agile fox leaps with great grace and speed over the lazy, 
         lethargic, motionless [still, stiff] dog who doesn't even twitch. The dog even ...
         This might not be the case if the dog is awake and doesnt like foxes. Here is why, ...
@@ -40,10 +40,14 @@ example: >
         Meanwhile, a rabbit watches from the bushes. Rabbits are ...
         Here is a formula I found regarding the agility ratio. I am not completely conviced...
         Formula: fox_agility = dog_agility * 2 - turtle_agility
+        ```python
+        fox_agility = dog_agility * 2 - turtle-agility
+        ```
         Impressum: WeAreFoxes Ltd Fox RD 1234, ...
         cookie disclaimer: We use cookies to improve your browsing experience. Please, ...
-    
-    - Example nicely formatted "De-Noised Text":
+        Please sign up for our newsletter to get more information about foxes and dogs.
+
+    - Example nicely formatted "Formatted Text":
         # Foxes meet Dogs
         This text explores the behavior of foxes and dogs when they meet.
         # Behavioral Properties
@@ -65,19 +69,38 @@ example: >
       This examle output retains the core idea of the fox leaping over the dog while removing 
       redundant details such as over-emphasizing the fox's agility or the dog's lethargy, 
       which are not essential to the main message. 
-      Note: Formulas often contain valuable insight, so it makes sense to keep them.
+      Note, Formulas often contain valuable insight, so it makes sense to keep them.
       However, the mentioning of the rabbit is not relevant given the scenario question.
 
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    The provided <noisy_text> must be cleaned/denoised using the rules shown above. 
+    The provided <poluted_text> must be cleaned up using the rules shown above. 
     The result should be a concise nicely formatted WikiPedia style article 
     containing only the most relevant information.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Clean the text provided inside the <noisy_text> ... </noisy_text> tags ! 
+    Clean the text provided inside the <poluted_text> ... </poluted_text> tags ! 
     In particular keep and highlight contained __formulas__ and __code snippets__ 
     when relevant to the topic.
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will veryfy the model response from this strategy
+validations:
+    expected_len:
+        - 0.25
+        - 0.99
+    illegal_terms:
+        - Foxes
+        - foxes
+        - Dogs
+        - dogs
+        - Foxes meet Dogs
+        - fox_agility
+    required_terms: null
+    start_terms:
+        - Here is the formatted ...
+        - The formatted text ...
+

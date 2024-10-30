@@ -21,7 +21,6 @@ class WebSearch:
     search_fields_path = os.path.join(sts.data_dir, 'data_WebSearch_search_fields.yml')
     se_num = 3
 
-
     def __init__(self, *args, name:str=None, data_dir:str=None, **kwargs):
         self.name = name
         self.api_key = config.services.get('google_se').get('api_key')
@@ -37,7 +36,7 @@ class WebSearch:
     def __call__(self, *args, **kwargs):
         se_results = self.run_google_se(*args, **kwargs)
         urls = [l.get('link') for l in se_results.get('items')]
-        se_contents = self.parser.parse_urls(urls, max_workers=5)
+        se_contents = self.parser.parse_urls(urls, *args, max_workers=5, **kwargs)
         self.r = self.prep_results(se_results, se_contents, urls, *args, **kwargs )
         return self.r
 
@@ -47,17 +46,17 @@ class WebSearch:
         dr = [{f: r[f] for f in fields} for i, r in self.search_results.ldf[1:].iterrows()]
         return dr, search_query
 
-    def run_google_se(self, search_query: str, num: int = None, *args, **kwargs) -> dict:
+    def run_google_se(self, search_query: str, se_num: int = None, *args, **kwargs) -> dict:
       """
       Performs a Google Custom Search and returns the results as a JSON dictionary.
       """
-      num = num if num is not None else self.se_num
+      se_num = se_num if se_num is not None else self.se_num
       params = {
-          'key': self.api_key,
-          'cx': self.cse_id,
-          'q': search_query,
-          'num': num,
-          'lang': 'en'  # Add the 'lang' parameter with value 'en' for English
+                  'key': self.api_key,
+                  'cx': self.cse_id,
+                  'q': search_query,
+                  'num': se_num,
+                  'lang': 'en'  # Add the 'lang' parameter with value 'en' for English
       }
       print(f"Performing Search for query:{Fore.YELLOW} '{search_query}' {Fore.RESET}")
       r = requests.get(self.g_url, params=params)

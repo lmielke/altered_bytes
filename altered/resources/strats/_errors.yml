@@ -1,0 +1,84 @@
+clean_text.yml:
+  Illegal Terms in response:
+    Dogs found: 4
+    Foxes found: 4
+    Foxes meet Dogs found: 3
+    dogs found: 5
+    fox_agility found: 3
+    foxes found: 5
+  Required Terms Missing:
+    '# missing': 3
+  Response Format:
+    'JSON Decode Error: Unterminated string starting at: line 1 column 12485 (char 12484)': 1
+  Response Length:
+    'Length: 115 < Min: 946': 1
+    'Length: 12574 > Max: 3746': 1
+    'Length: 18 < Min: 946': 4
+    'Length: 19 < Min: 946': 1
+    'Length: 209 < Min: 946': 1
+    'Length: 304 < Min: 946': 1
+    'Length: 317 < Min: 946': 1
+    'Length: 334 < Min: 2648': 1
+    'Length: 343 < Min: 946': 1
+    'Length: 351 < Min: 2648': 1
+    'Length: 364 < Min: 946': 1
+    'Length: 373 < Min: 946': 1
+    'Length: 387 < Min: 946': 1
+    'Length: 437 < Min: 946': 1
+    'Length: 450 < Min: 946': 1
+    'Length: 4573 > Max: 3746': 1
+    'Length: 509 < Min: 946': 2
+    'Length: 512 < Min: 946': 1
+    'Length: 540 < Min: 946': 1
+    'Length: 547 < Min: 946': 1
+    'Length: 954 < Min: 2648': 1
+format_short.yml:
+  Illegal Terms in response:
+    Dogs found: 24
+    Foxes found: 24
+    Foxes meet Dogs found: 22
+    dogs found: 27
+    fox_agility found: 36
+    foxes found: 27
+  Response Length:
+    'Length: 10516 > Max: 1419': 1
+    'Length: 11220 > Max: 1419': 1
+    'Length: 12525 > Max: 1419': 1
+    'Length: 1427 > Max: 1419': 1
+    'Length: 1450 > Max: 1419': 1
+    'Length: 1599 > Max: 1419': 1
+    'Length: 1704 > Max: 1419': 1
+    'Length: 1756 > Max: 1419': 1
+    'Length: 1897 < Min: 2648': 1
+    'Length: 2046 > Max: 1419': 1
+    'Length: 2068 > Max: 1419': 1
+    'Length: 2110 > Max: 1419': 1
+    'Length: 2255 < Min: 2648': 1
+    'Length: 2405 > Max: 1419': 1
+    'Length: 3212 > Max: 1419': 1
+    'Length: 3374 > Max: 1419': 1
+    'Length: 3377 > Max: 1419': 1
+    'Length: 3482 > Max: 1419': 1
+    'Length: 3540 > Max: 1419': 1
+    'Length: 3846 > Max: 1419': 1
+    'Length: 3891 > Max: 1419': 1
+    'Length: 3916 > Max: 1419': 1
+    'Length: 4342 > Max: 1419': 1
+    'Length: 4362 > Max: 1419': 1
+    'Length: 4444 > Max: 1419': 1
+    'Length: 4722 > Max: 1419': 1
+    'Length: 5386 > Max: 1419': 1
+    'Length: 5732 > Max: 1419': 1
+    'Length: 574 < Min: 662': 1
+    'Length: 5791 > Max: 1419': 1
+    'Length: 6023 > Max: 1419': 1
+    'Length: 6075 > Max: 1419': 1
+    'Length: 6262 > Max: 1419': 1
+    'Length: 6330 > Max: 1419': 1
+    'Length: 6493 > Max: 5676': 1
+    'Length: 6684 > Max: 5676': 1
+    'Length: 7017 > Max: 1419': 1
+    'Length: 7201 > Max: 1419': 1
+    'Length: 7410 > Max: 5676': 1
+    'Length: 8203 > Max: 1419': 1
+    'Length: 8685 > Max: 1419': 1

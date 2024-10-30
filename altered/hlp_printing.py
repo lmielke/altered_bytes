@@ -15,21 +15,23 @@ def wrap_text(text:str, *args, max_chars:int=sts.table_max_chars, **kwargs):
             if len(line) > max_chars:
                 line = '\n'.join(tw(line, max_chars))
             wrapped += f"\n{line}"
+        if len(wrapped)>=300:
+            print(wrapped)
         return wrapped.strip()
     return text
 
 def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
-    prompt = re.sub(r'<user_prompt>\s*</user_prompt>', '', prompt, flags=re.MULTILINE)
+    prompt = re.sub(r'<user_comment>\s*</user_comment>', '', prompt, flags=re.MULTILINE)
         # we replace the <tags> in prompt with colorized tags
     p = (
-            prompt.replace('context>', f"{Back.BLUE}context{Style.RESET_ALL}>")
+            prompt.replace('deliverable>', f"{Back.MAGENTA}deliverable{Style.RESET_ALL}>")
                 .replace('rag_db_matches>', f"{Back.GREEN}rag_db_matches{Style.RESET_ALL}>")
-                .replace('user_prompt>', f"{Back.YELLOW}user_prompt{Style.RESET_ALL}>")
+                .replace('user_comment>', f"{Back.YELLOW}user_comment{Style.RESET_ALL}>")
                 .replace('previous_responses>', f"{Back.CYAN}previous_responses{Style.RESET_ALL}>")
                 .replace('sample>', f"{Back.CYAN}sample{Style.RESET_ALL}>")
                 .replace('io_template>', f"{Back.CYAN}io_template{Style.RESET_ALL}>")
                 .replace('INST>', f"{Back.CYAN}INST{Style.RESET_ALL}>")
-                .replace('noisy_text>', f"{Back.CYAN}noisy_text{Style.RESET_ALL}>")
+                .replace('poluted_text>', f"{Back.CYAN}poluted_text{Style.RESET_ALL}>")
                 .replace('__SAMPLE', f"__{Style.DIM}{Fore.WHITE}SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")
                 .replace('__RESPONSE SAMPLE', f"__{Style.DIM}{Fore.WHITE}RESPONSE SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")
                 .replace('__TEXT SAMPLE', f"__{Style.DIM}{Fore.WHITE}TEXT SAMPLE{Style.RESET_ALL}{Style.RESET_ALL}")

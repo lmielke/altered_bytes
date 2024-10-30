@@ -4,7 +4,7 @@ This is the last change I made.
 """
 from altered.prompt_context_search import ContextSearch
 from altered.prompt_context_activities import ContextActivities
-from altered.prompt_context_os_system import ContextOsSystem
+from altered.prompt_context_sys_info import ContextSysInfo
 from altered.prompt_context_package_data import ContextPackageData
 from colorama import Fore, Style
 
@@ -15,7 +15,7 @@ class Context:
         self.context = context
         self.web_search = ContextSearch(*args, name=name, **kwargs)
         self.user_activities = ContextActivities(*args, **kwargs)
-        self.os_sys_info = ContextOsSystem(*args, **kwargs)
+        self.os_sys_info = ContextSysInfo(*args, **kwargs)
         self.pg_info = ContextPackageData(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):

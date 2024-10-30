@@ -1,7 +1,0 @@
-# simple_answer.yml
-# The provided Q&A yml example string contains a single field (answer).
-
-# meta: {"name": "answer", "type": "string", "default": "", "example": "I am a helpful assistant. How can I help you today?"}
-# The answer field contains the model response
-answer: \{{ answer }}
-

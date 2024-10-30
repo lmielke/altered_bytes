@@ -1,0 +1,15 @@
+# test_prompt_kwargs.yml
+user_prompt: How do I monitor my GPU Performance?
+num_activities: 0
+package_infos: null
+root_file_name: null
+file_match_regex: null
+strat_templates: null
+io_template: simple_answer
+fmt: json
+repeats:
+  num: 1
+  agg: agg_mean
+search_query: list comprehensions in Python
+sys_info_ops: true
+deliverable: true

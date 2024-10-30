@@ -1,0 +1,36 @@
+user_prompt: "I am having trouble with my list comprehensions?"
+sys_info: true
+num_activities: 3
+package_infos: true
+root_file_name: "prompt_instructs.py"
+file_match_regex: "settings.*"
+chat_history:
+  - role: "user"
+    content: "What are list comprehensions?"
+  - role: "assistant"
+    content: "List comprehensions are a way to create lists in Python."
+  - role: "user"
+    content: "I need these with Python programming."
+  - role: "assistant"
+    content: "Sure, I can help you with that."
+init_prompt:
+  role: "user"
+  content: "What are list comprehensions?"
+strat_templates:
+  - "agg_best"
+prompts:
+  - "What are list comprehensions?"
+  - "What use have list comprehensions?"
+  - "Why do we need list comprehensions?"
+responses:
+  - "List comprehensions are single line list creation methods."
+  - "List comprehensions provide a way to create complex lists."
+  - "You can create lists in Python using list comprehensions."
+search_results:
+  - source: "https://www.stackoverflow.com/some_topic"
+    content: "Search Query is None because this is unittest"
+  - source: "https://www.stackexchange.com/some_other_topic"
+    content: "List comprehensions in Python"
+  - source: "https://www.python.org/some_topic"
+    content: "Python list comprehensions"
+search_query: "list comprehensions in Python"

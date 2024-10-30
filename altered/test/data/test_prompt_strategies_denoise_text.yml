@@ -1,0 +1,116 @@
+text_0: >
+  Stack Exchange network consists of 183 Q&A communities including Stack Overflow, the largest, most trusted online community for developers
+  to learn, share their knowledge, and build their careers.
+  Now available on Stack Overflow for Teams! AI features where you work: search, IDE, and chat.
+  Ask questions, find answers and collaborate at work with Stack Overflow for Teams.
+    Explore Teams Teams
+  Connect and share knowledge within a single location that is structured and easy to search.
+  I have tried Get-Process and Get-CimInstance Win32_Process to get GPU usage and GPU memory, but both of them can't offer those information.
+  In Windows Task Manager, it can show GPU memory.
+  So, is there a way to get those in powershell
+  Windows uses Performance Counters to track this type of thing. You can get the values in powershell via Get-Counter. Depending on your GPU
+  and drivers, you may have more specific counters available, but these examples should always be available:
+  I found these counter names by running Get-Counter -ListSet 'GPU*', and taking the Counter values from there. It looks like GPU engine usage
+  is broken down into 4 types:
+  I'm just summing engtype_3D in the example, since it is the only one with usage on my system. These values all match up with what displays
+  in windows Task Manager, so it should be accurate enough.
+  To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+  Site design / logo © 2024 Stack Exchange Inc;
+  user contributions licensed under
+    CC BY-SA. rev 2024.10.17.16978
+  List of Partners (vendors)
+    Get-Process Get-CimInstance Win32_Process Get-WmiObject Win32_VideoController Get-Counter
+  $p = Get-Process dwm
+  ((Get-Counter "\GPU Process Memory(pid_$($p.id)*)\Local Usage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB"}
+  ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%"}
+    # Outputs:
+  Process dwm GPU Engine Usage 0.47%
+  # Example to get total GPU usage counters:
+  $GpuMemTotal = (((Get-Counter "\GPU Process Memory(*)\Local Usage").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+  Write-Output "Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB"
+  $GpuUseTotal = (((Get-Counter "\GPU Engine(*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue | measure
+  -sum).sum
+  Write-Output "Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%"
+    # Outputs:
+  Total GPU Engine Usage: 0.77%
+  # Example to get GPU usage counters for a specific process:
+  $p = Get-Process dwm
+  ((Get-Counter "\GPU Process Memory(pid_$($p.id)*)\Local Usage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Process Memory $([math]::Round($_/1MB,2)) MB"}
+  ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue |
+  foreach {Write-Output "Process $($P.Name) GPU Engine Usage $([math]::Round($_,2))%"}
+    # Outputs:
+  Process dwm GPU Engine Usage 0.47%
+  # Example to get total GPU usage counters:
+  $GpuMemTotal = (((Get-Counter "\GPU Process Memory(*)\Local Usage").CounterSamples | where CookedValue).CookedValue | measure -sum).sum
+  Write-Output "Total GPU Process Memory Local Usage: $([math]::Round($GpuMemTotal/1MB,2)) MB"
+  $GpuUseTotal = (((Get-Counter "\GPU Engine(*engtype_3D)\Utilization Percentage").CounterSamples | where CookedValue).CookedValue | measure
+  -sum).sum
+  Write-Output "Total GPU Engine Usage: $([math]::Round($GpuUseTotal,2))%"
+    # Outputs:
+  Total GPU Engine Usage: 0.77%
+  Get-Counter -ListSet 'GPU*'
+text_1: >
+  Communities for your favorite technologies.  Explore all Collectives
+  Now available on Stack Overflow for Teams! AI features where you work: search, IDE, and chat.
+  Ask questions, find answers and collaborate at work with Stack Overflow for Teams.
+    Explore Teams
+    Teams
+  Connect and share knowledge within a single location that is structured and easy to search.
+  Get early access and see previews of new features.
+  Earn badges by improving or asking questions in Staging Ground.
+  I try to pickup GPU usage of my c# app but there is no way i can doit and make that wrk with NVDIA, AMD, or Intel.
+  Trough powershell is possible to obtain that info, example:
+  This show the gpu usage and work like a charm on any graphic card.
+  How can pickup in asyncronous way the result?
+  Of curse async in order not create blocking thread.
+  Here the full code to pickup the GPU usage from your app or any process, put inside a timer fire this every one second. Work with Intel,
+  Nvidia, AMD.
+  The script gpu.ps:
+  Script for global gpu , cpu etc, take a lok on:
+    https://superuser.com/questions/1632758/how-to-get-gpu-usage-and-gpu-memory-info-of-a-process-by-powershell7
+  Thanks for contributing an answer to Stack Overflow!
+  But avoid …
+  To learn more, see our tips on writing great answers.
+  Required, but never shown
+  By clicking “Post Your Answer”, you agree to our terms of service and acknowledge you have read our privacy policy.
+  To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+  Site design / logo © 2024 Stack Exchange Inc;
+  user contributions licensed under
+    CC BY-SA. rev 2024.10.17.16978
+  List of Partners (vendors)
+  $p = Get-Process MyAPP; ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where
+  CookedValue).CookedValue |foreach {Write-Output "$([math]::Round($_,1))%"}
+  PowerShell ps = PowerShell.Create();
+  ps.AddScript(System.IO.File.ReadAllText(@"e:\gpu.ps"));  //the script.
+  var gpu = ps.BeginInvoke();
+  gpuinfobox.Text = gpu.ToString();  //of curse this not work!
+  PowerShell ps = PowerShell.Create();
+  ps.AddScript(System.IO.File.ReadAllText(@"e:\gpu.ps"));  //the script.
+  var gpu = ps.BeginInvoke();
+  gpuinfobox.Text = gpu.ToString();  //of curse this not work!
+  System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+  dispatcherTimer.Tick += DispatcherTimer_Tick;
+  dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0,1000);
+    dispatcherTimer.Start();
+   {
+    ps.AddScript(System.IO.File.ReadAllText(@"e:\gpu.ps"));
+  var objs = await task;
+  if (objs.Count > 0)
+   {
+  TextBox.Text  =  string.IsNullOrEmpty(result) ? null : result;
+   }}
+  dispatcherTimer.Tick += DispatcherTimer_Tick;
+  dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0,1000);
+    dispatcherTimer.Start();
+   {
+    ps.AddScript(System.IO.File.ReadAllText(@"e:\gpu.ps"));
+  var objs = await task;
+  if (objs.Count > 0)
+   {
+  TextBox.Text  =  string.IsNullOrEmpty(result) ? null : result;
+   }}
+  $p = Get-Process YourApp; ((Get-Counter "\GPU Engine(pid_$($p.id)*engtype_3D)\Utilization Percentage").CounterSamples | where
+  CookedValue).CookedValue |foreach {Write-Output "$([math]::Round($_,1))%"}  

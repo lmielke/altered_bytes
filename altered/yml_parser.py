@@ -50,6 +50,7 @@ class Format(Enum):
 
 
 class YmlParser:
+    file_meta_flag = '# file_meta:'
     meta_flag = '# meta:'
     replaces = {r'\{{': r'{{',}
     code_regex = r'^([a-zA-Z_0-9]*)(?:\s*:\s*(.*)$)'
@@ -60,6 +61,7 @@ class YmlParser:
         self.data = {}
         self.fields_text = ''
         self.fields_name = ''
+        self.fields_example = ''
         self(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
@@ -72,10 +74,12 @@ class YmlParser:
             with open(path, 'r') as f:
                 # we remove the first line from the file as it is the fields file name
                 file = f.read()
-                # print(f"{Fore.YELLOW}YmlParser.load_fields, {file = }{Fore.RESET}")
-                self.fields_text += '\n\n'.join([l for l in file.split('\n\n')[1:]])
-                self.fields_text += '\n'
-        self.fields_text = self.fields_text.replace('\n'*3, '\n'*2)
+                blocks = file.split('\n\n')
+                self.fields_text += ('\n\n'.join(blocks[1:]) + '\n' ).replace('\n'*3, '\n'*2)
+        match = re.search(fr"({self.file_meta_flag})(.*)$", blocks[0])
+        if match:
+            self.fields_example = json.loads(match.group(2))
+
 
     def add_labels(self, *args, description=None, **kwargs):
         self.fields = self.parse_meta(*args, **kwargs)
@@ -243,5 +247,5 @@ class YmlParser:
                         markdown_str += f"# {key.capitalize()}\n{value}\n\n"
                 except:
                     pass  # Handle any malformed JSON-like strings
-        return markdown_str.strip()
+        return markdown_str.strip().replace('<lb>', '\n')
 

@@ -2,13 +2,14 @@
 prompt.py
 
 """
-import os
+import os, yaml
 from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
 from altered.prompt_instructs import Instructions
 from altered.prompt_stats import PromptStats
 from altered.model_connect import SingleModelConnect
+from altered.prompt_deliverable import Deliverable
 import altered.hlp_printing as hlpp
 import altered.settings as sts
 
@@ -26,6 +27,7 @@ class Prompt:
         self.I = Instructions(name, *args, **kwargs)
         self.RD = Render(*args, **kwargs)
         self.stats = PromptStats(*args, **kwargs)
+        self.delv = Deliverable(*args, **kwargs)
         self.data = None
         self.warnings = {}
 
@@ -45,18 +47,34 @@ class Prompt:
         self.context = { 
                             'prompt_title': self.name,
                             'context': self.get_context(*args, verbose=verbose, **kwargs),
+                            'deliverable': self.delv.mk_context(*args, **kwargs),
+                            'user_comment': user_prompt,
                             'instructs': instructs,
-                            'user_prompt': user_prompt,
                         }
-        if verbose:
+        self.context['manifest'] = self.context.keys() - 'prompt_title'
+        if verbose >= 2:
             print(self.stats(2, *args, data_dict=self.context, **kwargs))
 
-    def render_prompt(self, *args, context:dict=None, template_name:str=None, _context:dict=None, **kwargs):
-        context = _context if _context is not None else self.context
-        template_name = template_name if template_name is not None else self.template_name
-        data = self.RD.render(*args, template_name=template_name, context=context, **kwargs, )
-        hlpp.pretty_prompt(data, *args, **kwargs)
-        return data
+    def render_prompt(self, *args, context:dict=None, _cont:dict=None, **kwargs):
+        kwargs.update(self.get_template(*args, **kwargs))
+        context = _cont if _cont is not None else self.context
+        prompt = self.RD.render(*args, context=context, **kwargs, )
+        hlpp.pretty_prompt(prompt, *args, **kwargs)
+        return prompt
+
+    def get_template(self, *args, template_name:str=None, **kwargs):
+        if self.instructs.params.get('sub_method') == 'short':
+            template_name = Instructions.template_name
+        else:
+            template_name = template_name if template_name is not None \
+                                                                    else self.template_name
+        if os.path.isfile(os.path.join(sts.templates_dir, template_name)):
+            return {'template_name': template_name}
+        else:
+            print(  f"{Fore.YELLOW}WARNING: prompt.get_template: "
+                    f"Template not found {Fore.RESET}, going with default "
+                    f"'template_name': {self.template_name}")
+            return {'template_name': self.template_name}
 
     def mk_prompt_summary(self, *args, context:dict=None, **kwargs):
         """
@@ -74,28 +92,38 @@ class Prompt:
         for k, v in p_sum.copy().items():
             p_sum[k] = v.replace("'<user_prompt>'", 'question')
         template = 'prompt_summary.md'
-        _context = {'prompt_summary': p_sum}
-        self.context['prompt_summary'] = self.render_prompt(*args, _context=_context,
-                                                                    template_name=template, 
-                                                                    **kwargs,
-                                                                )
+        _cont = {'prompt_summary': p_sum}
+        self.context['prompt_summary'] = self.render_prompt(*args, _cont=_cont, **kwargs, )
 
     def get_context(self, *args, **kwargs):
         context_dict = self.C(*args, **kwargs)
         return context_dict
 
     def get_instructs(self, *args, **kwargs):
-        instructs = self.I(*args, **kwargs)
-        return instructs
+        self.instructs = self.I(*args, **kwargs)
+        self.fmt = self.instructs.fmt
+        return self.instructs.context
 
 
 class Response:
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name:str, *args, **kwargs):
+        self.name = name
         self.r = {}
+        self.v = Validations(name, *args, **kwargs)
 
     def __call__(self, *args, **kwargs):
-        return self.extract(self.validate(*args, **kwargs), *args, **kwargs)
+        checks_ok = self.v(*args, **kwargs)
+        self.params_to_table(checks_ok, *args, **kwargs)
+        if checks_ok:
+            return self.extract(*args, **kwargs)
+        else:
+            return False
+
+    def params_to_table(self, checks_ok, *args, **kwargs):
+        kwargs['checks'] = checks_ok
+        kwargs.update(self.v.validations)
+        print(hlpp.dict_to_table('PROMPT kwargs', kwargs, *args, **kwargs))
 
     def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
@@ -121,17 +149,141 @@ class Response:
         return record
 
 
-    @staticmethod
-    def validate(r:dict, *args, **kwargs) -> dict:
-        resp_content = r.get('responses')[0].get('response').strip()
-        if not resp_content:
-            raise ValueError(f"Error: No response content returned from the AI model.")
-        if '</INST>' in resp_content:
-            # content most likely contains the instruction tag which we remove here
-            resp_content = resp_content.split('</INST>')
-            if len(resp_content) > 2:
-                raise ValueError(f"Error: Multiple Instruction Tags Found")
-            elif len(resp_content) == 2:
-                resp_content = resp_content[-1].strip()
-        r['responses'][0]['response'] = resp_content
-        return r
+from altered.prompt_strategies import Strategy
+from collections import Counter
+import json, yaml
+
+class Validations(Prompt):
+
+    ep = 'prompt.Validations ERROR: '  # error prefix
+    error_file_name = '_errors.yml'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.strats = Strategy(*args, **kwargs)
+        self.errors = {}
+
+    def __call__(self, *args, **kwargs):
+        self.errors = {}
+        self.instruct_params = self.I.get_instruct_params(*args, **kwargs)
+        self.strat_params, self.fmt = self.strats(
+                                                    self.instruct_params['t_name'], *args, 
+                                                    **kwargs
+                                                    )
+        self.validations = self.strat_params.get('validations')
+        self.validate(*args, **kwargs)
+        self.error_tracking(*args, **kwargs)
+        if self.errors:
+            print(f"{Fore.RED}Response Validation Failed:{Fore.RESET}")
+            return False
+        else:
+            print(f"{Fore.GREEN}Response Validation Passed{Fore.RESET}")
+            return True
+
+    def validate(self, r: dict, *args, **kwargs) -> dict:
+        response = r.get('responses')[0].get('response').strip()
+        self.resp_len_check(response, *args, **kwargs)
+        self.resp_check_format(response, *args, **kwargs)
+        self.resp_illegal_terms_check(response, *args, **kwargs)
+        self.resp_illegal_ends_check(response, *args, **kwargs)
+        self.resp_required_terms_check(response, *args, **kwargs)
+
+    def resp_len_check(self, response, *args, **kwargs):
+        if not response:
+            self.msgs('Response Length', 'No response content returned from the AI model.')
+        else:
+            len_response = int(len(response) // self.strats.lpw)
+        if len_response < self.validations.get('expected_words')[0]:
+            self.msgs(  
+                'Response Length', 
+                f"Length: {len_response} < Min: {self.validations.get('expected_words')[0]}"
+                )
+        elif len_response > self.validations.get('expected_words')[1]:
+            self.msgs(
+                'Response Length', 
+                f"Length: {len_response} > Max: {self.validations.get('expected_words')[1]}"
+                )
+
+    def resp_check_format(self, response, *args, **kwargs):
+        if self.fmt == 'json':
+            try:
+                r = json.loads(response)
+            except json.JSONDecodeError as e:
+                self.msgs('Response Format', f'JSON Decode Error: {e}')
+        elif self.fmt == 'yaml':
+            try:
+                r = yaml.safe_load(response)
+            except yaml.YAMLError as e:
+                self.msgs('Response Format', f'YAML Error: {e}')
+        elif self.fmt == 'makdown':
+            pass
+
+    def resp_illegal_terms_check(self, response, *args, **kwargs):
+        num_inst_tags = response.count('<INST>')
+        if num_inst_tags >= 2:
+            self.msgs('Illegal Tags', f'Multiple <INST> tags found: Count {num_inst_tags}')
+        illegal_terms = self.validations.get('illegal_terms')
+        for il in illegal_terms:
+            if il in response:
+                self.msgs('Illegal Terms in response', f'{il} found')
+
+    def resp_illegal_ends_check(self, response, *args, **kwargs):
+        illegal_ends = self.validations.get('illegal_ends')
+        resp_end = response[-100:]
+        for il in illegal_ends:
+            if il in resp_end:
+                self.msgs('Promt Repitition Error', f'{il} found')
+
+    def resp_required_terms_check(self, response, *args, **kwargs):
+        required_terms = self.validations.get('required_terms')
+        if not required_terms: return
+        # required_terms indicate what constitutes a valid response
+        for rq in required_terms:
+            if rq not in response:
+                self.msgs('Required Terms Missing', f'{rq} missing')
+
+    def msgs(self, error_category: str, msg: str, *args, **kwargs):
+        """
+        Updates the errors Counter with structured error messages.
+
+        Args:
+            error_category (str): The category of the error.
+            msg (str): The detailed error message.
+        """
+        if error_category not in self.errors:
+            self.errors[error_category] = Counter()
+        self.errors[error_category].update([msg])
+        print(f"{Fore.RED}{self.ep}{Fore.RESET}{error_category}: {msg}")
+
+    def error_tracking(self, *args, **kwargs):
+        # if no errors were recorded, we return now
+        if not self.errors:
+            return
+
+        # Load existing errors from the YAML file
+        error_path = os.path.join(sts.strats_dir, self.error_file_name)
+        if os.path.isfile(error_path):
+            with open(error_path, 'r') as f:
+                errors = yaml.safe_load(f) or {}
+        else:
+            errors = {}
+        # Convert existing errors to nested Counter structure
+        updated_errors = {}
+        for category, messages in errors.get(self.strats.template_file_name, {}).items():
+            updated_errors[category] = Counter(messages)
+
+        # Merge existing errors with new errors
+        for category, messages in self.errors.items():
+            if category not in updated_errors:
+                updated_errors[category] = messages
+            else:
+                updated_errors[category].update(messages)
+
+        # Prepare the final dictionary structure to write back
+        errors[self.strats.template_file_name] = {
+            category: dict(messages) for category, messages in updated_errors.items()
+        }
+
+        # Write updated errors back to the YAML file
+        with open(error_path, 'w') as f:
+            yaml.safe_dump(errors, f)

@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader, Template, nodes
 import altered.settings as sts
 
 template_path = os.path.join(sts.templates_dir, 'i_instructs_strats.md')
-tech_fields = {'s_meth', 's_type', 'strats_method'}
+tech_fields = {'s_meth', 's_type', 'strats_method', 'fmt', 'validations'}
 
 @dataclass
 class StrategyFields:
@@ -16,6 +16,8 @@ class StrategyFields:
     s_meth: str
     s_type: str
     strats_method: Dict[str, Any] = field(default_factory=dict)
+    fmt: str = None
+    validations: Dict[str, Any] = field(default_factory=dict)
     # strats .yml fields
     name: str = None
     description: str = None
@@ -24,6 +26,7 @@ class StrategyFields:
     your_task: str = None
     # dynamic fields
     inputs_tag: Optional[str] = None
+    expected_words: Optional[Tuple[int, int]] = None
     inputs_data: str = None
     inputs_intro: Optional[str] = None
     inputs_header: Optional[str] = None

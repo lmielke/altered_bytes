@@ -10,6 +10,7 @@ aliasses:
     l3.2: llama3.2
     m8: mixtral:8x22b
     q2b: qwen2:72b
+    nemo: nemotron
   servers:
     '0': while-ai_0
     '1': while-ai_1
@@ -68,6 +69,15 @@ models:
     general.file_type: Q4_0
     last_update: 8 days ago
     name: llama3.1:70b
+    new_update_available: false
+  nemotron:
+    blob_id: a677b4a4b70c
+    context_length: 131072
+    embedding_length: 8192
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: nemotron
     new_update_available: false
   llama3.1:
     blob_id: 8eeb52dfb3bb

@@ -101,9 +101,9 @@ Here is an illustrative example, to be used as a template or guide: Assume the e
 
 </context>
 
-<user_prompt>
+<user_comment>
     None
-</user_prompt>
+</user_comment>
 
 <INST>
 
@@ -1023,9 +1023,9 @@ This strategy reduces a single ""Noisy Text"" to a single ""De-Noised Text"" by 
 
 </context>
 
-<user_prompt>
+<user_comment>
     
-</user_prompt>
+</user_comment>
 
 <INST>
 
