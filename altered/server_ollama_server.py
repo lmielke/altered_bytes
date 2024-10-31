@@ -58,6 +58,7 @@ class OllamaCall:
             response.update(response_data)
             print(f"{Fore.GREEN}Ollama server response: {response}{Fore.RESET}")
         except Exception as e:
+            print(f"{Fore.RED}Error executing Ollama call: {e}{Fore.RESET}")
             response['error'] = str(e)
 
     def execute_timeout(self):
