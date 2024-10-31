@@ -27,18 +27,6 @@ class Endpoints:
         self.api_counter = defaultdict(int)
         self.olc = Client(host='http://localhost:11434')
 
-    def ping(self, *args, server:object, **kwargs) -> dict:
-        """
-        Generates the JSON response for the /ping request.
-        Updates the /ping counter directly.
-        """
-        # Increment the /ping counter directly
-        return {
-                    'response': 'pong',
-                    'server_ip': server.server_address[0],
-                    'server_port': server.server_address[1]
-        }
-
     def get_embeddings(self, ep, *args, prompts:list, **kwargs) -> dict:
         responses = []
         for prompt in prompts:
@@ -53,38 +41,28 @@ class Endpoints:
                 responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
         return {'responses': responses}
 
-    def unittest(self, *args, repeats, **kwargs) -> dict:
-        """
-        Generates the JSON response for the /unittest request.
-        """
-        response = self.ping(*args, **kwargs)
-        # response['agg_test'] = self.aggate_responses(*args, **kwargs)
-        return {'responses': [response]}
-
     def _ollama(self, func:str, prompt:str, *args, fmt:str=None, verbose:int=0,**kwargs) -> dict:
         """
         Generates the JSON response for the /_ollama request.
         """
-        # Increment the /_ollama counter directly
         params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
         # fmt will only be delivered for get_generates func
         if fmt in self.ollama_formats:
             params['format'] = fmt
+        # Increment the /_ollama counter directly
         self.prompt_counter[func] += 1
-        if verbose:
-            print(f"{Fore.RED}_ollama: '{func}'{Fore.RESET} params: {params}")
-            num_lines = len(prompt.split('\n'))
-            print(f"{len(prompt) = }, {num_lines = }, {len(prompt.split(' ')) = }")
-            print(self.prompt_counter)
+        r = self._call_ollama_server(func, prompt, *args, **params)
+        return r
+
+    def _call_ollama_server(self, )
         # here we finally call ollama server
         r = getattr(self.olc, func)(prompt=prompt, **params)
-        # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
         return r
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     service = None  # This will be set when the server starts
-    allowed_endpoints = {'ping', 'unittest', 'get_generates', 'get_embeddings'}
+    allowed_endpoints = {'get_generates', 'get_embeddings'}
 
     def do_POST(self, *args, **kwargs):
         """
@@ -94,7 +72,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
-        print(f"{Fore.RED}do_Post in:{Fore.RESET} {kwargs.get('verbose') = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
         # Route the request to the appropriate service ep
@@ -149,12 +126,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         Returns:
             Updated response data with additional metadata.
         """
-        time.sleep(0.01)
-        print(
-                    f"\nService {ep} responded successfully. "
-                    f"\n\tprompt_counter = {self.service.api_counter}, "
-                    f"\n\ttotal_server_time = {time.time() - self.server_time:.2f}"
-                    )
+        time.sleep(0.001)
         return {
                             'network_up_time': (self.network_up_time),
                             'server_time': time.time() - self.server_time,

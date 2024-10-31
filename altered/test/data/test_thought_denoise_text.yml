@@ -1,7 +1,7 @@
 # test_thought_denoise_text.yml
 user_prompt: How do I monitor my GPU Performance?
 fmt: json
-alias: l3.2_0
+alias: l3.2_1
 search_query: monitor GPU Performance
 strat_template: format_short
 strat_input_data: >
