@@ -4,60 +4,66 @@ import time
 import yaml
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from collections import defaultdict
 from ollama import Client
 from colorama import Fore, Style
 import random as rd
+import json
 
+from altered.server_ollama_server import OllamaCall
 import altered.model_params as msts
 import altered.settings as sts
-from altered.prompt_instructs import Instructions
-from altered.renderer import Render
 
 
 class Endpoints:
 
     def __init__(self, *args, **kwargs):
-        self.ep_mappings = {
-                                'get_generates': 'generate', 
-                                'get_embeddings': 'embeddings', 
-                            }
-        # used to filter the kwargs for the ollama client
+        """
+        Initializes the Endpoints class, sets up the Ollama call instance, and prepares endpoint mappings.
+        """
+        self.ep_mapps = {
+            'get_generates': 'generate',
+            'get_embeddings': 'embeddings',
+        }
+        # Used to filter the kwargs for the ollama client
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
         self.ollama_formats = {'json', }
         self.api_counter = defaultdict(int)
-        self.olc = Client(host='http://localhost:11434')
+        self.ollama_call = OllamaCall(host='http://localhost:11434', timeout=30)
 
-    def get_embeddings(self, ep, *args, prompts:list, **kwargs) -> dict:
+    def get_embeddings(self, ep, *args, prompts: list, **kwargs) -> dict:
+        """
+        Retrieves embeddings for the provided prompts.
+
+        Args:
+            ep (str): The endpoint name.
+            prompts (list): List of prompts to send to the Ollama server.
+
+        Returns:
+            dict: The server's responses containing embeddings.
+        """
         responses = []
         for prompt in prompts:
-            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+            responses.append(self.ollama_call.execute(self.ep_mapps.get(ep), prompt, kwargs))
         return {'responses': responses}
 
-    def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs
-        ) -> dict:
+    def get_generates(self, ep: str, *args, prompts: list, repeats: int = sts.repeats, **kwargs) -> dict:
+        """
+        Generates text for the provided prompts, repeating as specified.
+
+        Args:
+            ep (str): The endpoint name.
+            prompts (list): List of prompts to send to the Ollama server.
+            repeats (int): Number of times to repeat generation for each prompt.
+
+        Returns:
+            dict: The server's responses containing generated texts.
+        """
         responses = []
         for i, prompt in enumerate(prompts):
             for repeat in range(repeats['num']):
-                responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+                responses.append(self.ollama_call.execute(self.ep_mapps.get(ep), prompt, kwargs))
         return {'responses': responses}
-
-    def _ollama(self, func:str, prompt:str, *args, fmt:str=None, verbose:int=0,**kwargs) -> dict:
-        """
-        Generates the JSON response for the /_ollama request.
-        """
-        params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
-        # fmt will only be delivered for get_generates func
-        if fmt in self.ollama_formats:
-            params['format'] = fmt
-        # Increment the /_ollama counter directly
-        self.prompt_counter[func] += 1
-        r = self._call_ollama_server(func, prompt, params)
-        return r
-
-    def _call_ollama_server(self, func:str, prompt:str, params:dict):
-        # here we finally call ollama server
-        r = getattr(self.olc, func)(prompt=prompt, **params)
-        return r
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
