@@ -51,10 +51,10 @@ class Endpoints:
             params['format'] = fmt
         # Increment the /_ollama counter directly
         self.prompt_counter[func] += 1
-        r = self._call_ollama_server(func, prompt, *args, **params)
+        r = self._call_ollama_server(func, prompt, params)
         return r
 
-    def _call_ollama_server(self, )
+    def _call_ollama_server(self, func:str, prompt:str, params:dict):
         # here we finally call ollama server
         r = getattr(self.olc, func)(prompt=prompt, **params)
         return r
