@@ -94,13 +94,6 @@ class OllamaCall:
         except subprocess.CalledProcessError as e:
             print(f"{Fore.RED}Error retrieving process ID: {e}{Fore.RESET}")
         return "", None
-            if process:
-                return f"taskkill /PID {process} /F"
-            else:
-                print(f"{Fore.RED}No process named {self.ollama_process_name} was found.{Fore.RESET}")
-        except subprocess.CalledProcessError as e:
-            print(f"{Fore.RED}Error retrieving process ID: {e}{Fore.RESET}")
-        return ""
 
     def run_kill_cmd(self, kill_cmd: str, process_id: str = None):
         """
@@ -117,8 +110,5 @@ class OllamaCall:
                     print(f"{Fore.GREEN}Successfully killed process with ID {process_id}: {kill_cmd}{Fore.RESET}")
                 else:
                     print(f"{Fore.GREEN}Successfully executed kill command: {kill_cmd}{Fore.RESET}")
-            try:
-                subprocess.run(kill_cmd, shell=True, check=True)
-                print(f"{Fore.GREEN}Successfully executed kill command: {kill_cmd}{Fore.RESET}")
             except subprocess.CalledProcessError as e:
                 print(f"{Fore.RED}Failed to execute kill command: {e}{Fore.RESET}")
