@@ -1,12 +1,7 @@
-import json
-import os
-import time
-import yaml
+import json os time yaml
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from collections import defaultdict
 from colorama import Fore, Style
-import json
 from ollama import Client
 import random as rd
 
