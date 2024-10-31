@@ -10,12 +10,6 @@ import altered.model_params as msts
 import altered.settings as sts
 
 
-import json
-from collections import defaultdict
-from ollama_call_with_timeout import OllamaCall
-import altered.settings as sts
-
-
 class Endpoints:
 
     def __init__(self, *args, **kwargs):
