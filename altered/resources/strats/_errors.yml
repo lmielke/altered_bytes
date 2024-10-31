@@ -34,20 +34,21 @@ clean_text.yml:
     'Length: 954 < Min: 2648': 1
 format_short.yml:
   Illegal Terms in response:
-    Dogs found: 25
-    Foxes found: 25
-    Foxes meet Dogs found: 23
-    dogs found: 28
-    fox_agility found: 38
-    foxes found: 28
+    Dogs found: 26
+    Foxes found: 26
+    Foxes meet Dogs found: 24
+    dogs found: 29
+    fox_agility found: 39
+    foxes found: 29
   Promt Repitition Error:
-    Do not explain your reasoning unless specifically asked for! found: 1
+    Do not explain your reasoning unless specifically asked for! found: 2
   Response Length:
     'Length: 10516 > Max: 1419': 1
     'Length: 11220 > Max: 1419': 1
     'Length: 12525 > Max: 1419': 1
     'Length: 1427 > Max: 1419': 1
     'Length: 1450 > Max: 1419': 1
+    'Length: 1488 > Max: 1419': 1
     'Length: 1599 > Max: 1419': 1
     'Length: 1640 > Max: 1419': 1
     'Length: 1704 > Max: 1419': 1
