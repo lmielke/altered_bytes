@@ -5,10 +5,10 @@ import yaml
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from collections import defaultdict
-from ollama import Client
 from colorama import Fore, Style
-import random as rd
 import json
+from ollama import Client
+import random as rd
 
 from altered.server_ollama_server import OllamaCall
 import altered.model_params as msts
