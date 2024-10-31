@@ -31,13 +31,12 @@ class OllamaCall:
             dict: The response from the Ollama server or an error response if timed out.
         """
         response = {}
-        print(f"{Fore.BLUE}Executing Ollama call with function: {func = }, \n\t{prompt = }, \n\t{params = }{Fore.RESET}")
         thread = threading.Thread(target=self._call_ollama_server, args=(func, prompt, params, response))
         thread.start()
         thread.join(timeout=self.timeout)
 
         if thread.is_alive():
-            print(f"{Fore.YELLOW}Ollama server is unresponsive. Executing timeout handling...{Fore.RESET}")
+            print(f"{Fore.RED}Ollama server is unresponsive. Executing timeout!{Fore.RESET}")
             self.execute_timeout()
             response['error'] = f"Request timed out after {self.timeout} seconds"
         return response
@@ -53,10 +52,10 @@ class OllamaCall:
             response (dict): A reference dictionary to store the server response.
         """
         try:
-            print(f"{Fore.RED}Calling Ollama server with function: {func = }, \n\t{params = }{Fore.RESET}")
+            print(f"\n{Fore.YELLOW}Calling Ollama server with function: {func = }, \n\t{params = }{Fore.RESET}")
             response_data = getattr(self.client, func)(prompt=prompt, **params)
+            print(f"{Fore.GREEN}Ollama server response: {response_data = }{Fore.RESET}")
             response.update(response_data)
-            print(f"{Fore.GREEN}Ollama server response: {response}{Fore.RESET}")
         except Exception as e:
             print(f"{Fore.RED}Error executing Ollama call: {e}{Fore.RESET}")
             response['error'] = str(e)
