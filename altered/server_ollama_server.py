@@ -31,6 +31,7 @@ class OllamaCall:
             dict: The response from the Ollama server or an error response if timed out.
         """
         response = {}
+        print(f"{Fore.BLUE}Executing Ollama call with function: {func = }, \n\t{prompt = }, \n\t{params = }{Fore.RESET}")
         thread = threading.Thread(target=self._call_ollama_server, args=(func, prompt, params, response))
         thread.start()
         thread.join(timeout=self.timeout)
@@ -52,8 +53,10 @@ class OllamaCall:
             response (dict): A reference dictionary to store the server response.
         """
         try:
+            print(f"{Fore.RED}Calling Ollama server with function: {func = }, \n\t{params = }{Fore.RESET}")
             response_data = getattr(self.client, func)(prompt=prompt, **params)
             response.update(response_data)
+            print(f"{Fore.GREEN}Ollama server response: {response}{Fore.RESET}")
         except Exception as e:
             response['error'] = str(e)
 
