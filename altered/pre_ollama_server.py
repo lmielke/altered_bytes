@@ -1,121 +1,103 @@
-
 import json
+import os
 import time
-import threading
-import subprocess
+import yaml
+from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from ollama import Client
-from collections import defaultdict
-from colorama import Fore
+from colorama import Fore, Style
+import random as rd
+
+import altered.model_params as msts
+import altered.settings as sts
+from altered.prompt_instructs import Instructions
+from altered.renderer import Render
+
 
 class Endpoints:
 
     def __init__(self, *args, **kwargs):
         self.ep_mappings = {
-            'get_generates': 'generate',
-            'get_embeddings': 'embeddings',
-        }
+                                'get_generates': 'generate', 
+                                'get_embeddings': 'embeddings', 
+                            }
+        # used to filter the kwargs for the ollama client
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
-        self.ollama_formats = {'json'}
+        self.ollama_formats = {'json', }
         self.api_counter = defaultdict(int)
-        self.prompt_counter = defaultdict(int)
         self.olc = Client(host='http://localhost:11434')
 
-    def ping(self, *args, server: object, **kwargs) -> dict:
+    def ping(self, *args, server:object, **kwargs) -> dict:
         """
         Generates the JSON response for the /ping request.
+        Updates the /ping counter directly.
         """
+        # Increment the /ping counter directly
         return {
-            'response': 'pong',
-            'server_ip': server.server_address[0],
-            'server_port': server.server_address[1]
+                    'response': 'pong',
+                    'server_ip': server.server_address[0],
+                    'server_port': server.server_address[1]
         }
 
-    def get_generates(self, ep: str, *args, prompt: str, **kwargs) -> dict:
-        response = self._ollama_threaded(self.ep_mappings.get(ep), prompt, *args, **kwargs)
-        self.prompt_counter[ep] += 1
-        return {'response': response}
+    def get_embeddings(self, ep, *args, prompts:list, **kwargs) -> dict:
+        responses = []
+        for prompt in prompts:
+            responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+        return {'responses': responses}
 
-    def _ollama_threaded(self, func: str, prompt: str, *args, timeout: int = 10, **kwargs) -> dict:
-        """
-        Calls the Ollama client in a separate thread with a timeout.
-        If the timeout is exceeded, a kill command is executed to stop the Ollama process.
-        """
-        result = {}
+    def get_generates(self, ep:str, *args, prompts:list, repeats:int=sts.repeats, **kwargs
+        ) -> dict:
+        responses = []
+        for i, prompt in enumerate(prompts):
+            for repeat in range(repeats['num']):
+                responses.append(self._ollama(self.ep_mappings.get(ep), prompt, *args, **kwargs))
+        return {'responses': responses}
 
-        def call_ollama():
-            try:
-                params = {k: v for k, v in kwargs.items() if k in self.ollama_params}
-                response = getattr(self.olc, func)(prompt=prompt, **params)
-                result['response'] = response
-            except Exception as e:
-                result['error'] = str(e)
+    def unittest(self, *args, repeats, **kwargs) -> dict:
+        """
+        Generates the JSON response for the /unittest request.
+        """
+        response = self.ping(*args, **kwargs)
+        # response['agg_test'] = self.aggate_responses(*args, **kwargs)
+        return {'responses': [response]}
 
-        thread = threading.Thread(target=call_ollama)
-        thread.start()
-        thread.join(timeout)
-        if thread.is_alive():
-            self.execute_timeout()
-            result['error'] = 'Request timed out and process was killed'
-        return result
-
-    def execute_timeout(self):
+    def _ollama(self, func:str, prompt:str, *args, fmt:str=None, verbose:int=0,**kwargs) -> dict:
         """
-        Executes the timeout handling by running a kill command for the Ollama process.
+        Generates the JSON response for the /_ollama request.
         """
-        kill_cmd = self.get_kill_cmd()
-        self.run_kill_cmd(kill_cmd)
-
-    def get_kill_cmd(self) -> str:
-        """
-        Generates the command to kill the Ollama process running on the GPU.
-        
-        Returns:
-            A string representing the kill command for the Ollama process.
-        """
-        try:
-            process = subprocess.check_output(
-                ['powershell', '-Command', "Get-Process | Where-Object { $_.Path -like '*ollama_llama_server.exe' } | Select-Object -First 1 -ExpandProperty Id"],
-                text=True
-            ).strip()
-            if process:
-                return f"taskkill /PID {process} /F"
-            else:
-                print(f"{Fore.RED}No process named ollama_llama_server.exe was found.{Fore.RESET}")
-        except subprocess.CalledProcessError as e:
-            print(f"{Fore.RED}Error retrieving process ID: {e}{Fore.RESET}")
-        return ""
-
-    def run_kill_cmd(self, kill_cmd: str):
-        """
-        Executes the provided kill command.
-        
-        Args:
-            kill_cmd: The command to execute to kill the process.
-        """
-        if kill_cmd:
-            try:
-                subprocess.run(kill_cmd, shell=True, check=True)
-                print(f"{Fore.GREEN}Successfully executed kill command: {kill_cmd}{Fore.RESET}")
-            except subprocess.CalledProcessError as e:
-                print(f"{Fore.RED}Failed to execute kill command: {e}{Fore.RESET}")
+        # Increment the /_ollama counter directly
+        params = {k: vs for k, vs in kwargs.items() if k in self.ollama_params}
+        # fmt will only be delivered for get_generates func
+        if fmt in self.ollama_formats:
+            params['format'] = fmt
+        self.prompt_counter[func] += 1
+        if verbose:
+            print(f"{Fore.RED}_ollama: '{func}'{Fore.RESET} params: {params}")
+            num_lines = len(prompt.split('\n'))
+            print(f"{len(prompt) = }, {num_lines = }, {len(prompt.split(' ')) = }")
+            print(self.prompt_counter)
+        # here we finally call ollama server
+        r = getattr(self.olc, func)(prompt=prompt, **params)
+        # r = {'model': '_ollama', 'response': 'This is a test response.', 'prompt': prompt, 'params': params}
+        return r
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    service = None
-    allowed_endpoints = {'ping', 'get_generates', 'get_embeddings'}
+    service = None  # This will be set when the server starts
+    allowed_endpoints = {'ping', 'unittest', 'get_generates', 'get_embeddings'}
 
     def do_POST(self, *args, **kwargs):
         """
-        Handles the POST requests by routing to the appropriate service method
-        and sending the response as JSON. Tracks the prompt counter and timing information.
+        Handles the POST requests by routing to the appropriate service method 
+        and sending the response as JSON.
+        Tracks the prompt counter and timing information.
         """
         # Update kwargs with the parsed JSON body from the client
         kwargs.update(self.get_kwargs(*args, **kwargs))
-        print(f"{Fore.RED}do_POST in:{Fore.RESET} {kwargs.get('verbose') = }")
+        print(f"{Fore.RED}do_Post in:{Fore.RESET} {kwargs.get('verbose') = }")
         self.start_timing(*args, **kwargs)
         ep, payload = self.get_endpoint(*args, **kwargs)
-        # Route the request to the appropriate service endpoint
+        # Route the request to the appropriate service ep
         payload.update(getattr(self.service, ep)(ep, *args, server=self.server, **kwargs))
         # Update response with timing information and other server statistics
         payload.update(self.end_timing(ep, *args, **kwargs))
@@ -135,41 +117,48 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.service.api_counter[ep] += 1
             self.service.prompt_counter = defaultdict(int)
         return ep, {
-            'api_counter': self.service.api_counter,
-            'prompt_counter': self.service.prompt_counter
-        }
+                    'api_counter': self.service.api_counter, 
+                    'prompt_counter': self.service.prompt_counter
+                    }
 
-    def start_timing(self, *args, network_up_time: float = None, **kwargs):
+    def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
         """
         Explicitly handles network_up_time passed from kwargs.
         
         Args:
-            network_up_time: The time when the network started, passed from the client.
+            start_time: The time when the request started processing.
+            network_up_time: The time when the network started, passed from client.
+        
+        Returns:
+            A tuple containing network_up_time and total server time.
         """
-        self.network_up_time = time.time() - network_up_time if network_up_time else time.time()
-        self.server_start_time = time.time()
+        # Calculate elapsed network up time
+        time.sleep(0.01)
+        self.network_up_time = time.time() - network_up_time
+        self.server_time = time.time()
 
-    def end_timing(self, ep, *args, **kwargs) -> dict:
+    def end_timing(self, ep, *args, **kwargs ) -> dict:
         """
         Updates the response data with timing information and other server statistics.
         
         Args:
-            ep: The endpoint being processed.
+            payload: The original response data to be updated.
+            self.network_up_time: The calculated network up time.
+            server_time: The total time the server took to process the request.
         
         Returns:
-            A dictionary with updated timing metadata.
+            Updated response data with additional metadata.
         """
-        processing_time = time.time() - self.server_start_time
-        network_down_time = time.time()
+        time.sleep(0.01)
         print(
-            f"\nService {ep} responded successfully. "
-            f"\n\tprompt_counter = {self.service.prompt_counter}, "
-            f"\n\ttotal_server_time = {processing_time:.2f}"
-        )
+                    f"\nService {ep} responded successfully. "
+                    f"\n\tprompt_counter = {self.service.api_counter}, "
+                    f"\n\ttotal_server_time = {time.time() - self.server_time:.2f}"
+                    )
         return {
-            'network_up_time': self.network_up_time,
-            'server_processing_time': processing_time,
-            'network_down_time': network_down_time,
+                            'network_up_time': (self.network_up_time),
+                            'server_time': time.time() - self.server_time,
+                            'network_down_time': time.time(),
         }
 
     def send_server_response(self, payload: dict, *args, status_code: int = 200, **kwargs):
@@ -196,8 +185,13 @@ class ServiceHTTPServer(HTTPServer):
         self.RequestHandlerClass.service = Endpoints(*args, **kwargs)
 
 
-def run(server_class=ServiceHTTPServer, handler_class=SimpleHTTPRequestHandler, port=8000, *args, **kwargs):
+def run(server_class=ServiceHTTPServer, handler_class=SimpleHTTPRequestHandler, port=None, 
+            *args, **kwargs
+    ):
+    print(f"{msts.config.defaults['port'] = }")
+    port = port if port is not None else msts.config.defaults['port']
     server_address = ('', port)
+    print(f"{server_address = }")
     httpd = server_class(server_address, handler_class)
     print(f"Starting the HTTP server on port {port}...")
     httpd.serve_forever()
