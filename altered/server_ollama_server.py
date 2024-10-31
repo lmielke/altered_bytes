@@ -15,7 +15,7 @@ class OllamaCall:
         Initializes the OllamaCall class with the Ollama client.
         """
         self.client = Client(host=self.host)
-        self.ollama_process_name = 'ollama_llama_server.exe'
+        self.prc_name = 'ollama_llama_server.exe'
 
     def execute(self, func: str, prompt: str, params: dict) -> dict:
         """
@@ -30,23 +30,33 @@ class OllamaCall:
             dict: The response from the Ollama server or an error response if timed out.
         """
         response = {}
-        attempts = 0
+        attempts = 1
 
-        while attempts < self.max_repeat:
-            thread = threading.Thread(target=self._call_ollama_server, args=(func, prompt, params, response))
+        while attempts <= self.max_repeat:
+            thread = threading.Thread(
+                target=self._call_ollama_server, 
+                args=(func, prompt, params, response)
+            )
             thread.start()
             thread.join(timeout=self.timeout)
 
             if thread.is_alive():
-                print(f"{Fore.YELLOW}Ollama server is unresponsive. Executing timeout handling...{Fore.RESET}")
+                print(
+                    f"{Fore.YELLOW}Ollama server is unresponsive. "
+                    f"Executing timeout handling...{Fore.RESET}"
+                )
                 self.execute_timeout()
                 attempts += 1
-                print(f"{Fore.YELLOW}Retrying... Attempt {attempts}/{self.max_repeat}{Fore.RESET}")
+                print(
+                    f"{Fore.YELLOW}Retrying {attempts}/{self.max_repeat}{Fore.RESET}"
+                )
             else:
                 break
 
-        if attempts == self.max_repeat:
-            response['error'] = f"Request timed out after {self.timeout * self.max_repeat} seconds"
+        if attempts > self.max_repeat:
+            response['error'] = (
+                f"Request timed out after {self.timeout * self.max_repeat} seconds"
+            )
         return response
 
     def _call_ollama_server(self, func: str, prompt: str, params: dict, response: dict):
@@ -70,7 +80,8 @@ class OllamaCall:
         Executes the timeout handling by running a kill command for the Ollama process.
         """
         kill_cmd, process_id = self.get_kill_cmd()
-        self.run_kill_cmd(kill_cmd, process_id)
+        if kill_cmd:
+            self.run_kill_cmd(kill_cmd, process_id)
 
     def get_kill_cmd(self) -> tuple:
         """
@@ -83,14 +94,20 @@ class OllamaCall:
             process = subprocess.check_output(
                 [
                     'powershell', '-Command',
-                    f"Get-Process | Where-Object {{ $_.Path -like '*{self.ollama_process_name}' }} | Select-Object -First 1 -ExpandProperty Id"
+                    (
+                        f"Get-Process | Where-Object {{ $_.Path -like '*{self.prc_name}' }} "
+                        f"| Select-Object -First 1 -ExpandProperty Id"
+                    )
                 ],
                 text=True
             ).strip()
             if process:
                 return f"taskkill /PID {process} /F", process
             else:
-                print(f"{Fore.RED}No process named {self.ollama_process_name} was found.{Fore.RESET}")
+                print(
+                    f"{Fore.RED}No process named {self.prc_name} was found." 
+                    f"{Fore.RESET}"
+                )
         except subprocess.CalledProcessError as e:
             print(f"{Fore.RED}Error retrieving process ID: {e}{Fore.RESET}")
         return "", None
@@ -107,8 +124,13 @@ class OllamaCall:
             try:
                 subprocess.run(kill_cmd, shell=True, check=True)
                 if process_id:
-                    print(f"{Fore.GREEN}Successfully killed process with ID {process_id}: {kill_cmd}{Fore.RESET}")
+                    print(
+                        f"{Fore.GREEN}Successfully killed process with ID {process_id}: "
+                        f"{kill_cmd}{Fore.RESET}"
+                    )
                 else:
-                    print(f"{Fore.GREEN}Successfully executed kill command: {kill_cmd}{Fore.RESET}")
+                    print(
+                        f"{Fore.GREEN}Successfully executed:{Fore.RESET} {kill_cmd = }"
+                    )
             except subprocess.CalledProcessError as e:
                 print(f"{Fore.RED}Failed to execute kill command: {e}{Fore.RESET}")
