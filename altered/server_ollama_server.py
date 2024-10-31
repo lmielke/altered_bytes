@@ -9,15 +9,14 @@ import altered.settings as sts
 
 
 class OllamaCall:
-    ollama_host: str = 'http://localhost:11434'
-    timeout: int = 60
-    max_retries: int = 3
+    timeout: int = msts.config.params.get('timeout')
+    max_retries: int = msts.config.params.get('max_retries')
 
     def __init__(self, *args, **kwargs):
         """
         Initializes the OllamaCall class with the Ollama client.
         """
-        self.client = Client(host=self.ollama_host)
+        self.client = Client(host=msts.config.params.get('ollama_host'))
         self.prc_name = 'ollama_llama_server.exe'
 
     def execute(self, func: str, prompt: str, params: dict) -> dict:
