@@ -24,7 +24,7 @@ class Endpoints:
         self.ollama_params = {'prompt', 'options', 'keep_alive', 'stream', 'model'}
         self.ollama_formats = {'json', }
         self.api_counter = defaultdict(int)
-        self.ollama_call = OllamaCall(host='http://localhost:11434', timeout=10)
+        self.ollama_call = OllamaCall(*args, **kwargs)
 
     def get_embeddings(self, ep, *args, prompts: list, **kwargs) -> dict:
         """
