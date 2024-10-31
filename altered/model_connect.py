@@ -129,7 +129,7 @@ class ModelConnect:
             if context.get('service_endpoint') == 'get_generates':
                 if num_predict is not None: 
                     context['options']['num_predict'] = num_predict
-                    # num_predict is also used by pre_ollama_server, so we add it here to
+                    # num_predict is also used by server_ollama_endpoint, so we add it here to
                     context['num_predict'] = num_predict
                 context['fmt'] = fmt
                 context['stream'] = False

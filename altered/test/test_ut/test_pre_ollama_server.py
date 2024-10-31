@@ -1,8 +1,8 @@
-# test_pre_ollama_server.py
+# test_server_ollama_endpoint.py
 
 import unittest, http.client, json, threading, time
 from colorama import Fore, Style
-from altered.pre_ollama_server import run, ServiceHTTPServer, SimpleHTTPRequestHandler
+from altered.server_ollama_endpoint import run, ServiceHTTPServer, SimpleHTTPRequestHandler
 
 
 class Test_Ollama_Server(unittest.TestCase):

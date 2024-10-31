@@ -4,17 +4,20 @@ import time
 from ollama import Client
 from colorama import Fore, Style
 
+import altered.model_params as msts
+import altered.settings as sts
+
 
 class OllamaCall:
-    host: str = 'http://localhost:11434'
-    timeout: int = 30
-    max_repeat: int = 3
+    ollama_host: str = 'http://localhost:11434'
+    timeout: int = 60
+    max_retries: int = 3
 
     def __init__(self, *args, **kwargs):
         """
         Initializes the OllamaCall class with the Ollama client.
         """
-        self.client = Client(host=self.host)
+        self.client = Client(host=self.ollama_host)
         self.prc_name = 'ollama_llama_server.exe'
 
     def execute(self, func: str, prompt: str, params: dict) -> dict:
@@ -32,7 +35,7 @@ class OllamaCall:
         response = {}
         attempts = 1
 
-        while attempts <= self.max_repeat:
+        while attempts <= self.max_retries:
             thread = threading.Thread(
                 target=self._call_ollama_server, 
                 args=(func, prompt, params, response)
@@ -48,14 +51,14 @@ class OllamaCall:
                 self.execute_timeout()
                 attempts += 1
                 print(
-                    f"{Fore.YELLOW}Retrying {attempts}/{self.max_repeat}{Fore.RESET}"
+                    f"{Fore.YELLOW}Retrying {attempts}/{self.max_retries}{Fore.RESET}"
                 )
             else:
                 break
 
-        if attempts > self.max_repeat:
+        if attempts > self.max_retries:
             response['error'] = (
-                f"Request timed out after {self.timeout * self.max_repeat} seconds"
+                f"Request timed out after {self.timeout * self.max_retries} seconds"
             )
         return response
 

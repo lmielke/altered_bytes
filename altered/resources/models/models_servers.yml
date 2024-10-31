@@ -168,3 +168,7 @@ overwrites:
   get_embeddings:
     model: llama3.1
     server: while-ai_1
+params:
+  ollama_host: http://localhost:11434
+  timeout: 60
+  max_retries: 3

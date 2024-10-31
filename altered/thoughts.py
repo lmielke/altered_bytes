@@ -4,7 +4,7 @@ This class orchestrates the communication between the user and the AI assistant.
 It stores and manages the thought history and creates the thought message for the next prompt and
 receives the response from the AI LLM. 
 
-Run like: pipenv run python -m altered.pre_ollama_server
+Run like: pipenv run python -m altered.server_ollama_endpoint
 
 """
 
