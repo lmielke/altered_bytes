@@ -1,7 +1,9 @@
 # test_thought_denoise_text.yml
 user_prompt: How do I monitor my GPU Performance?
 fmt: json
-alias: l3.2_1
+alias:
+  - llama3.2
+  - while-ai_0
 search_query: monitor GPU Performance
 strat_template: format_short
 strat_input_data: >

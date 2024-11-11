@@ -163,15 +163,12 @@ class Validations(Prompt):
         self.strats = Strategy(*args, **kwargs)
         self.errors = {}
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, r:dict, *args, **kwargs):
         self.errors = {}
         self.instruct_params = self.I.get_instruct_params(*args, **kwargs)
-        self.strat_params, self.fmt = self.strats(
-                                                    self.instruct_params['t_name'], *args, 
-                                                    **kwargs
-                                                    )
+        self.strat_params, self.fmt = self.strats(*args, params=self.instruct_params, **kwargs)
         self.validations = self.strat_params.get('validations')
-        self.validate(*args, **kwargs)
+        self.validate(r, *args, **kwargs)
         self.error_tracking(*args, **kwargs)
         if self.errors:
             print(f"{Fore.RED}Response Validation Failed:{Fore.RESET}")
@@ -193,12 +190,13 @@ class Validations(Prompt):
             self.msgs('Response Length', 'No response content returned from the AI model.')
         else:
             len_response = int(len(response) // self.strats.lpw)
-        if len_response < self.validations.get('expected_words')[0]:
+        bias = 5
+        if len_response < self.validations.get('expected_words')[0] - bias:
             self.msgs(  
                 'Response Length', 
                 f"Length: {len_response} < Min: {self.validations.get('expected_words')[0]}"
                 )
-        elif len_response > self.validations.get('expected_words')[1]:
+        elif len_response > self.validations.get('expected_words')[1] + bias:
             self.msgs(
                 'Response Length', 
                 f"Length: {len_response} > Max: {self.validations.get('expected_words')[1]}"
@@ -223,12 +221,14 @@ class Validations(Prompt):
         if num_inst_tags >= 2:
             self.msgs('Illegal Tags', f'Multiple <INST> tags found: Count {num_inst_tags}')
         illegal_terms = self.validations.get('illegal_terms')
+        if not illegal_terms: return
         for il in illegal_terms:
             if il in response:
                 self.msgs('Illegal Terms in response', f'{il} found')
 
     def resp_illegal_ends_check(self, response, *args, **kwargs):
         illegal_ends = self.validations.get('illegal_ends')
+        if not illegal_ends: return
         resp_end = response[-100:]
         for il in illegal_ends:
             if il in resp_end:

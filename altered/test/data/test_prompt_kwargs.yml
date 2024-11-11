@@ -17,8 +17,7 @@ chat_history:
 init_prompt:
   role: user
   content: What are list comprehensions?
-strat_templates:
-  - agg_best
+strat_template: agg_mean
 prompts:
   - What are list comprehensions?
   - What use have list comprehensions?

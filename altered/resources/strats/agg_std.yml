@@ -13,15 +13,15 @@ description: >
     ranging from identical (low variance) to highly divergent (high variance). 
     The output is a JSON string that provides a standard deviation score
     from 0 (virtually identical) to 6 (no commonalities), along with a short justification 
-    for the score.
-    Here is a more detailed explanation of the various std scores:\n
-    0: The texts are virtually identical.\n
-    1: The texts are virtually identical in topic and context, but differ in wording.\n
-    2: The texts handle the same topic, but show minor variations in context and signifficant variations in wording.\n
-    3: The texts handle the same topic, but show signifficant variations in both, context and wording.\n
-    4. The texts show signifficant variations in context and wording. Also at least one text is completely off topic.\n
-    5. The texts are partially related however, there is multiple texts that talk about different topics.\n
-    6. The texts are completely unrelated.\n
+    for the score.\n
+    The following std scores apply when: Texts are\n
+    0: virtually identical.\n
+    1: virtually identical in topic and context, but differ in wording.\n
+    2: handling the same topic, with minor variations in context and signifficant variations in wording.\n
+    3: handling the same topic, with signifficant variations in both, context and wording.\n
+    4. showing signifficant variations in context and wording. Also at least one text is completely off topic.\n
+    5. partially related however, there is multiple texts that talk about different topics.\n
+    6. completely unrelated.\n
 
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
@@ -34,7 +34,7 @@ example: >
       - "Response 2: A fox swiftly leaps over a sleeping dog with grace and speed."
       - "Response 3: The nimble fox hops over a lethargic dog."
     Expected Output:\n
-    ```JSON
+    ``` JSON
       {
         'std': 2, 
         'reasoning': 'The texts are similar in describing the same action but differ signifficantly in wording and emphasis on the dog condition.'
@@ -58,9 +58,29 @@ your_task: >
     re-construct the prompt or problem statement based on the provided responses.
     3. Derrive the semantic std along with a brief justification for the score, 
     The output must be in JSON format:\n
-    ```JSON
+    ``` JSON
       {
         'std': <int>, 
         'reasoning': '<justification_str>'
       }
     ```
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "json"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: json
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "json"}
+# validations will verify the model response from this strategy
+validations:
+    illegal_terms:
+        - fox jumps
+        - lazy dog
+        - graceful fox
+    illegal_ends:
+        - Do not elaborate further unless specifically asked.
+    required_terms:
+        - '{'
+        - '}'
+    start_terms:
+        - Here is the compressed ...
+        - The compressed text ...

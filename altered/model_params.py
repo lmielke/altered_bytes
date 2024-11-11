@@ -126,7 +126,7 @@ class ModelParams:
             server_name = self.defaults.get(service_endpoint)['server'] if server is None else server
             # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
-        elif type(alias) == tuple:
+        elif type(alias) in [tuple, list]:
             model_alias, server_alias = None, None
             model_name, server_name = alias
             model_name = model_name if model is None else model

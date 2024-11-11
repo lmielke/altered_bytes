@@ -41,6 +41,7 @@ class Endpoints:
         for prompt in prompts:
             params = {k: v for k, v in kwargs.items() if k in self.ollama_params}
             responses.append(self.ollama_call.execute(self.ep_mapps.get(ep), prompt, params))
+            self.prompt_counter[ep] += 1
         return {'responses': responses}
 
     def get_generates(self, ep: str, *args, prompts: list, repeats: int = sts.repeats, **kwargs) -> dict:
@@ -60,6 +61,7 @@ class Endpoints:
             for repeat in range(repeats['num']):
                 params = {k: v for k, v in kwargs.items() if k in self.ollama_params}
                 responses.append(self.ollama_call.execute(self.ep_mapps.get(ep), prompt, params))
+                self.prompt_counter[ep] += 1
         return {'responses': responses}
 
 

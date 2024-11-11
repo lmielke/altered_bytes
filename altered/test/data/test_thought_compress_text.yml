@@ -1,0 +1,51 @@
+# test_thought_compress_text.yml
+user_prompt: How do I monitor my GPU Performance?
+fmt: json
+alias:
+  - llama3.2
+  - while-ai_1
+search_query: monitor GPU Performance
+strat_template: compress_short
+strat_input_data: >
+  # Why is the Sky Blue?
+  
+  The blue color of the sky is a phenomenon rooted in the interactions between sunlight and 
+  Earth’s atmosphere. This explanation combines physics and atmospheric science to understand 
+  how light behaves in different conditions.
+  
+  ## The Nature of Sunlight
+  
+  Sunlight, while appearing white to the naked eye, is actually made up of a spectrum of colors 
+  that include red, orange, yellow, green, blue, indigo, and violet. 
+  Each color represents light waves of different wavelengths, with red having 
+  the longest wavelength and violet the shortest.
+  
+  ### The Spectrum of Light and Wavelengths
+  
+  The visible light spectrum spans wavelengths from approximately 380 nanometers (violet) to 
+  700 nanometers (red). Shorter wavelengths correspond to colors like blue 
+  and violet, while longer wavelengths correlate with colors like red and orange.
+  
+  ## Interaction of Light with Atmospheric Particles
+  
+  When sunlight enters Earth's atmosphere, it encounters various particles like nitrogen and 
+  oxygen molecules. These particles scatter the sunlight in different directions, 
+  with the scattering effect being more pronounced for shorter wavelengths.
+  
+  ### Rayleigh Scattering: The Key to Blue Skies
+  
+  The phenomenon known as Rayleigh scattering explains why we see a predominantly blue sky. 
+  Rayleigh scattering occurs when light interacts with particles much smaller than its 
+  wavelength, scattering shorter wavelengths (blue and violet) more efficiently than longer 
+  wavelengths (red and orange).
+  
+  #### Rayleigh Scattering Formula
+  
+  The intensity of Rayleigh scattering is inversely proportional to the fourth power of the 
+  wavelength, which can be represented as follows:
+  
+  ```python
+  
+  scattering_intensity = (1 / wavelength**4) * particle_density
+    
+  ```

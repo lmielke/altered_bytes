@@ -2,18 +2,18 @@
 {{ instructs.strats.description }}
 
 {%- if instructs.strats.example %}
-## Strategy Example
+## Task Example
 {{ instructs.strats.example }}
 {%- endif %}
 
-## Strategy Objective
+## Task Objective
 {{ instructs.strats.objective }}
 
-{%- if instructs.strats.inputs_data %}
+{%- if instructs.strats.strat_input_data %}
 ## {{ instructs.strats.inputs_header }}
 {{ instructs.strats.inputs_intro }}
 <!-- <{{ instructs.strats.inputs_tag }}> -->
-{{ instructs.strats.inputs_data }}
+{{ instructs.strats.strat_input_data }}
 <!-- </{{ instructs.strats.inputs_tag }}> -->
 {% endif%}
 
@@ -22,4 +22,6 @@
 
 ## Your Task
 {{ instructs.strats.your_task }}
+{%- if instructs.strats.expected_words[1] != 0 %}
 Your answer must have between {{ instructs.strats.expected_words[0] }} and {{ instructs.strats.expected_words[1] }} words.
+{% endif%}

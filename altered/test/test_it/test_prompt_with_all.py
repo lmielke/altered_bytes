@@ -12,7 +12,7 @@ class Test_Prompt(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 0
-        cls.test_templates_names = ['simple_qa', 'agg_best']
+        cls.test_templates_names = 'agg_best'
         cls.name = 'ut_Test_Prompt'
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
@@ -49,7 +49,7 @@ class Test_Prompt(unittest.TestCase):
                         ],
                     'init_prompt': {'role': 'user', 'content': 'Hello, how can you help me today?'},
                     'name': self.name,
-                    'strat_templates': self.test_templates_names,
+                    'strat_template': self.test_templates_names,
                     'user_prompt': 'Why do horses neigh?',
                     'prompts': [
                                 'Why is the sky blue?',

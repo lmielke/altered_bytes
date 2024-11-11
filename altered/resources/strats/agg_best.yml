@@ -21,9 +21,13 @@ example: >
       - "Response 1: The quick brown fox jumps over the lazy dog."
       - "Response 2: A fox swiftly leaps over a sleeping dog with grace and speed."
       - "Response 3: The nimble fox hops over a lethargic dog."
-    Expected Output:
-      2: A fox swiftly leaps over a sleeping dog with grace and speed.
-      
+    Expected Output:\n
+    ``` JSON
+      {
+        'best': 2, 
+        'reasoning': 'Text 2 provides more detail and a more vivid description.'
+      }
+    ```
       In our example Text 2 is selected because it provides more detail and a more vivid 
       description, which __'best'__ explains the interaction between the fox and the dog.
 
@@ -38,5 +42,31 @@ objective: >
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Using the prompt and the provided RESPONSE SAMPLE`s select and return the single one     text, 
-    that __'best'__ fits the prompts objective !
+    Using the prompt and the provided RESPONSE SAMPLE`s select and return the single one text, 
+    that __'best'__ fits the prompts objective !\n
+    ``` JSON
+      {
+        'best': <index int>, 
+        'reasoning': '<justification_str>'
+      }
+    ```
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "json"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: json
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "json"}
+# validations will verify the model response from this strategy
+validations:
+    illegal_terms:
+        - fox jumps
+        - lazy dog
+        - graceful fox
+    illegal_ends:
+        - Do not elaborate further unless specifically asked.
+    required_terms:
+        - '{'
+        - '}'
+    start_terms:
+        - Here is the compressed ...
+        - The compressed text ...

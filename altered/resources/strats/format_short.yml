@@ -1,33 +1,32 @@
-# denoise_text.yml
-# Strategy for reducing a single long text by removing redundant or irrelevant information.
+# format_short.yml
+# Task for reducing a single long text by removing redundant or irrelevant information.
 
 # meta: {"name": "name", "type": "string", "default": "", "example": "Format Text ..."}
 # name of the strategy
-name: Format
+name: Format Text Task
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    Below is a __Strategy__ called __"Format"__ that re-writes a "Unformatted Text" 
-    to a "Formatted Text". 
-    unformatted texts can be search results, forum posts, or other long badly written texts.
-    The Formatted Text will include:
+    Below is a __Task__ called __"Format"__ that re-writes a "Text to format" 
+    to a "Formated Text". 
+    Unformated texts can be search results, forum posts, or other long badly written texts.
+    The Formated Text will include:
     1. **Text De-noising**: Removal of irrelevant details such as advertisements, 
-        cookie disclaimers, or metadata that detract from the core message.
-        Removal headers that sound relevant but contain no relevant content. (parsing errors)
+        cookie disclaimers, comunity notes or metadata that detract from the core message.
+        Removal of headers that contain no relevant content. (i.e. parsing errors)
     2. **Redundancy Cleansing**: Identificatin and elimination of repetitive information, 
-        overly emphasized ideas or long exhaustive explanations.
+        overly emphasized ideas or nedlessly long exhaustive explanations.
     3. **Formula and Code Retention**: Preservation and emphasizing of formulas, code snippets, 
         or other technical details that are relevant to the topic.
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when solving a task
 example: >
-    Next is an illustrative Format example, to be used as a formating guide. Do NOT include
-    any text from this example in your answer.
+    Next is an illustrative example, only to be used as a template or guide:
+    Assume the example scenario: "What happens when foxes meet dogs?".
     
-    Assume the example prompt: "What happens when foxes meet dogs?".
-    - Example "Unformatted Text":
+    - Example "Unformated Text":
         The quick, agile fox leaps with great grace and speed over the lazy, 
         lethargic, motionless [still, stiff] dog who doesn't even twitch. The dog even ...
         This might not be the case if the dog is awake and doesnt like foxes. Here is why, ...
@@ -40,7 +39,7 @@ example: >
         Impressum: WeAreFoxes Ltd Fox RD 1234, ...
         cookie disclaimer: We use cookies to improve your browsing experience. Please, ...
     
-    - Example nicely "Formatted Text":
+    - Example nicely "Formated Text":
         # Foxes meet Dogs
         This text explores the behavior of foxes and dogs when they meet.
         # Behavioral Properties
@@ -61,27 +60,27 @@ example: >
         - dogs.com
         - foxes.com
       
-      This now nicely formatted text retains the core idea of the fox leaping over the dog 
+      The resulting nicely formated text retains the core idea of the fox leaping over the dog 
       while removing redundant details such as over-emphasizing the fox's agility or 
       the dog's lethargy, which are not essential to the main message.
+      Also, the mentioning of the rabbit is not relevant given the scenario/question.
       Note: Formulas/Code-snippets often provide valuable insights, so if possible, keep them.
-      However, the mentioning of the rabbit is not relevant given the scenario question.
 
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    The provided <unformatted_text> must be cleaned/formatted using the rules shown above. 
-    The result should be a concise nicely formatted WikiPedia style article 
+    The provided <unformated_text> must be cleaned/denoised following the rules shown above. 
+    The result should be a concise nicely formated WikiPedia style article 
     containing only the most relevant information.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
-    Format the text provided inside the <unformatted_text> ... </unformatted_text> tags,
-    using the provided strategy!
+    Clean the text provided inside the <unformated_text> ... </unformated_text> tags,
+    following the provided "Format" Task example!
 
 # meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
-# fmt is the response format and will over-write the kwargs fmt param (markdown, json, yaml)
+# fmt is the response format expected from the model (markdown, json, yaml)
 fmt: markdown
 
 # meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}

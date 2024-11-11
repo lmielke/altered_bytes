@@ -18,11 +18,11 @@ output the information in a certain way or format. They are used to homogenize o
 interconnect the information flow in the thought process. 
 
 ## Parameters
-Strategies are called using the __'strat_templates'__ argument like:
+Strategies are called using the __'strat_template'__ argument like:
 
 ```python
 # List of names to call the strategies with
-strat_templates = ['simple_qa', 'agg_best']
+strat_template = agg_best
 ```
 For each of these names there is a corresponding strategy file.yml inside the __'strats'__ 
 and/or __'io'__ directory.  i.e. __'.../resource_dir/io/simple_qa.yml'__

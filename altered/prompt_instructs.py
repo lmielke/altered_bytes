@@ -57,7 +57,7 @@ class Instructions:
         if not self.params:
             return None
         return getattr(Strats, self.params['method'].capitalize())(*args, **kwargs,
-                )(self.params['t_name'], *args, **kwargs)
+                )(*args, params=self.params, **kwargs)
 
     def run_io(self, *args, io_template:str=None, fmt:str=None, **kwargs):
         if io_template is None or not os.path.isfile(os.path.join(sts.io_dir, io_template)):

@@ -1,3 +1,8 @@
+"""
+server_ollama_server.py
+Calls the Ollama server with timeout handling. Retries in case of a timeout.
+"""
+
 import subprocess
 import threading
 import time
@@ -9,15 +14,16 @@ import altered.settings as sts
 
 
 class OllamaCall:
-    timeout: int = msts.config.params.get('timeout')
-    max_retries: int = msts.config.params.get('max_retries')
+
+    timeout: int = msts.config.params.get('timeout') # ollama server hangup timeout
+    max_retries: int = msts.config.params.get('max_retries') # retries after hangup
+    prc_name = 'ollama_llama_server.exe'
 
     def __init__(self, *args, **kwargs):
         """
         Initializes the OllamaCall class with the Ollama client.
         """
         self.client = Client(host=msts.config.params.get('ollama_host'))
-        self.prc_name = 'ollama_llama_server.exe'
 
     def execute(self, func: str, prompt: str, params: dict) -> dict:
         """
@@ -33,7 +39,6 @@ class OllamaCall:
         """
         response = {}
         attempts = 1
-
         while attempts <= self.max_retries:
             thread = threading.Thread(
                 target=self._call_ollama_server, 
@@ -41,20 +46,16 @@ class OllamaCall:
             )
             thread.start()
             thread.join(timeout=self.timeout)
-
             if thread.is_alive():
                 print(
-                    f"{Fore.YELLOW}Ollama server is unresponsive. "
-                    f"Executing timeout handling...{Fore.RESET}"
+                        f"{Fore.YELLOW}Ollama server is unresponsive. "
+                        f"Executing timeout handling...{Fore.RESET}"
                 )
                 self.execute_timeout()
                 attempts += 1
-                print(
-                    f"{Fore.YELLOW}Retrying {attempts}/{self.max_retries}{Fore.RESET}"
-                )
+                print(f"{Fore.YELLOW}Retrying {attempts}/{self.max_retries}{Fore.RESET}")
             else:
                 break
-
         if attempts > self.max_retries:
             response['error'] = (
                 f"Request timed out after {self.timeout * self.max_retries} seconds"
@@ -127,12 +128,10 @@ class OllamaCall:
                 subprocess.run(kill_cmd, shell=True, check=True)
                 if process_id:
                     print(
-                        f"{Fore.GREEN}Successfully killed process with ID {process_id}: "
-                        f"{kill_cmd}{Fore.RESET}"
+                            f"{Fore.GREEN}Successfully killed process with ID {process_id}: "
+                            f"{kill_cmd}{Fore.RESET}"
                     )
                 else:
-                    print(
-                        f"{Fore.GREEN}Successfully executed:{Fore.RESET} {kill_cmd = }"
-                    )
+                    print(f"{Fore.GREEN}Successfully executed:{Fore.RESET} {kill_cmd = }")
             except subprocess.CalledProcessError as e:
                 print(f"{Fore.RED}Failed to execute kill command: {e}{Fore.RESET}")

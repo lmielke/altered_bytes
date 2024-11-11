@@ -46,3 +46,25 @@ your_task: >
     relevant details, making sure to include both shared ideas and specific nuances 
     from each text. The final output should be a comprehensive synthesis that reflects 
     the full range of information presented.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will verify the model response from this strategy
+validations:
+    expected_len:
+        - 1.0  # minimum compression factor
+        - 2.0  # maximum compression factor
+    illegal_terms:
+        - fox jumps
+        - lazy dog
+        - graceful fox
+    illegal_ends:
+        - Do not elaborate further unless specifically asked.
+    required_terms:
+        - '#'  # for headers
+    start_terms:
+        - Here is the compressed ...
+        - The compressed text ...

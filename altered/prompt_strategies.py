@@ -31,22 +31,32 @@ class Strategy:
         self.load_strat(*args, **kwargs)
         self.strat_input_data = self.get_strat_input_data(*args, **kwargs)
         self.set_validation_params(*args, **kwargs)
+        self.validations_to_fields(*args, **kwargs)
         return self.fields.__dict__, self.fmt
 
-    def set_validation_params(self, *args, **kwargs):
-        self.validations['inputs_len'] = len(self.strat_input_data) if self.strat_input_data \
-                                                                                        else 0
-        lengths, self.lpw = self.validations['expected_len'], 4
+    def set_validation_params(self, inputs_len:int=None, *args, **kwargs):
+        if inputs_len is None:
+            self.validations['inputs_len'] = len(self.strat_input_data) \
+                                                    if self.strat_input_data else 0
+        else:
+            self.validations['inputs_len'] = inputs_len
+        lengths, self.lpw = self.validations.get('expected_len', (0, 0)), 6
         self.validations['expected_words'] = (   
                             int(self.validations['inputs_len'] * lengths[0]) // self.lpw,
                             int(self.validations['inputs_len'] * lengths[1]) // self.lpw,
                         )
+        self.validations['mean_words'] = int(sum(self.validations['expected_words']) / 2)
 
-    def mk_strat_params(self, strat_template_name: str, *args, **kwargs):
-        self.template_name = strat_template_name
-        self.template_file_name = f'{strat_template_name}.yml'
+    def validations_to_fields(self, *args, **kwargs):
+        setattr(self.fields, 'expected_words', self.validations['expected_words'])
+        setattr(self.fields, 'mean_words', self.validations['mean_words'])
+        setattr(self.fields, 'num_predict', int(self.validations['expected_words'][1] * 1.5))
+
+    def mk_strat_params(self, *args, params:Dict[str, str], **kwargs):
+        self.template_name = params['t_name']
+        self.template_file_name = f"{params['t_name']}.yml"
         self.template_path = os.path.join(sts.strats_dir, self.template_file_name)
-        self.s_type, s_meth = strat_template_name.split('_', 1)
+        self.s_type, s_meth = params['t_name'].split('_', 1)
         self.fields = StrategyFields(s_meth=s_meth, s_type=self.s_type)
 
     def load_strat(self, *args, fmt='markdown', **kwargs):
@@ -61,23 +71,22 @@ class Strategy:
             setattr(self.fields, k, vs)
         setattr(self, 'validations', loader.data.get('validations'))
 
-    def mk_context(self, *args, **kwargs):
-        return self.fields.__dict__
-
-    # def add_strat(self, s_meth, value):
-    #     setattr(self.fields, s_meth, value)
-    #     self.fields.__post_init__()
-
-    def get_strat_input_data(self, *args, strat_input_data:str=None, **kwargs):
+    def get_strat_input_data(self, *args, strat_input_data:str=None, responses:list=None, 
+                                    **kwargs
+        ):
         """
         Strats can be provided with a generic strat_input_data:str field.
         strat_input_data can be the data itself or it can be a link to a data source.
         This method gets the data and assigns it to a self.input_data field.
         """
-        if strat_input_data is None:
-            return None
-        else:
+        if strat_input_data is not None:
             return strat_input_data
+        elif strat_input_data is None and responses is not None:
+            return '\n'.join(responses)
+        else:
+            print(  f"{Fore.RED}prompt_strategies.Strategy: "
+                    f"No strat_input_data provided and not derrivable.{Style.RESET_ALL}")
+            return None
 
 
 class Default(Strategy):
@@ -90,13 +99,14 @@ class Agg(Strategy):
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
         strat = self.mk_prompt_agg_instruct(*args, **kwargs)
+        self.adjust_validation_params(*args, **kwargs)
         self.fields.check_values(*args, **kwargs)
         return strat, self.fmt
 
-    def check_params(self, responses:List[str], template_name:str, *args, **kwargs):
+    def check_params(self, responses:List[str], *args, **kwargs):
         if not responses:
             msg = ( f"{Fore.RED}prompt_strategies.Agg: No texts provided"
-                    f" to aggregate. {Style.RESET_ALL} {template_name = }, {responses = }"
+                    f" to aggregate.{Style.RESET_ALL}{self.template_name = }, {responses = }"
                     )
             raise ValueError(msg)
 
@@ -109,31 +119,25 @@ class Agg(Strategy):
         
         if not kwargs.get('prompts'):
             self.fields.inputs_intro += (
-                f"that need to be aggregated. "
                 f"Note, that there is no 'prompt' associated with these responses. "
                 f"Therefore you have to infer the 'prompt' from other information, "
                 f"i.e. the responses, name or search query."
             )
-            self.fields.inputs_header = f"Texts to aggregate:"
-            self.fields.inputs_data = self.mk_sample_no_prompt(*args, responses=responses, 
-                                                                                    **kwargs)
+            self.fields.inputs_header = f"Actual texts to aggregate:"
+            self.fields.strat_input_data = self.no_prompt(responses, *args, **kwargs)
         elif len(kwargs['prompts']) == 1:
             self.fields.inputs_header = f"Answers to a single prompt:"
             self.fields.inputs_intro += f"trying to answer the same single prompt."
-            self.fields.inputs_data = self.mk_sample_single_prompt(*args, responses=responses,
-                                                                                    **kwargs)
+            self.fields.strat_input_data = self.single_prompt(responses, *args, **kwargs)
         elif len(kwargs['prompts']) > 1:
             self.fields.inputs_header = f"Answers and prompts:"
             self.fields.inputs_intro += f"trying to answer {len(kwargs['prompts'])} prompts."
-            self.fields.inputs_data = self.mk_sample_multi_prompt(*args, responses=responses, 
-                                                                                    **kwargs)
+            self.fields.strat_input_data = self.multi_prompt(responses, *args, **kwargs)
         else:
-            self.fields.inputs_data = self.mk_sample_no_prompt(*args, responses=responses, 
-                                                                                    **kwargs)
-        
+            self.fields.strat_input_data = self.no_prompt(responses, *args, **kwargs)
         return self.fields.__dict__
 
-    def mk_sample_multi_prompt(self, *args, prompts: List[str], responses: List[str], 
+    def multi_prompt(self, responses, *args, prompts: List[str], 
         rm_tags: bool = False, **kwargs) -> str:
         sample_pairs = []
         for i, (prompt, resp) in enumerate(zip(prompts, responses)):
@@ -147,25 +151,22 @@ class Agg(Strategy):
         all_samples = '\n\n'.join(sample_pairs)
         return f"Samples of Provided multiple Prompts and Answers:\n{all_samples}\n"
 
-    def mk_sample_single_prompt(self, *args, prompts: List[str], responses: List[str], 
-        rm_tags: bool = False, **kwargs) -> str:
+    def single_prompt(self, responses, *args, prompts:List[str], rm_tags:bool=False, **kwargs,
+        ) -> str:
         samples = []
         if rm_tags:
             prompt = self.rm_tags(prompts[0], *args, **kwargs)
         else:
             prompt = prompts[0]
         for i, response in enumerate(responses):
-            samples.append(
-                f"\n__RESPONSE SAMPLE {i+1}__\n"
-                f"{response}"
-            )
+            samples.append(f"\n__RESPONSE SAMPLE {i+1}__\n {response}")
         all_samples = '\n'.join(samples)
         return (
             f"\nOriginal Prompt for all Samples:\n{prompt}\n"
             f"Samples of Provided Answers to the Original Prompt:\n{all_samples}\n"
         )
 
-    def mk_sample_no_prompt(self, *args, responses: List[str], **kwargs) -> str:
+    def no_prompt(self, responses, *args, **kwargs) -> str:
         samples = []
         for i, response in enumerate(responses):
             samples.append(
@@ -181,6 +182,16 @@ class Agg(Strategy):
             prompt = prompt.replace(f"<{tag}>", "").replace(f"</{tag}>", "")
         return prompt
 
+    def adjust_validation_params(self, responses, *args, params: Dict[str, str], **kwargs):
+        # we get the aggreation method
+        if params.get('sub_method') in ['mean', 'max', 'min']:
+            inputs_len = sum([len(r) for r in responses]) // len(responses)
+        elif params.get('sub_method') in ['best', 'std']:
+            inputs_len = 0
+        super().set_validation_params(inputs_len, *args, **kwargs)
+        super().validations_to_fields(*args, **kwargs)
+
+
 class Format(Strategy):
 
     inputs_tag = 'unformatted_text'
@@ -195,11 +206,31 @@ class Format(Strategy):
 
     def mk_strat_fields(self, *args, **kwargs) -> dict:
         self.fields.inputs_tag = self.inputs_tag
-        self.fields.expected_words = self.validations['expected_words']
-        self.fields.inputs_data = f"{self.strat_input_data}"
+        self.fields.strat_input_data = self.strat_input_data
         self.fields.inputs_header = self.header
         self.fields.inputs_intro = self.intro
         return self.fields.__dict__
+
+
+class Compress(Strategy):
+
+    inputs_tag = 'uncompressed_text'
+    header = 'Uncompressed Text'
+    intro = f'Below is a {inputs_tag} that needs to be compressed/condensed.'
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        strat = self.mk_strat_fields(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat, self.fmt
+
+    def mk_strat_fields(self, *args, **kwargs) -> dict:
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.strat_input_data = self.strat_input_data
+        self.fields.inputs_header = self.header
+        self.fields.inputs_intro = self.intro
+        return self.fields.__dict__
+
 
 class Clean(Strategy):
 
@@ -211,32 +242,30 @@ class Clean(Strategy):
         self.fields.check_values(*args, **kwargs)
         return strat, self.fmt
 
-    def mk_prompt_reduce_instruct(self, *args, 
-                                  strat_input_data: List[str],
-                                  user_prompt: Optional[str] = None,
-                                  link: Optional[str] = None,
-                                  rm_tags: bool = False,
-                                  search_query: Optional[str] = None, 
-                                  **kwargs) -> dict:
+    def mk_prompt_reduce_instruct(self, *args,  user_prompt: Optional[str] = None,
+                                                link: Optional[str] = None,
+                                                rm_tags: bool = False,
+                                                search_query: Optional[str] = None, 
+                                                **kwargs
+        ) -> dict:
         headers = ''
         if user_prompt:
             headers += f"user_prompt: {user_prompt}\n"
-            response = 'Response:\n' + strat_input_data
+            response = 'Response:\n' + self.strat_input_data
         if search_query:
             headers += f"search_query: {search_query}\n"
-            response = 'Text:\n' + strat_input_data
+            response = 'Text:\n' + self.strat_input_data
         if link:
             headers += f"\nlink: {link}\n"
             response = response
         if not user_prompt and not search_query:
-            response = strat_input_data
+            response = self.strat_input_data
         
         self.fields.inputs_tag = self.inputs_tag
-        self.fields.expected_words = self.expected_words
-        self.fields.inputs_len = inputs_len
-        self.fields.inputs_data = f"{headers}\n" + response
+        self.fields.strat_input_data = f"{headers}\n" + response
         self.fields.inputs_header = f"Text to Clean:"
         self.fields.inputs_intro = (
                                         f"Below is a {self.inputs_tag}, that needs to be "
-                                        f"cleaned and summarized.")
+                                        f"cleaned and summarized."
+                                    )
         return self.fields.__dict__

@@ -4,7 +4,7 @@ num_activities: 0
 package_infos: null
 root_file_name: null
 file_match_regex: null
-strat_templates: null
+strat_template: null
 io_template: simple_answer
 fmt: json
 repeats:

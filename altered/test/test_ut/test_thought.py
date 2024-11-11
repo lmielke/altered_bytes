@@ -1,4 +1,4 @@
-# test_thoughts.py
+# test_thought.py
 
 import os, re, shutil, sys, time, yaml
 import unittest
@@ -17,6 +17,7 @@ class Test_Thought(unittest.TestCase):
         cls.verbose = 2
         cls.test_data_dir = sts.test_data_dir
         cls.test_io_path = os.path.join(sts.test_data_dir, 'test_thought_denoise_text.yml')
+        cls.test_io_path = os.path.join(sts.test_data_dir, 'test_thought_compress_text.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
         # cls.thought = Thought(name='ut_chat')

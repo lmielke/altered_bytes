@@ -32,14 +32,52 @@ clean_text.yml:
     'Length: 540 < Min: 946': 1
     'Length: 547 < Min: 946': 1
     'Length: 954 < Min: 2648': 1
+compress_short.yml:
+  Response Length:
+    'Length: 146 > Max: 145': 3
+    'Length: 148 > Max: 145': 1
+    'Length: 149 > Max: 145': 1
+    'Length: 153 > Max: 145': 1
+    'Length: 154 > Max: 145': 1
+    'Length: 157 > Max: 145': 2
+    'Length: 236 > Max: 218': 1
+    'Length: 241 > Max: 218': 1
+    'Length: 244 > Max: 218': 2
+    'Length: 248 > Max: 218': 1
+    'Length: 251 > Max: 218': 1
+    'Length: 253 > Max: 218': 1
+    'Length: 262 > Max: 218': 1
+    'Length: 264 > Max: 218': 2
+    'Length: 269 > Max: 218': 1
+    'Length: 270 > Max: 218': 1
+    'Length: 271 > Max: 218': 1
+    'Length: 273 > Max: 218': 1
+    'Length: 275 > Max: 218': 1
+    'Length: 277 > Max: 218': 1
+    'Length: 279 > Max: 218': 1
+    'Length: 282 > Max: 218': 1
+    'Length: 283 > Max: 218': 1
+    'Length: 286 > Max: 218': 1
+    'Length: 287 > Max: 218': 1
+    'Length: 292 > Max: 218': 1
+    'Length: 293 > Max: 218': 1
+    'Length: 294 > Max: 218': 1
+    'Length: 295 > Max: 218': 2
+    'Length: 303 > Max: 218': 2
+    'Length: 304 > Max: 218': 1
+    'Length: 311 > Max: 218': 1
+    'Length: 312 > Max: 218': 1
+    'Length: 317 > Max: 218': 1
+    'Length: 331 > Max: 218': 1
+    'Length: 332 > Max: 218': 1
 format_short.yml:
   Illegal Terms in response:
-    Dogs found: 27
-    Foxes found: 27
+    Dogs found: 29
+    Foxes found: 29
     Foxes meet Dogs found: 25
-    dogs found: 30
-    fox_agility found: 40
-    foxes found: 30
+    dogs found: 32
+    fox_agility found: 42
+    foxes found: 32
   Promt Repitition Error:
     Do not explain your reasoning unless specifically asked for! found: 3
   Response Length:
@@ -49,11 +87,15 @@ format_short.yml:
     'Length: 1427 > Max: 1419': 1
     'Length: 1450 > Max: 1419': 1
     'Length: 1488 > Max: 1419': 1
+    'Length: 1557 > Max: 1419': 1
+    'Length: 1592 > Max: 1419': 1
     'Length: 1599 > Max: 1419': 1
     'Length: 1640 > Max: 1419': 1
     'Length: 1704 > Max: 1419': 1
+    'Length: 1726 > Max: 1419': 1
     'Length: 1756 > Max: 1419': 1
     'Length: 1897 < Min: 2648': 1
+    'Length: 1910 > Max: 1419': 1
     'Length: 2046 > Max: 1419': 1
     'Length: 2068 > Max: 1419': 1
     'Length: 2110 > Max: 1419': 1
@@ -65,6 +107,7 @@ format_short.yml:
     'Length: 3377 > Max: 1419': 1
     'Length: 3482 > Max: 1419': 1
     'Length: 3540 > Max: 1419': 1
+    'Length: 370 < Min: 473': 1
     'Length: 3846 > Max: 1419': 1
     'Length: 3891 > Max: 1419': 1
     'Length: 3916 > Max: 1419': 1

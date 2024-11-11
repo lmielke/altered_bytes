@@ -41,7 +41,7 @@ class Test_Ollama_Server(unittest.TestCase):
         network_up_time = time.time()
         payload = json.dumps({
                                 'network_up_time': network_up_time,
-                                'strat_templates': ['agg_mean'],
+                                'strat_template': 'agg_mean',
                                 'repeats': 3,
                                 'prompts': ['Why is the sky blue?',],
                                 'responses': [

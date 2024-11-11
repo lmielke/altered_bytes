@@ -1,0 +1,99 @@
+# compress_short.yml 
+# Task for compressing a formatted text by a specified factor with prioritized retention.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Compress Text Task"}
+# name of the strategy
+name: Compress Text Task
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    Below is a __Task__ called __"Compress"__ that reduces the length of a "Uncompressed Text"
+    to a shorter "Compressed Text" by a specified factor. In cases where strict reduction 
+    is required, this task involves prioritizing topics to retain core insights while maintaining
+    logical coherence. Compression techniques include:
+    1. **Prioritized Content Retention**: Key topics are prioritized based on relevance and contribution
+       to the core message, with less critical details omitted.
+    2. **Density Optimization**: Text is made information-dense by eliminating redundancy, 
+       consolidating, sumarizating headers while ensuring readability and flow.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to proceed when solving a task
+example: >
+    Next is an illustrative example, only to be used as a template or guide:
+    Assume the example scenario: "Behavioral Adaptations of Foxes in Forest Environments."
+    
+    - Example "Uncompressed Text":
+        # Behavioral Adaptations of Foxes in Woodland Habitats
+        Foxes exhibit a variety of adaptive behaviors in forested environments, allowing them to 
+        thrive in diverse conditions.
+        ## Foraging Behavior
+        Foxes are primarily nocturnal foragers, utilizing their keen senses to locate food.
+        They adjust their foraging habits based on food availability, season, and predator presence.
+        ## Territorial Marking
+        Scent marking plays a significant role in foxes' social and territorial behavior. 
+        By marking their territory, foxes communicate their presence to other animals 
+        and deter potential rivals.
+        ## Interaction with Other Species
+        Foxes maintain complex relationships with other forest-dwelling species.
+        They often compete with other predators for food, and their presence influences 
+        local ecosystems.
+        ### Example Formula for Food Availability
+        A simple formula to represent food availability in relation to fox foraging hours is:
+        ```python
+        food_availability = forage_hours * area_density
+        ```
+
+    - Example nicely "Compressed Text":
+        # Fox Behavioral Adaptations in Forrests
+        Foxes adapt foraging, marking, and interaction strategies for survival in forests.
+        - **Foraging:** Primarily nocturnal, foxes adjust their habits based on food availability 
+          and season.
+        - **Territorial Marking:** Scent marking helps foxes communicate territory and deter rivals.
+        - **Species Interaction:** Foxes influence forest ecosystems and compete with other predators.
+        
+        Formula for estimating food availability:
+        ```python
+        food_availability = forage_hours * area_density
+        ```
+
+      The compressed text retains the essential behavioral adaptations of foxes while 
+      streamlining sub-headers and condensing information for conciseness.
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
+    The provided <{{ instructs.strats.inputs_tag }}> must be reduced in length to about 
+    {{ instructs.strats.mean_words }} words following the rules above, prioritizing 
+    essential information where needed. The result should be a concise text capturing only
+    the most relevant information.
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    Compress the text provided inside the <{{ instructs.strats.inputs_tag }}> ... </{{ instructs.strats.inputs_tag }}> tags 
+    to about {{ instructs.strats.mean_words }} words, retaining prioritized 
+    information as per the example.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will verify the model response from this strategy
+validations:
+    expected_len:
+        - 0.3  # minimum compression factor
+        - 0.5  # maximum compression factor
+    illegal_terms:
+        - Foxes in Woodland Habitats
+        - forest-dwelling
+        - fox foraging hours
+        - Foxes are primarily nocturnal foragers
+    illegal_ends:
+        - Do not elaborate further unless specifically asked.
+    required_terms:
+        - '#'  # for headers
+    start_terms:
+        - Here is the compressed ...
+        - The compressed text ...

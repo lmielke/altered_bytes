@@ -90,10 +90,11 @@ class Thought:
         **kwargs, ):
         # Construct model parameters specific to this Thought (see ModelConnect.get_params())
         server_params = {
-                            'service_endpoint': 'get_generates',
-                            'repeats': repeats,
-                            'verbose': verbose,
-                            'prompt_summary': self.p.context.get('prompt_summary'),
+                    'service_endpoint': 'get_generates',
+                    'repeats': repeats,
+                    'verbose': verbose,
+                    'prompt_summary': self.p.context.get('prompt_summary'),
+                    'num_predict': self.p.context['instructs']['strats'].get('num_predict'),
                         }
         ignore_fields = {'context',}
         server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})

@@ -41,3 +41,25 @@ objective: >
 your_task: >
     Using the provided RESPONSE SAMPLE`s, extract the minimal common information that is shared 
     across all the responses and present a distilled, core summary.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will verify the model response from this strategy
+validations:
+    expected_len:
+        - 0.8  # minimum compression factor
+        - 1.5  # maximum compression factor
+    illegal_terms:
+        - fox jumps
+        - lazy dog
+        - graceful fox
+    illegal_ends:
+        - Do not elaborate further unless specifically asked.
+    required_terms:
+        - '#'  # for headers
+    start_terms:
+        - Here is the compressed ...
+        - The compressed text ...

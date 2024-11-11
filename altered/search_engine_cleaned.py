@@ -19,11 +19,15 @@ from altered.prompt_instructs import Instructions
 class CleanWebSearch(WebSearch):
 
     default_repeats = {'num': 1, 'agg': None}
+    # we use clean_text to clean the search results
+    strat_template = 'clean_text'
+    # we use search.md to render the clean_text prompt for the model
+    render_template = 'search.md'
+    alias = 'l3.2_0'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assi = SingleModelConnect(*args, **kwargs)
-        self.alias = 'l3.2_0'
         # prompt constructor for LLM interaction
         self.insts = Instructions(*args, **kwargs)
         self.renderer = Render(*args, **kwargs)
@@ -34,10 +38,10 @@ class CleanWebSearch(WebSearch):
         # The super call already runs the search and parses the results
         super().__call__(*args, **kwargs)
         if repeats is None: repeats = self.default_repeats
-        # Note, self.cleaning is doing a ollama call
-        cleaned = self.cleaning(*args, repeats=repeats, **kwargs)
+        # Note, self.clean_search_results is doing a ollama call
+        cleaned = self.clean_search_results(*args, repeats=repeats, **kwargs)
         for i, clean in enumerate(cleaned):
-            print(f"\n\n{Fore.RED}CleanWebSearch {i}:{Fore.RESET} {clean = }")
+            # print(f"\n\n{Fore.RED}CleanWebSearch {i}:{Fore.RESET} {clean = }")
             if clean.get('strat_template') is not None:
                 self.r.append(self.r[0].copy())
                 self.r[-1]['content'] = clean.get('response').strip()
@@ -48,33 +52,37 @@ class CleanWebSearch(WebSearch):
             self.r[i]['source'] = self.r[i].get('link')
         return self.r
 
-    def cleaning(self, *args, alias='l3:8b_1', **kwargs):
+    def clean_search_results(self, *args, alias=None, **kwargs):
+        """
+        Note: we pull the alias here, because we replace it with the default alias.
+        """
         contents = []
-        
-        for i, result in enumerate(self.r):
-            contents.append(self.mk_prompt(result.get('content'), result.get('link'), 
-                                            *args, **kwargs))
+        # we iterate over the search results and create a claning prompt for every single one
+        for i, result in enumerate( self.r ):
+            contents.append(self.mk_prompt( result.get('content'), result.get('link'), *args,
+                                            **kwargs,
+                            )
+            )
         # we use the ModelConnect object to post the contents to the AI model
         # NOTE: due to the potentially giant context size we have to use a powerfull server
-        r = self.assi.post(contents, *args, alias=self.alias, **kwargs )
-        return r.get('responses')
+        return self.assi.post(contents, *args, alias=self.alias, **kwargs ).get('responses')
 
-    def mk_prompt(self, content:str, link:str, search_query:str, *args, user_prompt:str, 
-        **kwargs):
-        _context = {
-                    'responses': [content.replace('\n\n', '\n')],
-                    'fmt': 'markdown',
-                    'link': link,
-                    'search_query': search_query,
-                    'user_prompt': user_prompt,
+    def mk_prompt(self, content:str, link:str, search_query:str, *args, 
+                                    user_prompt:str, **kwargs,
+        ) -> str:
+        _context = {    'responses': [content.replace('\n\n', '\n')],
+                        'fmt': 'markdown',
+                        'link': link,
+                        'search_query': search_query,
+                        'user_prompt': user_prompt,
         }
         # we use the Instructions object to render the context
-        context = self.insts(strat_templates=['denoise_text'], **_context)
-        rendered = self.renderer.render(
-                                        template_name='search.md',
-                                        context = {
-                                                    'instructs': context,
+        context = self.insts(strat_template=self.strat_template, **_context).context
+        rendered = self.renderer.render(*args,
+                                        template_name=self.render_template,
+                                        context = { 'instructs': context,
                                                     'prompt_title': 'Clean Up Search Results',
                                                     },
+                                        **kwargs,
                                         )
         return rendered
