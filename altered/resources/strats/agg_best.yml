@@ -8,7 +8,7 @@ name: Best Answer/Text
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy selects the __'best'__ text or answer from a given <sample> of texts. 
+    The task at hand is to select the __'best'__ text or answer from a given <sample> of texts. 
     The selected text should have the strongest supporting details and 
     the most comprehensive coverage of arguments answering the given problem.
 

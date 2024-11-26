@@ -143,9 +143,8 @@ class Data:
             for i, row in self.ldf.iterrows():
                 if isinstance(row[field], str):
                     history.append({'role': row['role'], field: row[field]})
-            else:
-                history = None
-        return history
+                    # print(f"{Fore.GREEN}{i}: {Fore.RESET} {row[field]}"[:200].replace('\n', ' '))
+        return history if history else None
 
     def save_to_disk(self, *args, **kwargs) -> str:
         return self.fs.save_to_disk(*args, data=self.ldf, **kwargs)

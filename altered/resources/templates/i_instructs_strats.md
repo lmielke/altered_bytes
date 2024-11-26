@@ -22,6 +22,6 @@
 
 ## Your Task
 {{ instructs.strats.your_task }}
-{%- if instructs.strats.expected_words[1] != 0 %}
+{%- if instructs.strats.expected_words[1] and instructs.strats.expected_words[1] != 0 %}
 Your answer must have between {{ instructs.strats.expected_words[0] }} and {{ instructs.strats.expected_words[1] }} words.
 {% endif%}

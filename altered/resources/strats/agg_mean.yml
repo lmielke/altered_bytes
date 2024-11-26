@@ -8,13 +8,11 @@ name: Weighted Mean Aggregation
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy generates a weighted average summary from a given <sample> of texts or answers. 
-    Instead of taking a strict average, the focus is on synthesizing key points from all responses, 
-    with emphasis placed on the most relevant or repeated ideas. Pay more attention to common 
-    themes or ideas mentioned by multiple responses, while ensuring that unique details 
-    from each response are included where relevant. The result is a balanced summary
-    that gives proportional weight to both common themes and unique insights, while still ensuring 
-    that frequently mentioned or significant ideas receive more attention.
+    The task at hand is to generate a weighted average text summary from a given <sample> 
+    of texts or answers. The focus is on incorporating key points from all responses,
+    while highlighting the most relevant or repeated and shared ideas. The result is a
+    balanced summary that gives proportional weight to both common themes and unique insights, 
+    while ensuring that frequently mentioned or significant ideas receive more attention.
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # example on how to precede when soliving a task
@@ -26,9 +24,36 @@ example: >
       - Response 2: "A fox swiftly leaps over a sleeping dog with grace and speed."
       - Response 3: "The nimble fox hops over a lethargic dog."
     Expected Output:
-      "Foxes typically leap over dogs, whether described as lazy, sleeping, or lethargic.
-      The common portrayal is that of a nimble, graceful fox in motion, although Text 2 emphasizes 
-      the speed of the fox more than the other descriptions."
+      # agg_mean.yml
+# Aggregation strategy for creating a weighted average summary of multiple responses.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Weighted Mean Answer ..."}
+# name of the strategy
+name: Weighted Mean Aggregation
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    Here a <sample> of multiple provided texts or answers must be aggregated into 
+    a single 'weighted average text summarization'. The focus of this task, is to incorporate 
+    key points from all texts, while highlighting the most relevant or repeated and shared 
+    ideas. The result is a balanced summary text, that gives proportional weight to both 
+    common themes and unique insights, while ensuring that frequently mentioned or 
+    significant ideas receive more attention.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to precede when soliving a task
+example: >
+    Example:
+    Assume the following prompt or statement, "What happens when foxes meet dogs?". 
+    We received the following responses.
+      - Response 1: "The quick brown fox jumps over the lazy dog."
+      - Response 2: "A fox swiftly leaps over a sleeping dog with grace and speed."
+      - Response 3: "The nimble fox hops over a lethargic dog."
+    Expected Output:
+      Foxes leap or jump, sometimes hop over dogs with swift movements. Dogs are often 
+      lazy, sleeping, or lethargic, due to their lack of activity. In contrast, jumping
+      foxes demonstrate notable agility, characterized by speed, nimbleness, and elegance.
       
       This output gives more weight to common themes, like the fox leaping, while incorporating 
       details from all the responses, balancing frequent mentions with unique contributions.
@@ -36,15 +61,15 @@ example: >
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
 # objective to be performed
 objective: >
-    Objective is to aggregate multiple responses into one atomic single response 
-    using the outlined stratey. The reader should not be bothered with multiple responses,
-    their original content and/or any reasoning on how the resulting single response was derived.
+    Objective here, is to aggregate multiple texts into one atomic single text
+    using the outlined strategy. The summary should not contain any explicit reference 
+    to the original content nor any reasoning on how the resulting single text was derived.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
 # your_task to be performed
 your_task: >
     Using the provided RESPONSE SAMPLE`s, create a weighted summary using the provided
-    stratgey and samples. Do not talk about or reference the original responses. The user
+    stratgey and samples. Do not talk about or reference the original texts. The user
     should only be provided with the final aggreated text.
     NOTE: Generously keep/include formulas and code snippets or shell commands.
 

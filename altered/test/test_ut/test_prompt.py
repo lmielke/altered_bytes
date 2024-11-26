@@ -26,7 +26,7 @@ class Test_Prompt(unittest.TestCase):
     @classmethod
     def mk_test_data(cls, *args, **kwargs):
         out = None
-        with open(os.path.join(sts.test_data_dir, "test_prompt_kwargs.yml"), "r") as f:
+        with open(os.path.join(sts.test_data_dir, "test_thought_all_kwargs.yml"), "r") as f:
             out = yaml.safe_load(f)
         return out
 

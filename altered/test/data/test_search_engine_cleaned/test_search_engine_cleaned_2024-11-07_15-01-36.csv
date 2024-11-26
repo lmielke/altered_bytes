@@ -120,7 +120,7 @@ Sie können Ihre Einstellungen jederzeit auf der Datenschutzerklärungsseite auf
   for True True if range()",,,2024-11-07 15:03:22.844725
 ,customsearch#result,5. Data Structures — Python 3.13.0 documentation,Python list comprehensions,https://docs.python.org/3/tutorial/datastructures.html,docs.python.org,List comprehensions provide a concise way to create lists. Common applications are to make new lists where each element is the result of some operations.,"{'cse_thumbnail': [{'src': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0o3uDlERm3RSZ54TCeoDN14moS7xHs1hbH7QgJM1nFOyOGmJgE0ze3tc&s', 'width': '200', 'height': '200'}], 'metatags': [{'og:image': 'https://docs.python.org/3/_static/og-image.png', 'og:type': 'website', 'og:image:alt': 'Python documentation', 'og:image:width': '200', 'theme-color': '#3776ab', 'og:site_name': 'Python documentation', 'viewport': 'width=device-width, initial-scale=1.0', 'og:title': '5. Data Structures', 'og:image:height': '200', 'og:url': 'https://docs.python.org/3/tutorial/datastructures.html', 'og:description': 'This chapter describes some things you’ve learned about already in more detail, and adds some new things as well. More on Lists: The list data type has some more methods. Here are all of the method...', 'readthedocs-addons-api-version': '1'}], 'cse_image': [{'src': 'https://docs.python.org/3/_static/og-image.png'}]}","<context>
 ## Clean
-This strategy reduces a single ""Unformatted Text"" to a single ""Formatted Text"" by removing redundant, non-relevant, or overly emphasized information. Poluted texts can be search results, forum posts, or other long badly written texts. Text Cleaning includes: 1. **Text De-noising**: Remove irrelevant details such as advertisements, 
+The task at hand reduces a single ""Unformatted Text"" to a single ""Formatted Text"" by removing redundant, non-relevant, or overly emphasized information. Poluted texts can be search results, forum posts, or other long badly written texts. Text Cleaning includes: 1. **Text De-noising**: Remove irrelevant details such as advertisements, 
     cookie disclaimers, or metadata that detract from the core message.
     Remove headers that sound relevant but contain no relevant content. (parsing errors)
 2. **Redundancy Cleansing**: Identify and eliminate repetitive information, 
@@ -186,7 +186,7 @@ Here is an illustrative example, to be used as a template or guide: Assume the e
 # 3. Instructions (INST)
 
 ## Description: Clean
-This strategy reduces a single ""Unformatted Text"" to a single ""Formatted Text"" by removing redundant, non-relevant, or overly emphasized information. Poluted texts can be search results, forum posts, or other long badly written texts. Text Cleaning includes: 1. **Text De-noising**: Remove irrelevant details such as advertisements, 
+The task at hand reduces a single ""Unformatted Text"" to a single ""Formatted Text"" by removing redundant, non-relevant, or overly emphasized information. Poluted texts can be search results, forum posts, or other long badly written texts. Text Cleaning includes: 1. **Text De-noising**: Remove irrelevant details such as advertisements, 
     cookie disclaimers, or metadata that detract from the core message.
     Remove headers that sound relevant but contain no relevant content. (parsing errors)
 2. **Redundancy Cleansing**: Identify and eliminate repetitive information, 

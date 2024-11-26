@@ -47,7 +47,6 @@ class UserPrompt:
         # user_prompt is provided as an empty string which triggers the input action
         elif not user_prompt:
             prompt_str = f"{self.get_prompt_str(*args, **kwargs)}\n"
-            print(f"{Fore.YELLOW}{prompt_str}{Fore.RESET}")
             self.user_prompt = input(f"\tYou: ").strip()
             if not self.user_prompt.strip():
                 print(f"No user_prompt provided: setting to None")

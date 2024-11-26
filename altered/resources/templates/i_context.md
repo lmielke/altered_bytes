@@ -1,7 +1,7 @@
 {%- if context %}
 
 # 1. Context Information
-Here you find all available context information possibly relevant for this prompt.
+Here you find all context information that might be relevant for the task below.
 
 {% if context.sys_info %}
 {% include "i_context_sys_info.md" ignore missing %}

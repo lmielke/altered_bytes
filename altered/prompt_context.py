@@ -31,7 +31,7 @@ class Context:
         if num_activities:
             self.context.update(self.user_activities.get_activities_results(*args, 
                                                     num_activities=num_activities, **kwargs))
-    
+
     def get_history(self, *args, chat_history:list=None, **kwargs):
         if chat_history:
             self.context['chat_history'] = chat_history

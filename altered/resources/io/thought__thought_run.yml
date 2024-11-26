@@ -17,11 +17,9 @@ num_predict: 500
 # fmt is the response format expected from the model (markdown, json, yaml)
 fmt: markdown
 
-# meta: {"name": "repeats", "type": "int", "default": "", "example": 1}
-# repeats is a prompt repeat counter (model is prompted multiple times to improve the response)
-repeats:
-  num: 3
-  agg: agg_mean
+# meta: {"name": "strat_template", "type": "str", "default": "", "example": "agg_mean"}
+# strat_template is a yaml template to be used to generate an instruction
+strat_template: expand_short
 
 # meta: {"name": "verbose", "type": "int", "default": 0, "example": 3}
 # verbose is a internal technical field to control the verbosity of the computation

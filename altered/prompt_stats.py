@@ -18,9 +18,6 @@ class PromptStats:
         Args:
             *args, **kwargs: Accepts and ignores additional arguments.
         """
-        self.results = {}
-        self.total = np.array([0, 0], dtype=int)
-        self.tbl_data = []
         self.lc = [Fore.BLUE, Fore.CYAN, Fore.MAGENTA]
         self.backs = [Back.BLUE, Back.CYAN, Back.MAGENTA]
         self.total_color, self.llc = Fore.YELLOW, Fore.WHITE
@@ -38,6 +35,9 @@ class PromptStats:
         Returns:
             The colored table as a string.
         """
+        self.results = {}
+        self.total = np.array([0, 0], dtype=int)
+        self.tbl_data = []
         self._process_level(*args, **kwargs)
         self.construct_table(up_to, *args, **kwargs)
         return self.color_table(up_to, *args, **kwargs)

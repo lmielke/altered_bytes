@@ -30,20 +30,23 @@ class Strategy:
         self.mk_strat_params(*args, **kwargs)
         self.load_strat(*args, **kwargs)
         self.strat_input_data = self.get_strat_input_data(*args, **kwargs)
-        self.set_validation_params(*args, **kwargs)
-        self.validations_to_fields(*args, **kwargs)
+        if self.validations is not None:
+            self.estimate_response_len(*args, **kwargs)
+            self.validations_to_fields(*args, **kwargs)
         return self.fields.__dict__, self.fmt
 
-    def set_validation_params(self, inputs_len:int=None, *args, **kwargs):
-        if inputs_len is None:
-            self.validations['inputs_len'] = len(self.strat_input_data) \
-                                                    if self.strat_input_data else 0
-        else:
-            self.validations['inputs_len'] = inputs_len
-        lengths, self.lpw = self.validations.get('expected_len', (0, 0)), 6
+    def estimate_response_len(self, inputs_len:int=None, *args, **kwargs):
+        inputs_len = inputs_len if inputs_len is not None \
+                                else len(self.strat_input_data) \
+                                if self.strat_input_data \
+                                else 0
+        req_terms_len = len(' '.join(self.validations['required_terms']).split())
+        total_inputs_len = inputs_len + req_terms_len
+        expected_len, self.lpw = self.validations.get('expected_len', (0, 0)), 6
+        self.validations['inputs_len'] = total_inputs_len
         self.validations['expected_words'] = (   
-                            int(self.validations['inputs_len'] * lengths[0]) // self.lpw,
-                            int(self.validations['inputs_len'] * lengths[1]) // self.lpw,
+                            int(total_inputs_len * expected_len[0]) // self.lpw,
+                            int(total_inputs_len * expected_len[1]) // self.lpw,
                         )
         self.validations['mean_words'] = int(sum(self.validations['expected_words']) / 2)
 
@@ -71,9 +74,10 @@ class Strategy:
             setattr(self.fields, k, vs)
         setattr(self, 'validations', loader.data.get('validations'))
 
-    def get_strat_input_data(self, *args, strat_input_data:str=None, responses:list=None, 
-                                    **kwargs
-        ):
+    def get_strat_input_data(self, *args,   strat_input_data:str=None, 
+                                            responses:list=None, 
+                                            user_prompt:str=None,
+        **kwargs):
         """
         Strats can be provided with a generic strat_input_data:str field.
         strat_input_data can be the data itself or it can be a link to a data source.
@@ -81,6 +85,8 @@ class Strategy:
         """
         if strat_input_data is not None:
             return strat_input_data
+        elif user_prompt is not None:
+            return user_prompt
         elif strat_input_data is None and responses is not None:
             return '\n'.join(responses)
         else:
@@ -188,7 +194,7 @@ class Agg(Strategy):
             inputs_len = sum([len(r) for r in responses]) // len(responses)
         elif params.get('sub_method') in ['best', 'std']:
             inputs_len = 0
-        super().set_validation_params(inputs_len, *args, **kwargs)
+        super().estimate_response_len(inputs_len, *args, **kwargs)
         super().validations_to_fields(*args, **kwargs)
 
 
@@ -217,6 +223,25 @@ class Compress(Strategy):
     inputs_tag = 'uncompressed_text'
     header = 'Uncompressed Text'
     intro = f'Below is a {inputs_tag} that needs to be compressed/condensed.'
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        strat = self.mk_strat_fields(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat, self.fmt
+
+    def mk_strat_fields(self, *args, **kwargs) -> dict:
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.strat_input_data = self.strat_input_data
+        self.fields.inputs_header = self.header
+        self.fields.inputs_intro = self.intro
+        return self.fields.__dict__
+
+class Expand(Strategy):
+
+    inputs_tag = 'short_text'
+    header = 'Short Text'
+    intro = f'Below is a {inputs_tag} that needs to be expanded elaborated upon.'
 
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)

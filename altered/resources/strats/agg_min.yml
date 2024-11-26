@@ -8,7 +8,7 @@ name: Min Aggregation
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy selects the text that distills the essential and shared elements from a 
+    The task at hand is to select the text that distills the essential and shared elements from a 
     given <sample> of texts. The goal is to identify the common core or minimal shared 
     information that all responses agree upon, ignoring unique details and focusing on 
     the basic facts that are consistent across the texts.

@@ -1,0 +1,116 @@
+# question-catalogue_short.yml
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Question Catalogue Task"}
+name: Question Catalogue Task
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+description: >
+    This task generates a structured series of questions designed to clarify and elaborate 
+    on a given topic or problem. The aim is to uncover missing information and provide a 
+    deeper understanding of the subject, enabling the user to identify actionable steps or 
+    insights. The questions are designed to adapt to a wide variety of contexts, ensuring 
+    applicability to both general inquiries and specific technical challenges.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+example: >
+    Consider the first example scenario: "Why is the sky blue?"
+
+    - Example "Source Text":
+        # Conceptual Elaboration
+        The question "Why is the sky blue?" touches on atmospheric physics, light scattering, 
+        and the perception of color. To fully address this question, it is essential to 
+        explore the scientific principles behind light behavior and human vision.
+
+        # Example Generated Questions:
+        1:
+            Question: What factors influence the color of the sky during the day?
+            Answers:
+                - The scattering of sunlight by atmospheric particles.
+                - The angle of the sun in the sky.
+                - The composition of the atmosphere.
+            Reasoning: Understanding these factors provides the basis for explaining why 
+            the sky appears blue and not some other color during the day.
+
+        2:
+            Question: Does the sky appear blue under all conditions?
+            Answers:
+                - Yes, under normal atmospheric conditions.
+                - No, it changes color during sunrise and sunset.
+                - No, it varies under extreme weather or pollution.
+            Reasoning: This question explores variations in sky color, linking it to specific 
+            phenomena like sunsets or environmental factors.
+
+
+    Consider another example scenario: "How do I manage high CPU usage on my Windows machine?"
+
+    - Example "Source Text":
+        # Conceptual Elaboration
+        The question "How do I manage high CPU usage on my Windows machine?" focuses on 
+        identifying and resolving performance bottlenecks. It requires knowledge of system 
+        monitoring tools, common causes of high CPU usage, and best practices for optimizing 
+        performance.
+
+        # Example Generated Questions:
+        1:
+            Question: What tool do you use to monitor CPU usage?
+            Answers:
+                - Task Manager.
+                - Resource Monitor.
+                - Third-party tools like Process Explorer.
+            Reasoning: Understanding the preferred tool provides insight into the level of 
+            detail available to the user and the potential next steps for troubleshooting.
+
+        2:
+            Question: What is the primary cause of high CPU usage on your system?
+            Answers:
+                - A specific application or process.
+                - Malware or unwanted software.
+                - Background updates or system tasks.
+            Reasoning: Identifying the root cause helps narrow down the focus to either 
+            addressing software issues or optimizing processes.
+
+        3:
+            Question: How often does your system experience high CPU usage?
+            Answers:
+                - Only during specific tasks like gaming or rendering.
+                - Frequently, even during idle states.
+                - Occasionally, under normal usage conditions.
+            Reasoning: Knowing the frequency of the issue helps determine whether the cause 
+            is tied to specific workloads or system misconfigurations.
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+objective: >
+    The provided <{{ instructs.strats.inputs_tag }}> must be read and fully understood. 
+    Therefore, a series of targeted questions must be generated to clarify the topic and 
+    uncover any missing information. These questions should be relevant to the user's 
+    inquiry and adaptable to both broad conceptual issues and specific technical challenges. 
+    Each question must include 3 - 7 answer options and a 'Reasoning' block explaining why 
+    the question is asked and how the answer helps address the main topic.
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+your_task: >
+    Generate a set of questions based on missing information to clarify and elaborate on the 
+    text provided inside the <{{ instructs.strats.inputs_tag }}> ... </{{ instructs.strats.inputs_tag }}> tags. 
+    The questions should aim to make the topic comprehensible and actionable, regardless of 
+    whether it is a general inquiry or a specific technical challenge. For each question, 
+    include 3 - 7 answer options and a 'Reasoning' block explaining its relevance.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "yaml"}
+fmt: yaml
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": ""}
+validations:
+    expected_len:
+        - 3
+        - 7
+    unit: total_sentences
+    required_terms:
+        - Question
+        - Answers
+        - Reasoning
+        - '?'
+    illegal_terms:
+        - Why is the sky blue?
+        - scattering of sunlight
+    start_terms:
+        - '1:'

@@ -16,7 +16,7 @@ class Test_Thought(unittest.TestCase):
     def setUpClass(cls, *args, **kwargs):
         cls.verbose = 2
         cls.test_data_dir = sts.test_data_dir
-        cls.test_io_path = os.path.join(sts.test_data_dir, 'test_thought_denoise_text.yml')
+        # cls.test_io_path = os.path.join(sts.test_data_dir, 'test_thought_denoise_text.yml')
         cls.test_io_path = os.path.join(sts.test_data_dir, 'test_thought_compress_text.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '

@@ -8,7 +8,7 @@ name: Clean
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy reduces a single "Unformatted Text" to a single "Formatted Text"
+    The task at hand reduces a single "Unformatted Text" to a single "Formatted Text"
     by removing redundant, non-relevant, or overly emphasized information.
     Poluted texts can be search results, forum posts, or other long badly written texts.
     Text Cleaning includes:

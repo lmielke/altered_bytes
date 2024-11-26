@@ -92,7 +92,7 @@ By using these methods, you can effectively monitor your GPU's performance and k
 [34m# 3. Instructions (INST)[39m
 
 [34m## Description: Weighted Mean Aggregation[39m
-This strategy generates a weighted average summary from a given <[46msample[0m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. Pay more attention to common  themes or ideas mentioned by multiple responses, while ensuring that unique details  from each response are included where relevant. The result is a balanced summary that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
+The task at hand generates a weighted average summary from a given <[46msample[0m> of texts or answers.  Instead of taking a strict average, the focus is on synthesizing key points from all responses,  with emphasis placed on the most relevant or repeated ideas. Pay more attention to common  themes or ideas mentioned by multiple responses, while ensuring that unique details  from each response are included where relevant. The result is a balanced summary that gives proportional weight to both common themes and unique insights, while still ensuring  that frequently mentioned or significant ideas receive more attention.
 
 [34m## Example[39m
 Example: Assume the following prompt or statement, ""What happens when foxes meet dogs?"".  We received the following responses.

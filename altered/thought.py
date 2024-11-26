@@ -12,16 +12,12 @@ import random as rd
 from tabulate import tabulate as tb
 from colorama import Fore, Style
 
-import altered.hlp_printing as hlpp
 import altered.settings as sts
 from altered.model_connect import SingleModelConnect
 from altered.prompt import Prompt, Response
-from altered.data import Data
 
 
 class Thought:
-
-    rd_div = 500
 
 
     def __init__(self, name:str, *args, **kwargs):
@@ -30,22 +26,28 @@ class Thought:
         self.assi = SingleModelConnect(*args, **kwargs)
         # prompt constructor for LLM interaction
         self.prompt = Prompt(name, *args, **kwargs)
-        self.response = Response(name, *args, **kwargs)
+        self.response, self.last_response = Response(name, *args, **kwargs), None
 
     def think(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, **kwargs)
-        for p_cnt in range(5):
+        kwargs['num_predict'] = self.p.I.context.get('num_predict', kwargs.get('num_predict'))
+        for p_cnt in range(1, 5):
             # post calls the model and response handles post model cleanup
             self.r = self.response(self.post(p_cnt, *args, **kwargs), *args, **kwargs)
-            if self.r: break
+            if self.r:
+                self.last_response = self.r.get('content')
+                break
         else:
-            print(f"{Fore.RED}Thought.think ERROR: {Fore.RESET}No valid response received!")
+            print(  f"{Fore.RED}Thought.think ERROR: {p_cnt}{Fore.RESET} "
+                    f"No valid response received!")
             return None
         return self.filters(*args, **kwargs)
 
-    def filters(self, *args, r_filters:list=[], verbose:int=0, **kwargs):
-        if not r_filters: 
+    def filters(self, *args, r_filters:list=[], verbose:int=0, user_prompt:str=None, **kwargs
+        ) -> dict:
+        if not r_filters:
+            self.r['user_prompt'] = self.p.I.user_prompt
             return self.r
         # we filter self.r by the keys provided in r_filters
         if type(r_filters) == str: r_filters = [r_filters]
@@ -72,8 +74,9 @@ class Thought:
         """
         
         # Generate unique indices and sort them to ensure we traverse left-to-right
+        # 500 is a devider that reduces the amound of charactes changed in the text
         idxs = sorted({rd.randint(0, len(self.p.data) - 1) 
-                        for _ in range(max(5, len(self.p.data) // self.rd_div * p_cnt ))})
+                        for _ in range(max(5, len(self.p.data) // 500 * p_cnt ))})
         if p_cnt >= 1 and verbose:
             print(  f"{Fore.YELLOW}Thought.post WARNING: {Fore.RESET}"
                     f"{p_cnt = }, modifying {idxs = }")
@@ -94,9 +97,9 @@ class Thought:
                     'repeats': repeats,
                     'verbose': verbose,
                     'prompt_summary': self.p.context.get('prompt_summary'),
-                    'num_predict': self.p.context['instructs']['strats'].get('num_predict'),
+                    'num_predict': self.p.I.context.get('num_predict'),
                         }
-        ignore_fields = {'context',}
+        ignore_fields = {'context', 'num_predict', }
         server_params.update({k:vs for k, vs in kwargs.items() if not k in ignore_fields})
         server_params['fmt'] = self.p.fmt
         return server_params

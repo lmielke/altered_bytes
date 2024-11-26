@@ -53,13 +53,17 @@ class Prompt:
                         }
         self.context['manifest'] = self.context.keys() - 'prompt_title'
         if verbose >= 2:
+            print(f"\n{Fore.CYAN}Prompt.mk_prompt.context:{Fore.RESET} {verbose = } >= 2")
             print(self.stats(2, *args, data_dict=self.context, **kwargs))
 
-    def render_prompt(self, *args, context:dict=None, _cont:dict=None, **kwargs):
+    def render_prompt(self, *args, context:dict=None, _cont:dict=None, verbose:int=0, **kwargs
+        ):
         kwargs.update(self.get_template(*args, **kwargs))
         context = _cont if _cont is not None else self.context
         prompt = self.RD.render(*args, context=context, **kwargs, )
-        hlpp.pretty_prompt(prompt, *args, **kwargs)
+        if verbose >= 2:
+            print(f"\n{Fore.CYAN}Prompt.render_prompt.prompt:{Fore.RESET} {verbose = } >= 2")
+            hlpp.pretty_prompt(prompt, *args, verbose=verbose, **kwargs)
         return prompt
 
     def get_template(self, *args, template_name:str=None, **kwargs):
@@ -123,7 +127,7 @@ class Response:
     def params_to_table(self, checks_ok, *args, **kwargs):
         kwargs['checks'] = checks_ok
         kwargs.update(self.v.validations)
-        print(hlpp.dict_to_table('PROMPT kwargs', kwargs, *args, **kwargs))
+        print(hlpp.dict_to_table('Response.params_to_table.kwargs', kwargs, *args, **kwargs))
 
     def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
@@ -168,13 +172,16 @@ class Validations(Prompt):
         self.instruct_params = self.I.get_instruct_params(*args, **kwargs)
         self.strat_params, self.fmt = self.strats(*args, params=self.instruct_params, **kwargs)
         self.validations = self.strat_params.get('validations')
+        if not self.strat_params.get('validations'):
+            return True
         self.validate(r, *args, **kwargs)
         self.error_tracking(*args, **kwargs)
+        print(f"{Fore.CYAN}\nprompt.Validations.__call__.response:{Fore.RESET}", end=' ')
         if self.errors:
-            print(f"{Fore.RED}Response Validation Failed:{Fore.RESET}")
+            print(f"\n{Fore.RED}ERROR: {r['responses'][0].get('response') = }{Fore.RESET}\n")
             return False
         else:
-            print(f"{Fore.GREEN}Response Validation Passed{Fore.RESET}")
+            print(f"{Fore.GREEN}OK{Fore.RESET}")
             return True
 
     def validate(self, r: dict, *args, **kwargs) -> dict:

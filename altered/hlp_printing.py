@@ -43,7 +43,7 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     p = re.sub(r'^.?```(\w+)?$', f"{Fore.MAGENTA}``` \\1{Fore.RESET}", p, flags=re.MULTILINE)
     p = re.sub(r'(.*)(https?://[^\s\'_\"]+)(.*)', f"\\1{Fore.MAGENTA}\\2{Fore.RESET}\\3", p)
     if verbose >= 2:
-        print(f"\n\n{Fore.CYAN}-> hlp_printing.pretty_prompt:{Fore.RESET} \n{p}")
+        print(f"{p.strip()}")
     return p
 
 def pretty_dict(name:str, d:dict, *args, **kwargs):

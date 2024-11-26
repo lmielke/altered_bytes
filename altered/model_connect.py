@@ -49,7 +49,8 @@ class ModelConnect:
         lower = (0.1 + bias) if lower is None else (lower + bias)
         upper = (0.1 + bias) if upper is None else (upper + bias)
         rd_temp = min(max(lower, rd.random()), upper)
-        print(f"{Fore.YELLOW}Warning: {Fore.RESET}temp: {rd_temp:.2f}, {bias = }, {scale = }")
+        print(  f"{Fore.YELLOW}Warning: set_rd_temp setting temperature:{Fore.RESET} "
+                f"temp: {rd_temp:.2f}, {bias = }, {scale = }")
         return rd_temp
 
     def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs
@@ -150,22 +151,26 @@ class ModelConnect:
         Sends a message to the appropriate assistant and handles the response.
         """
         kwargs.update(self.set_service_endpoint(*args, **kwargs))
+        if verbose >= 2:
+            print(f"\n{Fore.CYAN}ModelConnect.post:{Fore.RESET} {verbose = } >= 2")
+            hlpp.unroll_print_dict(kwargs, 'service_endpoint')
         # print(msts.config.get_model(*args, **kwargs).get('model_file'))
         model_params = msts.config.get_model(*args, **kwargs)
         context = self.prep_context(*args, **model_params.get('model_file'), verbose=verbose, 
                                             **kwargs, )
         url, server = msts.config.get_url(*args, **kwargs), model_params.get('server')
         if verbose:
-            print(      f"{Fore.MAGENTA}ModelConnect.post: {Fore.RESET}"
+            print(      f"{Fore.MAGENTA}ModelConnect.post: {Fore.RESET} {verbose = } >= 1 \n"
                         f"{url}, {context['model']}, {server = }, "
                         f"{context.get('repeats', 'no repeats for embeddings')}, "
-                        f"{len(context['prompts']) = }, {kwargs.get('fmt') = }"
+                        f"{len(context['prompts']) = }, {kwargs.get('fmt') = }, "
+                        f"num_predict: {context.get('options', {}).get('num_predict')}"
                         )
         elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')
         # chat-gpt and ollama use different methods, Here we call ollama method.
         r = self._ollama(url, context, *args, verbose=verbose, **kwargs )
-        if verbose:
+        if verbose >= 1:
             print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r['num_results'] = }")
         r['model'], r['server'] = model_params.get('model_file').get('name'), server
         self.get_stats(r, context, *args, verbose=verbose, **kwargs)

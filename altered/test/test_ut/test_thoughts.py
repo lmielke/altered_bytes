@@ -10,17 +10,18 @@ from colorama import Fore
 from altered.thoughts import Thoughts
 Thoughts.thoughts_dir = os.path.join(sts.test_data_dir, 'thoughts')
 
-verbose = 3
 
 class Test_Thoughts(unittest.TestCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
+        cls.verbose = 3
         cls.test_data_dir = sts.test_data_dir
         cls.test_io_path = os.path.join(sts.resources_dir, 'io', 'thought__thought_run.yml')
         cls.test_data = cls.mk_test_data(*args, **kwargs)
         cls.msg = f' >>>> NOT IMPLEMENTED <<<< '
         # cls.thoughts = Thoughts(name='ut_thought')
-        cls.thoughts = Thoughts(name='ut_thought', verbose=verbose, data_dir=cls.test_data_dir)
+        cls.thoughts = Thoughts(name='ut_thought', verbose=cls.verbose, 
+                                                                data_dir=cls.test_data_dir)
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):

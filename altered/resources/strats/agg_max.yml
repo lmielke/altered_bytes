@@ -8,7 +8,7 @@ name: Extensive Summarization
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy creates an extensive summarization that incorporates all relevant details 
+    The task at hand is to create an extensive text summarization that incorporates all relevant details 
     from a given <sample> of texts or answers. The goal is to generate a comprehensive summary 
     that covers all major and minor points, ensuring that no important detail is omitted. 
     The resulting output reflects an exhaustive synthesis of the content provided.

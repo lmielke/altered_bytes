@@ -70,6 +70,42 @@ compress_short.yml:
     'Length: 317 > Max: 218': 1
     'Length: 331 > Max: 218': 1
     'Length: 332 > Max: 218': 1
+expand_short.yml:
+  Illegal Terms in response:
+    The quick brown fox jumps over the lazy dog. found: 7
+    over the lazy dog found: 11
+    quick brown fox found: 14
+  Required Terms Missing:
+    '# Assumption Analysis missing': 31
+    '# Known Unknowns missing': 42
+    '# Practical or Broader Implications missing': 1
+    '# System Environment missing': 4
+  Response Length:
+    'Length: 1022 > Max: 933': 1
+    'Length: 1151 > Max: 933': 1
+    'Length: 148 > Max: 61': 1
+    'Length: 155 > Max: 61': 1
+    'Length: 174 > Max: 61': 1
+    'Length: 180 > Max: 61': 1
+    'Length: 204 > Max: 191': 1
+    'Length: 210 > Max: 158': 1
+    'Length: 212 > Max: 158': 1
+    'Length: 225 > Max: 61': 1
+    'Length: 230 > Max: 191': 1
+    'Length: 256 > Max: 191': 1
+    'Length: 298 > Max: 0': 1
+    'Length: 314 > Max: 0': 1
+    'Length: 322 > Max: 158': 1
+    'Length: 322 > Max: 316': 1
+    'Length: 323 > Max: 316': 1
+    'Length: 325 > Max: 0': 1
+    'Length: 326 > Max: 316': 1
+    'Length: 327 > Max: 316': 1
+    'Length: 328 > Max: 316': 1
+    'Length: 330 > Max: 316': 1
+    'Length: 334 > Max: 316': 1
+    'Length: 376 > Max: 316': 1
+    'Length: 429 > Max: 0': 1
 format_short.yml:
   Illegal Terms in response:
     Dogs found: 29

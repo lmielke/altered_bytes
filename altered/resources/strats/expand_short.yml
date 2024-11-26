@@ -1,0 +1,125 @@
+# expand_short.yml
+# This defines a task called "Expand", which transforms a compressed text into an
+# expanded version using structured sections. The example illustrates the expansion of a 
+# sample text.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Expand Text Task"}
+# name of the strategy
+name: Expand Text Task
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
+description: >
+    Below is a __Task__ called __"Expand"__ that transforms a "Short Text"
+    into an "Expanded Text" by elaborating on key ideas, context, ambiguities,
+    environmental factors, assumptions, and potential unknowns. The expansion process includes 
+    the following structured sections, which guide the expanded text and enable future analysis:\n
+    1. **Conceptual Elaboration**: Define and explain core concepts or terms in the text. This 
+       helps establish a foundation for understanding and can serve as a glossary for future reference.\n
+    2. **Context and Background**: Explore the broader context or relevance of the topic, which
+       can later be expanded to provide historical or situational narratives.\n
+    3. **Ambiguity Analysis**: Identify and expand on potential ambiguities in nouns and verbs,
+       exploring different interpretations and their implications. This section can later be used 
+       to create multiple scenario analyses or alternative perspectives.
+    4. **System Environment**: Explore how different systems, setups, or environments affect the topic.
+       This includes hardware, interfaces, and supporting systems that could impact the subject's behavior 
+       or performance. For abstract cases like the fox, this might seem unusual but is intended to encourage 
+       discussion on any relevant environments or external systems that could influence behavior or context.
+    5. **Assumption Analysis**: Document and analyze underlying assumptions inferred from the text. These 
+       assumptions can be further developed into a manifest or principles guiding the understanding of 
+       the content.
+    6. **Known Unknowns**: Highlight missing information that limits our full understanding of the statement.
+       Specifically, identify gaps in context or detail that prevent a comprehensive analysis. This section 
+       can serve as a foundation for developing a question catalogue, aiding in identifying areas for further 
+       research or inquiry.
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example of how to proceed when solving a task
+example: >
+    Consider the example scenario: "The quick brown Fox jumps over the lazy Dog."
+
+    - Example "Short Text":
+        The quick brown fox jumps over the lazy dog.
+
+    - Example "Expanded Text":
+        # Conceptual Elaboration
+        This sentence describes a quick and agile fox, focusing on its speed and its brown 
+        coloration, which reflects natural camouflage...
+
+        # Context and Background
+        This sentence is phrased like a factual statement, but most likely is not as such. 
+        Instead, it’s a pangram used in typing tests, font demonstrations, 
+        and handwriting practice...
+
+        # Ambiguity Analysis
+        - **Fox**: There are many types of foxes, such as the red fox and arctic fox. 
+          The choice of "brown" suggests a wild fox species native to temperate forests...
+        - **Jump**: Jumping can mean a playful leap, a hunting maneuver, or a symbolic act 
+          representing overcoming challenges. Each interpretation alters the meaning of the 
+          sentence...
+
+        # System Environment
+        Foxes operate in various habitats and settings. For example, in snowy regions, 
+        a fox’s jump might involve different food acquisition tactics like "mousing," where they leap into snow 
+        to catch prey. In forests, food acquisition is more straightforward, but jumping is often used to overcome obstacles like fallen 
+        logs. If we think of this in a more abstract sense, one could also consider what external factors (e.g., forest density, weather) or 
+        supporting systems (e.g., ecosystem) might influence such behavior...
+
+        # Assumption Analysis
+        Given what we know, we can assume that this statement is part of a larger text or 
+        exercise designed to test typing speed or font rendering. The sentence is constructed 
+        to include all letters of the English alphabet, therefore...
+
+        # Known Unknowns
+        The context in which this statement is made is completely missing. We do not know if 
+        this is part of a story, an instructional text, or an unrelated exercise. There is also 
+        no indication of why this particular scenario was chosen, which leaves gaps in understanding 
+        its true purpose. Questions such as "Why a fox?" or "What significance does the dog have?" 
+        remain unanswered...
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
+    The provided <{{ instructs.strats.inputs_tag }}> must be expanded into a Wiki-style text. 
+    Strictly use all 6 example headers:\n 
+    - 'Conceptual Elaboration',\n
+    - 'Context and Background',\n
+    - 'Ambiguity Analysis',\n
+    - 'System Environment',\n
+    - 'Assumption Analysis',\n
+    - 'Known Unknowns'\n
+    The expanded text should have approximately {{ instructs.strats.mean_words }} words.
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    Expand the text provided inside the <{{ instructs.strats.inputs_tag }}> ... </{{ instructs.strats.inputs_tag }}> tags
+    using ALL 6 example headers and elaboration techniques. 
+    The expansion must address ambiguities, explore environmental considerations in detail, 
+    and provide a comprehensive understanding of the topic.\n Pay particular attention to the
+    'Known Unknowns' section.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": ""}
+# validations to ensure proper expansion
+validations:
+    expected_len:
+        - 20.0  # minimum expansion factor (can be omitted or adjusted based on word count)
+        - 100.0 # maximum expansion factor (can be omitted or adjusted based on word count)
+    required_terms:
+        - '# Conceptual Elaboration'
+        - '# Context and Background'
+        - '# Ambiguity Analysis'
+        - '# System Environment'
+        - '# Assumption Analysis'
+        - '# Known Unknowns'
+    illegal_terms:
+        - The quick brown fox jumps over the lazy dog.
+        - quick brown fox
+        - over the lazy dog
+    start_terms:
+        - Here is the expanded ...
+        - The expanded text ...

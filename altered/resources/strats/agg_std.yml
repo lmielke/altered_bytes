@@ -8,7 +8,7 @@ name: Std Aggregation
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    This strategy calculates the standard deviation of similarity between a given <sample> 
+    The task at hand is to derrive the standard deviation of similarity between a given <sample> 
     of texts or answers. The goal is to measure the degree of variance between the texts, 
     ranging from identical (low variance) to highly divergent (high variance). 
     The output is a JSON string that provides a standard deviation score
