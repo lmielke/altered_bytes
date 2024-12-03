@@ -25,7 +25,7 @@ The following shows the recent activities as well as PS cmds performed on the un
 
 ### Git Diffs Log
 The following section shows the recent {{ context.user_info.git_diffs|length }} `git diff` code changes, listed as txt files, sorted from recent to oldest.
-
+{% if context.user_info.git_diffs %}
 {% for git_diff in context.user_info.git_diffs %}
 ### Change {{ loop.index }}
 - **File Path:** {{ git_diff.file_path }}
@@ -35,3 +35,6 @@ The following section shows the recent {{ context.user_info.git_diffs|length }} 
 {{ git_diff.content }}
 ```
 {% endfor %}
+{% else %}
+No git diffs found.
+{% endif %}
