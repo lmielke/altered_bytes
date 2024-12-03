@@ -14,7 +14,7 @@ class Context:
     def __init__(self, name:str, context:str={}, *args, **kwargs):
         self.context = context
         self.web_search = ContextSearch(*args, name=name, **kwargs)
-        self.user_activities = ContextActivities(*args, **kwargs)
+        self.user_infos = ContextActivities(*args, **kwargs)
         self.os_sys_info = ContextSysInfo(*args, **kwargs)
         self.pg_info = ContextPackageData(*args, **kwargs)
 
@@ -22,15 +22,22 @@ class Context:
         self.prep_data(*args, **kwargs)
         return self.context
 
-    def prep_data(self, *args, num_activities:int=0, **kwargs):
+    def prep_data(self, *args, **kwargs):
         self.get_history(*args, **kwargs)
         self.get_init_prompt(*args, **kwargs)
         self.context.update(self.web_search(*args, **kwargs))
-        self.context.update(self.os_sys_info.mk_context(*args, **kwargs))
-        self.context.update(self.pg_info.mk_context(*args, **kwargs))
-        if num_activities:
-            self.context.update(self.user_activities.get_activities_results(*args, 
-                                                    num_activities=num_activities, **kwargs))
+        self.get_sys_info(*args, **kwargs)
+
+    def get_sys_info(self, *args,   package_info:bool=False, 
+                                    sys_info:bool=False, 
+                                    user_info:bool=False, 
+        **kwargs):
+        if sys_info:
+            self.context.update(self.os_sys_info.mk_context(*args, sys_info=sys_info, **kwargs))
+        if package_info:
+            self.context.update(self.pg_info.mk_context(*args, package_info=package_info, **kwargs))
+        if user_info:
+            self.context.update(self.user_infos(*args, user_info=user_info, **kwargs))
 
     def get_history(self, *args, chat_history:list=None, **kwargs):
         if chat_history:

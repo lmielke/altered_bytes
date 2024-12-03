@@ -1,6 +1,6 @@
 """
 info_package_imports.py
-run like: python info_package_imports.py root_file_name --verbose 1
+run like: python info_package_imports.py work_file_name --verbose 1
 Example: python -m altered.info_package_imports test_prompt_context_activities.py --verbose 1
 """
 
@@ -25,11 +25,12 @@ ignore_dirs = {
 }
 
 class PackageInfo:
-    def __init__(self, *args, root_file_name: str = sts.package_name, **kwargs):
+
+    def __init__(self, *args, work_file_name:str=sts.package_name, **kwargs):
         self.root_dir, self.package_name = self.find_root_dir(*args, **kwargs)
         if not self.root_dir:
             raise RuntimeError("Root directory not found.")
-        self.root_file_name = self.handle_file_name(root_file_name)
+        self.work_file_name = self.handle_file_name(work_file_name)
         self.graph = graphviz.Digraph(comment='Package Dependency Graph')
         self.visited_files = set()
         self.incoming_edges = {}  # Track incoming edges for each node
@@ -37,13 +38,13 @@ class PackageInfo:
         self.graph.attr('node', style='filled', fillcolor='white')
         self.graph.attr('edge', fontsize='10')  # Smaller font size for edges
 
-    def handle_file_name(self, root_file_name, *args, **kwargs):
+    def handle_file_name(self, work_file_name, *args, **kwargs):
         """
         Handle the main file name to ensure it ends with '.py'.
         """
-        if not root_file_name.endswith('.py'):
-            root_file_name += '.py'
-        return root_file_name
+        if not work_file_name.endswith('.py') and not '.' in work_file_name:
+            work_file_name += '.py'
+        return work_file_name
 
     def find_root_dir(self, start_dir:str=None, *args, **kwargs):
         """
@@ -84,14 +85,14 @@ class PackageInfo:
                 self.graph.edge(filename, next_filename, label=imp)
                 self.build_graph(next_file)
 
-    def finalize_graph(self):
+    def finalize_graph(self, *args, **kwargs):
         # Determine the maximum number of incoming edges for scaling
         max_edges = max(self.incoming_edges.values(), default=1)
         
         # Set node attributes based on incoming edges
         for node, count in self.incoming_edges.items():
             # Scale the fontsize according to the number of incoming edges
-            fontsize = '12' if node == self.root_file_name else str(10 + min(count * 2, 10))
+            fontsize = '12' if node == self.work_file_name else str(10 + min(count * 2, 10))
             
             # Calculate the intensity of the red color based on incoming edges
             if max_edges > 0:
@@ -103,16 +104,23 @@ class PackageInfo:
             
             # Adjusting the fill color and font size
             self.graph.node(node, fontsize=fontsize, fillcolor=fillcolor, style='filled')
-            self.graph.node(node, fontsize=fontsize, fillcolor='lightblue' if node == self.root_file_name else fillcolor)
+            self.graph.node(node, fontsize=fontsize, fillcolor='lightblue' if node == self.work_file_name else fillcolor)
 
-    def create_import_graph(self, *args, root_file_name:str=None, **kwargs):
+    def create_import_graph(self, *args, work_file_name:str=None, verbose:int=0, **kwargs):
         """
         Start the graph creation process from the specified main file.
         """
-        root_file_name = root_file_name if root_file_name is not None else self.root_file_name
-        main_path = self.locate_file(root_file_name, self.root_dir)
+        work_file_name = work_file_name if work_file_name is not None else self.work_file_name
+        work_file_name = self.handle_file_name(work_file_name)
+        main_path = self.locate_file(work_file_name, self.root_dir)
         if not main_path:
-            raise FileNotFoundError(f"{root_file_name} not found in {self.root_dir}")
+            raise FileNotFoundError(f"{work_file_name} not found in {self.root_dir}")
+        else:
+            if verbose >= 2:
+                print(  f"{Fore.YELLOW}Getting package imports{Fore.RESET} "
+                        f"starting from {work_file_name = } "
+                        f"{verbose =} "
+                )
         self.build_graph(main_path)
         self.finalize_graph()  # Apply final node styles based on connectivity
         return self.graph
@@ -162,7 +170,7 @@ class PackageInfo:
         return None
 
     def analyze_package_imports(self, *args, 
-                                        root_file_name: str, 
+                                        work_file_name: str, 
                                         show: bool = False, 
                                 **kwargs ) -> str:
         """
@@ -175,7 +183,7 @@ class PackageInfo:
                 Where is this module used in my project?
         Args:
             *args: Additional positional arguments. (not relevant here)
-            root_file_name (str): The name file to trace imports from.
+            work_file_name (str): The name file to trace imports from.
                 Defaults to the package entry file.
             verbose (int, optional): Verbose mode.
                 Defaults to 1.
@@ -183,10 +191,9 @@ class PackageInfo:
         Returns:
             str: The Graphviz source code of the generated import graph.
         Example arguments:
-            {root_file_name: "info.py", verbose: 1}
+            {work_file_name: "info.py", verbose: 1}
         """
-        print(f"Analyzing package imports starting from {root_file_name = }")
-        graph = self.create_import_graph(*args, root_file_name=root_file_name, **kwargs)
+        graph = self.create_import_graph(*args, work_file_name=work_file_name, **kwargs)
         dot_source = graph.source
         if show:
             graph_filepath = os.path.join(sts.logs_dir, "Digraph.gv")
@@ -194,13 +201,13 @@ class PackageInfo:
             graph.view()
         return {
                 'digraph': dot_source,
-                'root_file_name': f"'{root_file_name}'",
+                'work_file_name': f"'{work_file_name}'",
                 }
 
 
 def set_params(*args, **kwargs):
     parser = argparse.ArgumentParser(description="Analyze Python package structure and visualize import relationships.")
-    parser.add_argument('root_file_name', type=str, help='The name of the main Python file to trace imports from.')
+    parser.add_argument('work_file_name', type=str, help='The name of the main Python file to trace imports from.')
     parser.add_argument('--verbose', type=int, default=1,
                         help='Verbose mode. If set to 1 or higher, the graph is displayed.')
     return parser.parse_args().__dict__

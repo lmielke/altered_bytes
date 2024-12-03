@@ -2,6 +2,8 @@ import os
 import re
 from typing import Set
 
+from colorama import Fore, Style, Back
+
 import altered.settings as sts
 
 
@@ -52,7 +54,12 @@ class Tree:
         if file_match_regex and re.search(file_match_regex, file):
             self.matched_files.add(os.path.join(root, file))
 
-    def mk_tree(self, *args, project_dir:str=sts.project_dir, max_depth:int=2, file_match_regex:str=None, **kwargs) -> str:
+    def mk_tree(self, *args, 
+                            project_dir:str=sts.project_dir, 
+                            max_depth:int=2, 
+                            file_match_regex:str=None,
+                            work_file_name:str=None,
+        **kwargs) -> str:
         """
         Generate an uncolorized string representation of the directory tree and collect
         matched files.
@@ -66,7 +73,6 @@ class Tree:
         """
         tree_structure = ""
         base_level = project_dir.count(os.sep)
-
         for root, dirs, files in os.walk(project_dir, topdown=True):
             level = root.count(os.sep) - base_level
             subdir = os.path.basename(root)
@@ -85,10 +91,37 @@ class Tree:
             # Add directory to the tree
             tree_structure += f"{indent_level}|-- {subdir}/\n"
             for file in files:
-                tree_structure += f"{indent_level}{self.indent}|-- {file}\n"
+                if work_file_name and file.split('.')[0] == work_file_name:
+                    tree_structure += ( 
+                                        f"{indent_level}{self.indent}|-- "
+                                        f"{Fore.BLUE}{file}{Fore.RESET}\n"
+                                        )
+                    self.find_match(root, file, work_file_name, *args, **kwargs)
+                else:
+                    tree_structure += f"{indent_level}{self.indent}|-- {file}\n"
                 if file_match_regex:
                     self.find_match(root, file, file_match_regex, *args, **kwargs)
+        self.workfile_to_front(work_file_name, *args, **kwargs)
         return tree_structure
+
+    def workfile_to_front(self, work_file_name: str, *args, **kwargs) -> None:
+        """
+        If work_file_name matches any file in self.matched_files (without extension),
+        move that file's full path to the front of the list.
+        
+        Args:
+            work_file_name (str): File name without extension to search for
+        """
+        # Find the full path that matches work_file_name (if any)
+        matching_path = next(
+            (path for path in self.matched_files 
+             if os.path.splitext(os.path.basename(path))[0] == work_file_name),
+            None
+        )
+        
+        if matching_path:
+            # Remove the matching path and add it to the front
+            self.matched_files = [matching_path] + list(self.matched_files - {matching_path})
 
     def __call__(self, *args, **kwargs):
         """

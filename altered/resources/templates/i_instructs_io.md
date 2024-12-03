@@ -10,7 +10,6 @@ Respond with a '{{ instructs.io.fmt.upper() }}' string containing all entries sh
 Your response should be shorter than {{ instructs.num_predict | default('250') }} words. Do NOT include comment lines starting with {{ instructs.io.fmt_comment }}!
 {%- else %}
 The requested response format is MARKDOWN text, like shown below:
-instructs.io: {{ instructs.io }}
 ```markdown
 # Answer
 Your strait to the point answer goes here.

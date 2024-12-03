@@ -1,8 +1,8 @@
 # test_prompt_kwargs.yml
 user_prompt: How do I monitor my GPU Performance?
 num_activities: 0
-package_infos: null
-root_file_name: null
+package_info: null
+work_file_name: null
 file_match_regex: null
 strat_template: null
 io_template: simple_answer

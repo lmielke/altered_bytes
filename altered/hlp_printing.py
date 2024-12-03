@@ -47,7 +47,7 @@ def pretty_prompt(prompt:str, *args, verbose:int=0, **kwargs) -> str:
     return p
 
 def pretty_dict(name:str, d:dict, *args, **kwargs):
-    print(f"\n{Fore.CYAN}#{name}.keys(): {Fore.RESET}{d.keys()}")
+    print(f"\n{Fore.CYAN}{name} {Fore.RESET}\n{'*' * len(name)}")
     for k, v in d.items():
         print(f"{Fore.CYAN}{k}: {Fore.RESET}{v}")
 

@@ -1,10 +1,18 @@
 # test_prompt_kwargs.yml
 user_prompt: I am having trouble with my list comprehensions?
+# System and User Information
 sys_info: true
 num_activities: 3
-package_infos: true
-root_file_name: prompt_instructs.py
+package_info: true
+pg_imports: true
+pg_requirements: true
+pg_tree: true
+work_file_name: prompt_instructs.py
 file_match_regex: settings.*
+sys_info_ops: true
+sys_info_usr: true
+deliverable: true
+deliverable_path: C:/Users/lars/python_venvs/packages/altered_bytes/altered/test/data/test_deliverable.py
 chat_history:
   - role: user
     content: What are list comprehensions?
@@ -17,7 +25,8 @@ chat_history:
 init_prompt:
   role: user
   content: What are list comprehensions?
-strat_template: agg_mean
+strat_template: pythoncode_class
+# io_template: simple_a
 prompts:
   - What are list comprehensions?
   - What use have list comprehensions?
@@ -61,7 +70,3 @@ search_results:
     strat_template: agg_mean
   - source: https://www.python.org/some_topic
     content: Python list comprehensions will help you create lists in Python.
-sys_info_ops: true
-sys_info_usr: true
-deliverable: true
-deliverable_path: C:/Users/lars/python_venvs/packages/altered_bytes/altered/test/data/test_deliverable.py

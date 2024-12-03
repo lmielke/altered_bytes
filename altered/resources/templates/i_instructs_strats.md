@@ -10,11 +10,13 @@
 {{ instructs.strats.objective }}
 
 {%- if instructs.strats.strat_input_data %}
+{%- if instructs.strats.inputs_header %}
 ## {{ instructs.strats.inputs_header }}
 {{ instructs.strats.inputs_intro }}
 <!-- <{{ instructs.strats.inputs_tag }}> -->
 {{ instructs.strats.strat_input_data }}
 <!-- </{{ instructs.strats.inputs_tag }}> -->
+{% endif%}
 {% endif%}
 
 ## Response Layout and Format:

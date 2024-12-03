@@ -1,8 +1,9 @@
 """
-    Entry poiont for altered shell calls 
+    __main__.py
+    Entry point for altered shell calls 
     ###################################################################################
     
-    __main__.py imports the api module from altered.apis >> apiModule.py
+    __main__.py imports the api module from altered >> apiModule.py
                 and runs it
                 api is provided as first positional argument
 
@@ -11,15 +12,15 @@
     for user info runs: 
         python -m altered info
     above cmd is identical to
-        python -m altered.apis.info
+        python -m altered.info
 
 
 """
 
 import colorama as color
-
+from colorama import Fore, Style, Back
 color.init()
-import importlib
+import importlib, os
 
 import altered.settings as sts
 import altered.arguments as arguments
@@ -31,7 +32,14 @@ def runable(*args, api, **kwargs):
     imports api as a package and executes it
     returns the runable result
     """
-    return importlib.import_module(f"altered.apis.{api}")
+    if not api.startswith('api_'):
+        api = f"api_{api}"
+    if not os.path.exists(os.path.join(sts.package_dir, f"{api}.py")):
+        raise FileNotFoundError(
+                                    f"{Fore.RED}api {api} not found in{Fore.RESET} "
+                                    f"{sts.package_dir}"
+                                )
+    return importlib.import_module(f"altered.{api}")
 
 
 def main(*args, **kwargs):

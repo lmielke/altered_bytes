@@ -13,26 +13,25 @@ import os, subprocess, tomllib
 
 class ContextPackageData:
 
-    template_name = 'i_context_package_infos.md'
-    trigger = 'package_infos'
+    template_name = 'i_context_package_info.md'
+    trigger = 'package_info'
 
     def __init__(self, *args, **kwargs):
         self.context = {}
-        self.pg_data = PackageInfo(*args, **kwargs)
+        self.data = PackageInfo(*args, **kwargs)
         self.tree = Tree(*args, **kwargs)
 
-    def get_package_data(self, *args, root_file_name:str=None, **kwargs) -> dict:
-        if root_file_name is None:
+    def get_pg_imports(self, *args, work_file_name:str=None, **kwargs) -> dict:
+        if work_file_name is None:
             return {}
-        pg_data = self.pg_data.analyze_package_imports(*args, 
-                                                        root_file_name=root_file_name,
+        data = self.data.analyze_package_imports(*args, 
+                                                        work_file_name=work_file_name,
                                                         show=False, **kwargs
                     )
-        if pg_data.get('digraph'):
-            pg_data['digraph'] = '\n'.join([line.split('[')[0] for line in 
-                    pg_data.get('digraph', '').split('\n') if 'fillcolor' not in line])
-
-        return pg_data
+        if data.get('digraph'):
+            data['digraph'] = '\n'.join([line.split('[')[0] for line in 
+                    data.get('digraph', '').split('\n') if 'fillcolor' not in line])
+        return data
 
     def get_requirements(self, *args, pg_manager:str='pipenv', **kwargs) -> dict:
         """
@@ -40,11 +39,11 @@ class ContextPackageData:
         """
         if pg_manager == 'pipenv':
             req_format = 'Pipfile'
-            requirements = self.load_from_pipenv(*args, **kwargs)
+            pg_requirements = self.load_from_pipenv(*args, **kwargs)
         elif pg_manager == 'pip':
             req_format = 'requirements.txt'
-            requirements = self.load_from_pip(*args, **kwargs)
-        return { 'requirements': requirements, 'req_format': req_format }
+            pg_requirements = self.load_from_pip(*args, **kwargs)
+        return { 'pg_requirements': pg_requirements, 'req_format': req_format }
 
     def load_from_pipenv(self, *args, **kwargs) -> dict:
         """
@@ -70,12 +69,22 @@ class ContextPackageData:
             print(Fore.RED + f"Error fetching pip requirements: {e.stderr}" + Style.RESET_ALL)
             return {}
 
-    def mk_context(self, *args, package_infos: bool = False, **kwargs):
-        if not package_infos:
-            return {}
-        else:
-            self.context['package_infos'] = {}
-        self.context['package_infos'].update(self.get_package_data(*args, **kwargs))
-        self.context['package_infos'].update(self.get_requirements(*args, **kwargs))
-        self.context['package_infos'].update(self.tree(*args, **kwargs))
+    def mk_context(self, *args,     package_info:bool=False,
+                                    pg_imports:bool=False, 
+                                    pg_requirements:bool=False, 
+                                    pg_tree:bool=False,
+        **kwargs):
+        print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {package_info = }")
+        if not package_info: return {}
+        # Note: there are additional flags to get various package_infos
+        self.context['package_info'] = {}
+        if pg_imports:
+            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_imports = }")
+            self.context['package_info'].update(self.get_pg_imports(*args, **kwargs))
+        if pg_requirements:
+            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_requirements = }")
+            self.context['package_info'].update(self.get_requirements(*args, **kwargs))
+        if pg_tree:
+            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_tree = }")
+            self.context['package_info'].update(self.tree(*args, **kwargs))
         return self.context

@@ -17,7 +17,7 @@ class ContextActivities:
     template_name = 'i_context_activities.md'
     logs_dir = sts.logs_dir
     log_name = 'activity_log'
-    trigger = 'activities'
+    trigger = 'user_act'
 
     def __init__(self, *args, log_file_path:str=None, **kwargs):
         """
@@ -27,9 +27,27 @@ class ContextActivities:
         self.log_file_path = self.find_most_recent_act_log(*args, **kwargs) \
                                                 if log_file_path is None else log_file_path
         self.context = {}
-        self.load_activities(*args, **kwargs)
-        self.load_ps_history(*args, **kwargs)
-        self.load_git_diffs(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self.get_all_infos(*args, **kwargs)
+
+    def get_all_infos(self, *args,  git_diff:bool=False, 
+                                    user_act:bool=False, 
+                                    chat_hist:bool=False,
+                                    num_activities:int=1,
+        **kwargs):
+        data = {}
+        if user_act:
+            self.load_activities(*args, **kwargs)
+            data['user_act'] = self.context['user_act'][-num_activities:]
+        if chat_hist:
+            self.load_ps_history(*args, **kwargs)
+            data['ps_history'] = self.context['ps_history'][-num_activities*2:]
+        if git_diff:
+            self.load_git_diffs(*args, **kwargs)
+            data['git_diffs'] = self.context['git_diffs'][-num_activities:]
+        return {'user_info': data}
+
 
     def find_most_recent_act_log(self, *args, **kwargs):
         """
@@ -51,20 +69,9 @@ class ContextActivities:
         if os.path.exists(self.log_file_path):
             with open(self.log_file_path, 'r') as log_file:
                 # Load each activity record and append to the context list
-                self.context['activities'] = [json.loads(line.strip()) for line in log_file]
+                self.context['user_act'] = [json.loads(line.strip()) for line in log_file]
         else:
-            self.context['activities'] = []
-
-    def get_activities_results(self, *args, num_activities:int=0, **kwargs):
-        """
-        Retrieve the most recent 'num_activities' activities.
-        """
-        if not num_activities: return {}
-        return { 
-                'activities': self.context['activities'][-num_activities:],
-                'ps_history': self.context['ps_history'][-num_activities*2:],
-                'git_diffs': self.context['git_diffs'][-num_activities:],
-                }
+            self.context['user_act'] = []
 
     def get_ps_history_file_path(self, *args, **kwargs) -> str:
         """

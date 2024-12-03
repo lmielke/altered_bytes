@@ -1,9 +1,12 @@
-# question-catalogue_short.yml
+# questioncatalogue_short.yml
+# Task for generating questions elaborating a specific text.
 
 # meta: {"name": "name", "type": "string", "default": "", "example": "Question Catalogue Task"}
+# name of the strategy
 name: Question Catalogue Task
 
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the strategy
 description: >
     This task generates a structured series of questions designed to clarify and elaborate 
     on a given topic or problem. The aim is to uncover missing information and provide a 
@@ -12,15 +15,16 @@ description: >
     applicability to both general inquiries and specific technical challenges.
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# example on how to precede when solving a task
 example: >
     Consider the first example scenario: "Why is the sky blue?"
-
+    
     - Example "Source Text":
         # Conceptual Elaboration
         The question "Why is the sky blue?" touches on atmospheric physics, light scattering, 
         and the perception of color. To fully address this question, it is essential to 
         explore the scientific principles behind light behavior and human vision.
-
+        
         # Example Generated Questions:
         1:
             Question: What factors influence the color of the sky during the day?
@@ -30,7 +34,7 @@ example: >
                 - The composition of the atmosphere.
             Reasoning: Understanding these factors provides the basis for explaining why 
             the sky appears blue and not some other color during the day.
-
+            
         2:
             Question: Does the sky appear blue under all conditions?
             Answers:
@@ -39,17 +43,17 @@ example: >
                 - No, it varies under extreme weather or pollution.
             Reasoning: This question explores variations in sky color, linking it to specific 
             phenomena like sunsets or environmental factors.
-
-
+            
+    
     Consider another example scenario: "How do I manage high CPU usage on my Windows machine?"
-
+    
     - Example "Source Text":
         # Conceptual Elaboration
         The question "How do I manage high CPU usage on my Windows machine?" focuses on 
         identifying and resolving performance bottlenecks. It requires knowledge of system 
         monitoring tools, common causes of high CPU usage, and best practices for optimizing 
         performance.
-
+        
         # Example Generated Questions:
         1:
             Question: What tool do you use to monitor CPU usage?
@@ -59,7 +63,7 @@ example: >
                 - Third-party tools like Process Explorer.
             Reasoning: Understanding the preferred tool provides insight into the level of 
             detail available to the user and the potential next steps for troubleshooting.
-
+            
         2:
             Question: What is the primary cause of high CPU usage on your system?
             Answers:
@@ -68,7 +72,7 @@ example: >
                 - Background updates or system tasks.
             Reasoning: Identifying the root cause helps narrow down the focus to either 
             addressing software issues or optimizing processes.
-
+            
         3:
             Question: How often does your system experience high CPU usage?
             Answers:
@@ -79,6 +83,7 @@ example: >
             is tied to specific workloads or system misconfigurations.
 
 # meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
 objective: >
     The provided <{{ instructs.strats.inputs_tag }}> must be read and fully understood. 
     Therefore, a series of targeted questions must be generated to clarify the topic and 
@@ -88,21 +93,24 @@ objective: >
     the question is asked and how the answer helps address the main topic.
 
 # meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
 your_task: >
     Generate a set of questions based on missing information to clarify and elaborate on the 
     text provided inside the <{{ instructs.strats.inputs_tag }}> ... </{{ instructs.strats.inputs_tag }}> tags. 
     The questions should aim to make the topic comprehensible and actionable, regardless of 
     whether it is a general inquiry or a specific technical challenge. For each question, 
-    include 3 - 7 answer options and a 'Reasoning' block explaining its relevance.
+    include 3 - 5 answer options and a 'Reasoning' block explaining its relevance.
 
 # meta: {"name": "fmt", "type": "string", "default": "", "example": "yaml"}
+# fmt is the response format expected from the model (markdown, json, yaml)
 fmt: yaml
 
 # meta: {"name": "validations", "type": "string", "default": "", "example": ""}
+# validations will veryfy the model response from this strategy
 validations:
     expected_len:
-        - 3
-        - 7
+        - 30
+        - 50
     unit: total_sentences
     required_terms:
         - Question
@@ -112,5 +120,7 @@ validations:
     illegal_terms:
         - Why is the sky blue?
         - scattering of sunlight
+    illegal_ends:
+        - Do not explain your reasoning unless specifically asked for!
     start_terms:
         - '1:'

@@ -34,7 +34,7 @@ class GitDiffs:
         except subprocess.CalledProcessError as e:
             return f"Error retrieving git diff: {e}"
 
-    def parse_git_diff(self, raw_diff: str, *args, num_activities: int, **kwargs) -> None:
+    def parse_git_diff(self, raw_diff:str, *args, num_activities:int, **kwargs) -> None:
         """
         Parse the raw git diff output and store changes in the class list.
 

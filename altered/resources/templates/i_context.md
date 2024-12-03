@@ -11,12 +11,12 @@ Here you find all context information that might be relevant for the task below.
 {% include "i_context_chat_history.md" ignore missing %}
 {%- endif %}
 
-{%- if context.activities %}
-{% include "i_context_activities.md" ignore missing %}
+{%- if context.user_info %}
+{% include "i_context_user_info.md" ignore missing %}
 {%- endif %}
 
-{%- if context.package_infos %}
-{% include "i_context_package_infos.md" ignore missing %}
+{%- if context.package_info %}
+{% include "i_context_package_info.md" ignore missing %}
 {%- endif %}
 
 {%- if context.search_results %}

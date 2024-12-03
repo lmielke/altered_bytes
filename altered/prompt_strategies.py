@@ -41,12 +41,13 @@ class Strategy:
                                 if self.strat_input_data \
                                 else 0
         req_terms_len = len(' '.join(self.validations['required_terms']).split())
-        total_inputs_len = inputs_len + req_terms_len
+        self.validations['inputs_len'] = inputs_len + req_terms_len
+        # if expected_len is None or not provided, we default to (0, 0)
         expected_len, self.lpw = self.validations.get('expected_len', (0, 0)), 6
-        self.validations['inputs_len'] = total_inputs_len
+        expected_len = expected_len if expected_len is not None else (0, 0)
         self.validations['expected_words'] = (   
-                            int(total_inputs_len * expected_len[0]) // self.lpw,
-                            int(total_inputs_len * expected_len[1]) // self.lpw,
+                            int(self.validations['inputs_len'] * expected_len[0]) // self.lpw,
+                            int(self.validations['inputs_len'] * expected_len[1]) // self.lpw,
                         )
         self.validations['mean_words'] = int(sum(self.validations['expected_words']) / 2)
 
@@ -197,6 +198,44 @@ class Agg(Strategy):
         super().estimate_response_len(inputs_len, *args, **kwargs)
         super().validations_to_fields(*args, **kwargs)
 
+
+class Pythoncode(Strategy):
+
+    inputs_tag = 'class_description'
+    header = None
+    intro = f'Below is a {inputs_tag} that needs to be implemented in code.'
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        strat = self.mk_strat_fields(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat, self.fmt
+
+    def mk_strat_fields(self, *args, **kwargs) -> dict:
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.strat_input_data = self.strat_input_data
+        self.fields.inputs_header = self.header
+        self.fields.inputs_intro = self.intro
+        return self.fields.__dict__
+
+class Questioncatalogue(Strategy):
+
+    inputs_tag = 'ambigious_text'
+    header = 'Ambigious Text'
+    intro = f'Below is a {inputs_tag} that needs to be better understood.'
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        strat = self.mk_strat_fields(*args, **kwargs)
+        self.fields.check_values(*args, **kwargs)
+        return strat, self.fmt
+
+    def mk_strat_fields(self, *args, **kwargs) -> dict:
+        self.fields.inputs_tag = self.inputs_tag
+        self.fields.strat_input_data = self.strat_input_data
+        self.fields.inputs_header = self.header
+        self.fields.inputs_intro = self.intro
+        return self.fields.__dict__
 
 class Format(Strategy):
 

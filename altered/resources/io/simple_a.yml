@@ -1,0 +1,8 @@
+# simple_qa.yml
+# The provided Answer .yml is a generic answering template.
+# file_meta: {"example": "Hi!"}
+
+# meta: {"name": "answer", "type": "", "default": "", "example": "None"}
+# The answer structure is described in the instructions.
+answer: \{{ answer }}
+

@@ -1,0 +1,112 @@
+# pythoncode_class.yml
+# Task for generating a Python class from a given description.
+
+# meta: {"name": "name", "type": "string", "default": "", "example": "Write Python Class"}
+# name of the task
+name: Write Python Class
+
+# meta: {"name": "description", "type": "string", "default": "", "example": ""}
+# description of the task
+description: >
+    This task is about creating a Python implementation given the provided information. 
+    The implementation includes defining appropriate methods, attributes, and adding 
+    necessary type annotations. The output should follow Pythonic conventions, including 
+    type hints and docstrings, to ensure clarity and maintainability. 
+    All methods should include *args and **kwargs. External calls should preferably use 
+    keyword arguments (**kwargs), while internal calls use positional arguments (*args).
+    Used parameters are explicitly listed within the method definition.
+    Docstrings should emphasize the 'why' over the 'what'. Docstrings can omit information
+    that already exsit otherwise (i.e. no need to list args and kwargs inside the docstring)
+
+# meta: {"name": "example", "type": "string", "default": "", "example": ""}
+# This is an example about how to write a python class adhering to pep standards.
+example: >
+    Example:\n
+    Description: Create a class representing a bank account, with methods to deposit and 
+    withdraw money.
+    
+    Expected Output:
+      Here is a python implementation of the described bank account class.
+      ```python
+      class BankAccount:
+          def __init__(self, *args, account_holder:str=None, balance:float=0.0, **kwargs
+          ) -> None:
+              """
+              Initializes the BankAccount instance because it is essential to store account 
+              holder details and initial balance in order to manage transactions effectively.
+              """
+              self.account_holder = account_holder
+              self.balance = balance
+              super().__init__(*args, **kwargs)
+          
+          def deposit(self, *args, amount:float=None, **kwargs) -> None:
+              """
+              Deposits a specified amount into the bank account in order to increase 
+              the account balance.
+              """
+              amount = amount
+              self.balance += amount
+              self._log_transaction(*args, **kwargs)
+          
+          def withdraw(self, *args, amount:float=None, **kwargs) -> None:
+              """
+              Withdraws a specified amount from the bank account if sufficient balance 
+              exists because transactions require validation of available funds 
+              in order to avoid overdrafts.
+              """
+              amount = amount
+              if amount <= self.balance:
+                  self.balance -= amount
+                  self._log_transaction(*args, **kwargs)
+              else:
+                  raise ValueError("Insufficient funds.")
+          
+          def _log_transaction(self, *args, **kwargs) -> None:
+              """
+              Logs the transaction internally because it is important for keeping records 
+              of all operations.
+              """
+              # Placeholder for logging logic
+              pass
+      ```
+      
+      This output includes type annotations for all method parameters and return values, 
+      provides detailed docstrings to explain each function's purpose and usage, 
+      and includes *args and **kwargs for greater flexibility in method definitions and 
+      internal calls.
+
+# meta: {"name": "objective", "type": "string", "default": "", "example": ""}
+# objective to be performed
+objective: >
+    Objective is to generate a Python class from the provided description, following standard 
+    Pythonic conventions such as type annotations and descriptive docstrings. The resulting 
+    class should be complete and functional. 
+
+# meta: {"name": "your_task", "type": "string", "default": "", "example": ""}
+# your_task to be performed
+your_task: >
+    You have been provided with a <deliverable> and a <user_comment>. 
+    If currently there is no <deliverable> then it does not yet exist and has to be created.
+    Use all available information to adjust and extend upon the <deliverable> as been
+    requested by the <user_comment>. Adher to the outlined task principles 
+    and objectives.
+
+# meta: {"name": "fmt", "type": "string", "default": "", "example": "markdown"}
+# fmt is the response format expected from the model (markdown, json, yaml)
+fmt: markdown
+
+# meta: {"name": "validations", "type": "string", "default": "", "example": "markdown"}
+# validations will verify the model response from this task
+validations:
+    expected_len: null
+    illegal_terms:
+        - class BankAccount
+        - withdraw
+    required_terms:
+        - class 
+        - def 
+        - '*args'
+        - '**kwargs'
+    start_terms:
+        - class
+        - '# Here is the Python class ...'

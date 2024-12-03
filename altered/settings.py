@@ -1,4 +1,6 @@
-# settings.py
+"""
+settings.py
+"""
 import os, re, sys, time, yaml
 from datetime import datetime as dt
 

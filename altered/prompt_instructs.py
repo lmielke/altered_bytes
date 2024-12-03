@@ -41,14 +41,18 @@ class Instructions:
                 }
         # if time revise how num_predict is derrived (check kwargs['num_predict'])
         self.context['num_predict'] = max(  
-                    strat_context.get('validations', {}).get('expected_words', (0, 0))[-1],
-                    strat_context['num_predict'],
-                    self.max_words, )
+            strat_context.get('validations', {}).get('expected_words', (0, 0))[-1],
+            strat_context['num_predict'] if strat_context['num_predict'] is not None else 0,
+            self.max_words, 
+            )
         return self.context
 
     def get_instruct_params(self, *args, strat_template:str=None, **kwargs):
         # we are calling the strat
         strat_template = strat_template or self.default_strats
+        strats = [n.split('.')[0] for n in os.listdir(sts.strats_dir) if '_' in n]
+        if strat_template not in strats:
+            raise ValueError(f"{Fore.RED}{strat_template} not in {strats}{Fore.RESET}")
         method, sub_method = strat_template.split('_', 1)
         if os.path.exists(os.path.join(sts.strats_dir, f'{strat_template}.yml')):
             self.params = {'method': method, 't_name': strat_template, 'sub_method': sub_method}
@@ -61,7 +65,9 @@ class Instructions:
                 )(*args, params=self.params, **kwargs)
 
     def run_io(self, *args, io_template:str=None, fmt:str=None, **kwargs):
-        if io_template is None or not os.path.isfile(os.path.join(sts.io_dir, io_template)):
+        if io_template is None or not os.path.isfile(
+                                                os.path.join(sts.io_dir, f"{io_template}.yml")
+                                        ):
             return None
         io = getattr(Io, io_template.split('_', 1)[0].capitalize())(*args, **kwargs,
             )(io_template, *args, fmt=self.fmt, **kwargs)

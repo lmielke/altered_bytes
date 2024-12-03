@@ -1,8 +1,8 @@
 user_prompt: "I am having trouble with my list comprehensions?"
 sys_info: true
 num_activities: 3
-package_infos: true
-root_file_name: "prompt_instructs.py"
+package_info: true
+work_file_name: "prompt_instructs.py"
 file_match_regex: "settings.*"
 chat_history:
   - role: "user"

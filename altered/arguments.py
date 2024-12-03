@@ -22,112 +22,83 @@ def mk_args():
                         )
 
     parser.add_argument(
-        "-pr",
-        "--new_pr_name",
-        required=False,
-        nargs=None,
-        const=None,
-        type=str,
-        default=None,
-        help="project name (top folder) default parameter to change",
-    )
-
-    parser.add_argument(
-        "-n",
-        "--new_pg_name",
-        required=False,
-        nargs=None,
-        const=None,
-        type=str,
-        default=None,
-        help="default parameter to change",
-    )
-
-    parser.add_argument(
         "-a",
-        "--new_alias",
+        "--alias",
         required=False,
         nargs=None,
         const=None,
         type=str,
-        default=None,
-        help="alias you call the future package with, if left blank new_pg_name[:6] is used",
+        default='l3.2_1',
+        help=(f"Server and model to use."),
     )
 
     parser.add_argument(
-        "-t",
-        "--tgt_dir",
+        "-s",
+        "--sys_info",
         required=False,
-        nargs=None,
-        const=None,
+        nargs='*',  # Allows multiple arguments as a list
         type=str,
-        default=None,
-        help="default parameter to change",
+        default=[],
+        help=(  f"Host system technical infos. Provide multiple options "
+                f"like: -s sys_info_ops sys_info_usr"
+                ),
     )
 
     parser.add_argument(
         "-p",
-        "--py_version",
+        "--package_info",
+        required=False,
+        nargs='*',  # Allows multiple arguments as a list
+        type=str,
+        default=[],
+        help=(  f"Host package infos. Provide multiple options "
+                f"like: -p pg_imports pg_requirements"
+                ),
+    )
+
+    parser.add_argument(
+        "-u",
+        "--user_info",
+        required=False,
+        nargs='*',  # Allows multiple arguments as a list
+        type=str,
+        default=[],
+        help=(  f"User activity infos. Provide multiple options "
+                f"like: -u git_diff user_act chat_hist"
+                ),
+    )
+
+    parser.add_argument(
+        "-g",
+        "--work_file_name",
         required=False,
         nargs=None,
         const=None,
         type=str,
         default=None,
-        help=(f"python version placed inside your Pipfile."),
+        help=(f"Root file for building the package import graph."),
     )
 
     parser.add_argument(
-        "-e",
-        "--experts",
-        required=False,
-        nargs="+",
-        const=None,
-        type=str,
-        default='sudo',
-        help=(f"Names of experts you intend to use. Default: sudo"),
-    )
-
-    parser.add_argument(
-        "-f",
-        "--function",
-        required=False,
-        nargs=None,
-        const=None,
-        type=str,
-        default='none',
-        help=(f"States if functions should be used."),
-    )
-
-    parser.add_argument(
-        "-m",
-        "--model",
+        "-r",
+        "--file_match_regex",
         required=False,
         nargs=None,
         const=None,
         type=str,
         default=None,
-        help=(f"Names of model you intend to use. Default: gpt-3.5-turbo-0125"),
+        help=(f"Regex to match a desired file name i.e. api_.*.py ."),
     )
 
     parser.add_argument(
-        "--install",
+        "-n",
+        "--num_activities",
         required=False,
         nargs="?",
         const=1,
-        type=bool,
-        default=None,
-        help=f"This will trigger pipenv to install the environment using py_version.",
-    )
-
-    parser.add_argument(
-        "-i",
-        "--infos",
-        required=False,
-        nargs="+",
-        const=None,
-        type=str,
-        default=None,
-        help="list of infos to be retreived, default: all",
+        type=int,
+        default=0,
+        help="Number of activities to list.",
     )
 
     parser.add_argument(
@@ -148,7 +119,7 @@ def mk_args():
         nargs="?",
         const=1,
         type=bool,
-        default=None,
+        default=False,
         help="run without confirm, not used",
     )
 
