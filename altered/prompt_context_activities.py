@@ -14,7 +14,7 @@ from altered.info_git_diff import GitDiffs
 
 class ContextActivities:
 
-    template_name = 'i_context_activities.md'
+    template_name = 'i_context_user_info.md'
     logs_dir = sts.logs_dir
     log_name = 'activity_log'
     trigger = 'user_act'

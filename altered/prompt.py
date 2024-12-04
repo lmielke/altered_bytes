@@ -28,10 +28,14 @@ class Prompt:
         self.RD = Render(*args, **kwargs)
         self.stats = PromptStats(*args, **kwargs)
         self.delv = Deliverable(*args, **kwargs)
-        self.data = None
+        self.data = None # contains the rendered prompt
         self.warnings = {}
+        self.context = {} # contains the context for rendering the prompt
 
     def __call__(self, *args, **kwargs):
+        self.get_context(*args, **kwargs)
+        self.get_user_comment(*args, **kwargs)
+        self.get_instructs(*args, **kwargs)
         self.mk_prompt(*args, **kwargs)
         self.mk_prompt_summary(*args, **kwargs)
         self.data = self.render_prompt(*args, **kwargs)
@@ -41,15 +45,15 @@ class Prompt:
         """
         Constructs the final prompt as to be send to the AI model.
         """
-        instructs = self.get_instructs(*args, verbose=verbose, **kwargs)
-        user_prompt = instructs.get('user_prompt', {})
-        del instructs['user_prompt']
+        user_prompt = self.instructs.context.get('user_prompt', {})
+        # line removed because serves no appearent purpose, delete if no issues
+        # del self.instructs.context['user_prompt']
         self.context = { 
                             'prompt_title': self.name,
-                            'context': self.get_context(*args, verbose=verbose, **kwargs),
+                            'context': self.context_dict,
                             'deliverable': self.delv.mk_context(*args, **kwargs),
                             'user_comment': user_prompt,
-                            'instructs': instructs,
+                            'instructs': self.instructs.context,
                         }
         self.context['manifest'] = self.context.keys() - 'prompt_title'
         if verbose >= 2:
@@ -100,13 +104,15 @@ class Prompt:
         self.context['prompt_summary'] = self.render_prompt(*args, _cont=_cont, **kwargs, )
 
     def get_context(self, *args, **kwargs):
-        context_dict = self.C(*args, **kwargs)
-        return context_dict
+        self.context_dict = self.C(*args, **kwargs)
+        return self.context_dict
+
+    def get_user_comment(self, *args, **kwargs):
+        pass
 
     def get_instructs(self, *args, **kwargs):
         self.instructs = self.I(*args, **kwargs)
         self.fmt = self.instructs.fmt
-        return self.instructs.context
 
 
 class Response:
