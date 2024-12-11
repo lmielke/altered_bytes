@@ -91,8 +91,8 @@ class Strategy:
         elif strat_input_data is None and responses is not None:
             return '\n'.join(responses)
         else:
-            print(  f"{Fore.RED}prompt_strategies.Strategy: "
-                    f"No strat_input_data provided and not derrivable.{Style.RESET_ALL}")
+            print(  f"{Fore.YELLOW}Warning: prompt_strategies.Strategy: {Style.RESET_ALL}"
+                    f"No strat_input_data provided and not derrivable.")
             return None
 
 

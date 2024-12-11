@@ -34,27 +34,24 @@ class GitDiffs:
         except subprocess.CalledProcessError as e:
             return f"Error retrieving git diff: {e}"
 
-    def parse_git_diff(self, raw_diff:str, *args, num_activities:int, **kwargs) -> None:
+    def parse_git_diff(self, raw_diff: str, *args, num_activities: int, **kwargs) -> None:
         """
         Parse the raw git diff output and store changes in the class list.
-
         Args:
             raw_diff (str): The raw output from the git diff command.
             num_activities (int): Number of recent changes to extract.
         """
+        # Split and reverse the changes to prioritize recent changes
         changes = raw_diff.split('diff --git')
-
-        # Extract the last 'num_activities' blocks and process them
-        for change in changes[-num_activities:]:
+        # Extract the first 'num_activities' blocks and process them
+        for change in changes[:num_activities + 1]:
             change = change.strip()
             if change:
                 lines = change.splitlines()
-
                 # Extract the filename from the first line in the block
                 if lines:
                     file_line = lines[0]  # The first line contains the file paths
                     file_path = file_line.split()[-1].split('/')[-1]  # Extract filename
-
                     # Find the starting line and range from the '@@' line
                     start_end_match = re.search(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@', change)
                     if start_end_match:
@@ -65,7 +62,6 @@ class GitDiffs:
                         start_ends = [f"{start_old}+{length_old}", f"{start_new}+{length_new}"]
                     else:
                         start_ends = ["unknown", "unknown"]
-
                     # Collect the content of the change
                     content = '\n'.join(lines)
                     cleaned_content = self.escape_jinja_syntax(content)
@@ -75,7 +71,6 @@ class GitDiffs:
                         'start_ends': start_ends,
                         'content': cleaned_content
                     })
-
 
     def escape_jinja_syntax(self, content: str) -> str:
         """
@@ -115,5 +110,6 @@ class GitDiffs:
 # Example usage
 if __name__ == "__main__":
     git_diffs = GitDiffs()  # Instantiate the GitDiffs class
-    recent_changes = git_diffs.get_git_diffs(num_activities=2)  # Specify how many changes to track
-    print(recent_changes)
+    recent_changes = git_diffs.get_git_diffs(num_activities=3)  # Specify how many changes to track
+    for i, change in enumerate(recent_changes):
+        print(f"\n{i}: {change}")

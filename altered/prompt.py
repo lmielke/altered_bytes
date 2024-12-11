@@ -6,6 +6,7 @@ import os, yaml
 from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
+from altered.prompt_user_prompt import UserPrompt
 from altered.prompt_instructs import Instructions
 from altered.prompt_stats import PromptStats
 from altered.model_connect import SingleModelConnect
@@ -24,6 +25,7 @@ class Prompt:
     def __init__(self, name, *args, **kwargs):
         self.name = name
         self.C = Context(name, *args, **kwargs)
+        self.U = UserPrompt(*args, **kwargs)
         self.I = Instructions(name, *args, **kwargs)
         self.RD = Render(*args, **kwargs)
         self.stats = PromptStats(*args, **kwargs)
@@ -34,7 +36,8 @@ class Prompt:
 
     def __call__(self, *args, **kwargs):
         self.get_context(*args, **kwargs)
-        self.get_user_comment(*args, **kwargs)
+        self.get_deliverable(*args, **kwargs)
+        self.get_user_prompt(*args, **kwargs)
         self.get_instructs(*args, **kwargs)
         self.mk_prompt(*args, **kwargs)
         self.mk_prompt_summary(*args, **kwargs)
@@ -45,14 +48,14 @@ class Prompt:
         """
         Constructs the final prompt as to be send to the AI model.
         """
-        user_prompt = self.instructs.context.get('user_prompt', {})
+        # user_prompt = self.user_prompt
         # line removed because serves no appearent purpose, delete if no issues
         # del self.instructs.context['user_prompt']
         self.context = { 
                             'prompt_title': self.name,
                             'context': self.context_dict,
-                            'deliverable': self.delv.mk_context(*args, **kwargs),
-                            'user_comment': user_prompt,
+                            'deliverable': self.deliverable,
+                            'user_comment': self.up,
                             'instructs': self.instructs.context,
                         }
         self.context['manifest'] = self.context.keys() - 'prompt_title'
@@ -65,8 +68,8 @@ class Prompt:
         kwargs.update(self.get_template(*args, **kwargs))
         context = _cont if _cont is not None else self.context
         prompt = self.RD.render(*args, context=context, **kwargs, )
-        if verbose >= 2:
-            print(f"\n{Fore.CYAN}Prompt.render_prompt.prompt:{Fore.RESET} {verbose = } >= 2")
+        if verbose >= 1:
+            print(f"\n{Fore.CYAN}Prompt.render_prompt.prompt:{Fore.RESET} {verbose = } >= 1")
             hlpp.pretty_prompt(prompt, *args, verbose=verbose, **kwargs)
         return prompt
 
@@ -105,25 +108,43 @@ class Prompt:
 
     def get_context(self, *args, **kwargs):
         self.context_dict = self.C(*args, **kwargs)
-        return self.context_dict
 
-    def get_user_comment(self, *args, **kwargs):
-        pass
+    def get_deliverable(self, *args, **kwargs):
+        self.deliverable = self.delv.mk_context(*args, **kwargs)
+        # self.deliverable = {'content': 'this is a test', }
 
-    def get_instructs(self, *args, **kwargs):
-        self.instructs = self.I(*args, **kwargs)
+    def get_user_prompt(self, *args, strat_template:str=None, **kwargs):
+        self.up = UserPrompt(*args, **kwargs)(*args, **kwargs)
+        if strat_template is None and self.up.get('user_prompt') is None:
+            print(f"{Fore.RED}ERROR:{Fore.RESET} default strat requires a user_prompt")
+            self.up = UserPrompt(*args, **kwargs)(*args, user_prompt='', **kwargs)
+        self.user_prompt = self.up.get('user_prompt')
+
+    def get_instructs(self, *args, user_prompt:str=None, **kwargs):
+        self.instructs = self.I(*args, user_prompt=self.user_prompt, **kwargs)
+        self.instructs.context['inputs'] = self.get_inputs(*args, **kwargs)
         self.fmt = self.instructs.fmt
 
+    def get_inputs(self, *args, **kwargs):
+        if self.deliverable.get('content') and not self.up.get('user_prompt'):
+            return "'<deliverable>'"
+        elif not self.deliverable.get('content') and self.up.get('user_prompt'):
+            return "'<user_comment>'"
+        elif self.deliverable.get('content') and self.up.get('user_prompt'):
+            return "'<user_comment>' and '<deliverable>'"
+        # there must be some sort of input for the LLM to work with
+        elif not self.deliverable.get('content') and not self.up.get('user_prompt'):
+            raise ValueError(f"{Fore.RED}ERROR:{Fore.RESET} No inputs found")
 
 class Response:
 
     def __init__(self, name:str, *args, **kwargs):
         self.name = name
         self.r = {}
-        self.v = Validations(name, *args, **kwargs)
+        self.V = Validations(name, *args, **kwargs)
 
     def __call__(self, *args, **kwargs):
-        checks_ok = self.v(*args, **kwargs)
+        checks_ok = self.V(*args, **kwargs)
         self.params_to_table(checks_ok, *args, **kwargs)
         if checks_ok:
             return self.extract(*args, **kwargs)
@@ -132,7 +153,7 @@ class Response:
 
     def params_to_table(self, checks_ok, *args, **kwargs):
         kwargs['checks'] = checks_ok
-        kwargs.update(self.v.validations)
+        kwargs.update(self.V.validations)
         print(hlpp.dict_to_table('Response.params_to_table.kwargs', kwargs, *args, **kwargs))
 
     def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:
@@ -173,16 +194,15 @@ class Validations(Prompt):
         self.strats = Strategy(*args, **kwargs)
         self.errors = {}
 
-    def __call__(self, r:dict, *args, **kwargs):
+    def __call__(self, r:dict, *args, verbose:int=0, **kwargs):
         self.errors = {}
         self.instruct_params = self.I.get_instruct_params(*args, **kwargs)
         self.strat_params, self.fmt = self.strats(*args, params=self.instruct_params, **kwargs)
         self.validations = self.strat_params.get('validations')
-        if not self.strat_params.get('validations'):
-            return True
         self.validate(r, *args, **kwargs)
         self.error_tracking(*args, **kwargs)
-        print(f"{Fore.CYAN}\nprompt.Validations.__call__.response:{Fore.RESET}", end=' ')
+        if verbose:
+            print(f"{Fore.CYAN}\nprompt.Validations.__call__.response:{Fore.RESET}", end=' ')
         if self.errors:
             print(f"\n{Fore.RED}ERROR: {r['responses'][0].get('response') = }{Fore.RESET}\n")
             return False
@@ -190,19 +210,29 @@ class Validations(Prompt):
             print(f"{Fore.GREEN}OK{Fore.RESET}")
             return True
 
-    def validate(self, r: dict, *args, **kwargs) -> dict:
-        response = r.get('responses')[0].get('response').strip()
+    def validate(self, *args, **kwargs) -> dict:
+        response = self.get_response(*args, **kwargs)
+        if not response:
+            return
+        if not self.strat_params.get('validations'):
+            print(f"{Fore.YELLOW}No validations found{Fore.RESET}")
+            return
         self.resp_len_check(response, *args, **kwargs)
         self.resp_check_format(response, *args, **kwargs)
         self.resp_illegal_terms_check(response, *args, **kwargs)
         self.resp_illegal_ends_check(response, *args, **kwargs)
         self.resp_required_terms_check(response, *args, **kwargs)
 
-    def resp_len_check(self, response, *args, **kwargs):
+    def get_response(self, r:dict, *args, **kwargs):
+        response = r.get('responses')[0].get('response')
         if not response:
             self.msgs('Response Length', 'No response content returned from the AI model.')
+            return False
         else:
-            len_response = int(len(response) // self.strats.lpw)
+            return response
+
+    def resp_len_check(self, response, *args, **kwargs):
+        len_response = int(len(response) // self.strats.lpw)
         bias = 5
         if len_response < self.validations.get('expected_words')[0] - bias:
             self.msgs(  

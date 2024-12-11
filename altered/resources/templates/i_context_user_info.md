@@ -1,5 +1,5 @@
 ## User and System Activities
-The following shows the recent activities as well as PS cmds performed on the underlying system. Reading this can improve context understanding.
+The following shows recent activities performed by the user. Reading this can improve context understanding.
 {%- if context.user_info.user_act %}
 {%- for activity in context.user_info.user_act %}
 ### Activity {{ loop.index }}
@@ -16,8 +16,9 @@ The following shows the recent activities as well as PS cmds performed on the un
 {% endfor %}
 {%- endif %}
 
-{% if context.user_info.ps_history %}
-### Powershell cmd History
+{%- if context.user_info.ps_history %}
+## Powershell cmd History
+The following shows the recent {{ context.user_info.ps_history|length }} Powershell commands executed by the user.
 {%- for ps in context.user_info.ps_history %}
 - **{{ loop.index }}:** {{ ps }}
 {%- endfor %}

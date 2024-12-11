@@ -73,18 +73,23 @@ class ContextPackageData:
                                     pg_imports:bool=False, 
                                     pg_requirements:bool=False, 
                                     pg_tree:bool=False,
-        **kwargs):
-        print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {package_info = }")
+                                    verbose:int=0,
+        **kwargs) -> dict:
+        if verbose:
+            print(f"{Fore.YELLOW}ContextPackageData.mk_context{Fore.RESET} {package_info = }")
         if not package_info: return {}
         # Note: there are additional flags to get various package_infos
         self.context['package_info'] = {}
         if pg_imports:
-            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_imports = }")
             self.context['package_info'].update(self.get_pg_imports(*args, **kwargs))
+            if verbose:
+                print(f"{Fore.YELLOW}\tpg_imports: {Fore.RESET} {pg_imports}")
         if pg_requirements:
-            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_requirements = }")
             self.context['package_info'].update(self.get_requirements(*args, **kwargs))
+            if verbose:
+                print(f"{Fore.YELLOW}\tpg_requirements: {Fore.RESET} {pg_requirements}")
         if pg_tree:
-            print(f"{Fore.YELLOW}prompt_context_package_data.mk_context{Fore.RESET} {pg_tree = }")
             self.context['package_info'].update(self.tree(*args, **kwargs))
+            if verbose:
+                print(f"{Fore.YELLOW}\tpg_tree: {Fore.RESET} {pg_tree}")
         return self.context

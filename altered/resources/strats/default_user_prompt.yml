@@ -8,9 +8,7 @@ name: Simple Answer
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the strategy
 description: >
-    You were provided with a '<user_comment>' or question in the text above. 
-    Use all available sources of information from <context> and <user_comment> to 
-    prepare a high quality response.
+    Use all available sources of information to prepare a high quality response.
 
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}

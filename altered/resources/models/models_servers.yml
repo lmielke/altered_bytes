@@ -7,7 +7,8 @@ aliasses:
     gpt4o: gpt-4o
     l3:70b: llama3.1:70b
     l3:8b: llama3.1
-    l3.2: llama3.2
+    l3.2: llama3.2:3b
+    l3.3: llama3.3
     m8: mixtral:8x22b
     q2b: qwen2:72b
     nemo: nemotron
@@ -88,14 +89,23 @@ models:
     last_update: 8 days ago
     name: llama3.1
     new_update_available: false
-  llama3.2:
+  llama3.2:3b:
     blob_id: 8eeb52dfb3bb
     context_length: 131072
     embedding_length: 3072
     general.architecture: llama
     general.file_type: Q4_0
     last_update: 8 days ago
-    name: llama3.2
+    name: llama3.2:3b
+    new_update_available: false
+  llama3.3:
+    blob_id: 8eeb52dfb3bb
+    context_length: 131072
+    embedding_length: 3072
+    general.architecture: llama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: llama3.3
     new_update_available: false
   mixtral:8x22b:
     blob_id: 94e70a590f93
@@ -146,11 +156,11 @@ defaults:
   # defaults kick in if no parameter was supplied
   # default ollama server that comes with ollama
   generate:
-    model: llama3.2
+    model: llama3.2:3b
     server: while-ai_0
   # altered_bytes default server for generate responses
   get_generates:
-    model: llama3.2
+    model: llama3.2:3b
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:

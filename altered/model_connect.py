@@ -169,12 +169,13 @@ class ModelConnect:
         elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')
         # chat-gpt and ollama use different methods, Here we call ollama method.
-        r = self._ollama(url, context, *args, verbose=verbose, **kwargs )
+        r_dict = self._ollama(url, context, *args, verbose=verbose, **kwargs )
+        self.validate_response(r_dict, *args, **kwargs)
         if verbose >= 1:
-            print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r['num_results'] = }")
-        r['model'], r['server'] = model_params.get('model_file').get('name'), server
-        self.get_stats(r, context, *args, verbose=verbose, **kwargs)
-        return r
+            print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r_dict['num_results'] = }")
+        r_dict['model'], r_dict['server'] = model_params.get('model_file').get('name'), server
+        self.get_stats(r_dict, context, *args, verbose=verbose, **kwargs)
+        return r_dict
 
     def _ollama(self, url, context: dict, *args, **kwargs, ) -> dict:
         """
@@ -189,9 +190,19 @@ class ModelConnect:
         )
         r.raise_for_status()
         r_dict = r.json()
-        for i, (field, response) in enumerate(r_dict.copy().items()):
-            r_dict['num_results'] = len(r_dict['responses'])
+        r_dict['num_results'] = len(r_dict['responses'])
         return r_dict
+
+    def validate_response(self, r_dict:dict, *args, **kwargs) -> bool:
+        # the response might contain model errors such as 'error': 'Model not found'
+        for response in r_dict['responses']:
+            if 'error' in response:
+                if re.match(r"model '.*' not found", response['error']):
+                    raise ValueError( 
+                            f"{Fore.RED}Error in response: {response['error']}{Fore.RESET} "
+                            f"{Fore.RED}Check model name for this server {Fore.RESET}"
+                            f"{Fore.RED}in models_servers.yml{Fore.RESET}"
+                            )
 
     def get_stats(self, r, context, *args, context_length: int = 8000, verbose: int = 0, 
         **kwargs) -> dict:

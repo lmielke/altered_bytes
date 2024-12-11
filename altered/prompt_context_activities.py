@@ -33,14 +33,14 @@ class ContextActivities:
 
     def get_all_infos(self, *args,  git_diff:bool=False, 
                                     user_act:bool=False, 
-                                    chat_hist:bool=False,
+                                    ps_hist:bool=False,
                                     num_activities:int=1,
         **kwargs):
         data = {}
         if user_act:
             self.load_activities(*args, **kwargs)
             data['user_act'] = self.context['user_act'][-num_activities:]
-        if chat_hist:
+        if ps_hist:
             self.load_ps_history(*args, **kwargs)
             data['ps_history'] = self.context['ps_history'][-num_activities*2:]
         if git_diff:

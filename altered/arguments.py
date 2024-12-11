@@ -1,156 +1,123 @@
 """
-    pararses altered arguments and keyword arguments
-    args are provided by a function call to mk_args()
-    
-    RUN like:
-    import altered.arguments
-    kwargs.updeate(arguments.mk_args().__dict__)
+Command-line argument parser for the altered_bytes package.
+Handles API selection and various configuration parameters.
+
+Usage:
+    alter api_name [options]
+
+Example:
+    alter thought -v 1 -i sys_info_ops sys_info_usr -p pg_imports pg_requirements pg_tree 
+    -n 3 -w api_prompt -r settings.* -u git_diff user_act ps_hist
 """
 import argparse
-from typing import Dict
+import colorama as color
+from colorama import Fore, Style, Back
 
 
-def mk_args():
-    parser = argparse.ArgumentParser(description="run: python -m altered info")
+def get_parser() -> argparse.ArgumentParser:
+    """
+    Create and configure command-line argument parser for altered_bytes.
+    
+    Returns:
+        argparse.ArgumentParser: Configured argument parser
+    """
+    parser = argparse.ArgumentParser(
+        description="Run altered_bytes APIs with configurable parameters",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    # Required arguments
     parser.add_argument(
-                            "api", 
-                            metavar="api", nargs=None, 
-                            help=(
-                                    f""
-                                    f"see altered.apis"
-                                )
-                        )
+        "api",
+        help=(  f"Name of the API module to run "
+                f"(api_[{Fore.YELLOW}api{Fore.RESET}].py must exist in altered package)"
+                f"\n{Fore.YELLOW}NOTE:{Fore.RESET} "
+                f"For extended parameter and package info run: 'alter info'"
+                ),
+    )
 
+    # Optional arguments
     parser.add_argument(
-        "-a",
-        "--alias",
-        required=False,
-        nargs=None,
-        const=None,
+        "-al", "--alias",
         type=str,
         default='l3.2_1',
-        help=(f"Server and model to use."),
+        help="Model (i.e. l3.2) and Server (i.e. 1) alias to use. (default: l3.2_1)"
     )
 
+    # System information options
     parser.add_argument(
-        "-s",
-        "--sys_info",
-        required=False,
-        nargs='*',  # Allows multiple arguments as a list
+        "-si", "--sys_info",
+        nargs='*',
         type=str,
         default=[],
-        help=(  f"Host system technical infos. Provide multiple options "
-                f"like: -s sys_info_ops sys_info_usr"
-                ),
+        help="Host system technical info options (e.g., -i sys_info_ops sys_info_usr)"
     )
 
+    # Package information options
     parser.add_argument(
-        "-p",
-        "--package_info",
-        required=False,
-        nargs='*',  # Allows multiple arguments as a list
+        "-pi", "--package_info",
+        nargs='*',
         type=str,
         default=[],
-        help=(  f"Host package infos. Provide multiple options "
-                f"like: -p pg_imports pg_requirements"
-                ),
+        help="Host package info options (e.g., -p pg_imports pg_requirements)"
     )
 
+    # User activity options
     parser.add_argument(
-        "-u",
-        "--user_info",
-        required=False,
-        nargs='*',  # Allows multiple arguments as a list
+        "-ui", "--user_info",
+        nargs='*',
         type=str,
         default=[],
-        help=(  f"User activity infos. Provide multiple options "
-                f"like: -u git_diff user_act chat_hist"
-                ),
+        help="User activity info options (e.g., -u git_diff user_act ps_hist)"
     )
 
+    # File handling options
     parser.add_argument(
-        "-g",
-        "--work_file_name",
-        required=False,
-        nargs=None,
-        const=None,
+        "-wf", "--work_file_name",
         type=str,
-        default=None,
-        help=(f"Root file for building the package import graph."),
+        help="Current workfile (root file for package import graph)"
     )
 
     parser.add_argument(
-        "-r",
-        "--file_match_regex",
-        required=False,
-        nargs=None,
-        const=None,
+        "-rx", "--file_match_regex",
         type=str,
-        default=None,
-        help=(f"Regex to match a desired file name i.e. api_.*.py ."),
+        help="Regex pattern to match desired file names (e.g., 'api_.*.py')"
     )
 
+    # Behavior control options
     parser.add_argument(
-        "-n",
-        "--num_activities",
-        required=False,
-        nargs="?",
-        const=1,
+        "-na", "--num_activities",
         type=int,
         default=0,
-        help="Number of activities to list.",
+        nargs="?",
+        const=1,
+        help="Number of activities to list (default: 0)"
     )
 
     parser.add_argument(
-        "-v",
-        "--verbose",
-        required=False,
-        nargs="?",
-        const=1,
+        "-v", "--verbose",
         type=int,
         default=0,
-        help="0:silent, 1:user, 2:debug",
+        nargs="?",
+        const=1,
+        choices=[0, 1, 2, 3],
+        help="Verbosity level (0: silent, 1: user, 2: simple debug, 3: detailed debug)"
     )
 
     parser.add_argument(
-        "-y",
-        "--yes",
-        required=False,
-        nargs="?",
-        const=1,
-        type=bool,
-        default=False,
-        help="run without confirm, not used",
+        "-y", "--yes",
+        action="store_true",
+        help="Run without confirmation prompts"
     )
 
-    return parser.parse_args()
+    return parser
 
-
-
-def get_required_flags(parser: argparse.ArgumentParser) -> Dict[str, bool]:
+def mk_args() -> argparse.Namespace:
     """
-    Extracts the 'required' flag for each argument from an argparse.ArgumentParser object.
-
-    Args:
-        parser (argparse.ArgumentParser): The parser to extract required flags from.
+    Parse command-line arguments for altered_bytes.
 
     Returns:
-        Dict[str, bool]: A dictionary with argument names as keys and their 'required' status as values.
+        argparse.Namespace: Parsed command-line arguments
     """
-    required_flags = {}
-    for action in parser._actions:
-        if isinstance(action, argparse._StoreAction):
-            # For positional arguments, the 'required' attribute is not explicitly set,
-            # but they are required by default.
-            is_required = getattr(action, 'required', True) if action.option_strings == [] else action.required
-            # Option strings is a list of option strings (e.g., '-f', '--foo').
-            for option_string in action.option_strings:
-                required_flags[option_string] = is_required
-            if not action.option_strings: # For positional arguments
-                required_flags[action.dest] = is_required
-    return required_flags
-
-if __name__ == "__main__":
-    parser = mk_args()
-    required_flags = get_required_flags(parser)
-    print(required_flags)
+    parser = get_parser()
+    return parser.parse_args()

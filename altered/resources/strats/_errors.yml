@@ -37,9 +37,10 @@ compress_short.yml:
     'Length: 146 > Max: 145': 3
     'Length: 148 > Max: 145': 1
     'Length: 149 > Max: 145': 1
-    'Length: 153 > Max: 145': 1
+    'Length: 153 > Max: 145': 2
     'Length: 154 > Max: 145': 1
     'Length: 157 > Max: 145': 2
+    'Length: 167 > Max: 145': 1
     'Length: 236 > Max: 218': 1
     'Length: 241 > Max: 218': 1
     'Length: 244 > Max: 218': 2
@@ -70,6 +71,9 @@ compress_short.yml:
     'Length: 317 > Max: 218': 1
     'Length: 331 > Max: 218': 1
     'Length: 332 > Max: 218': 1
+default_user_prompt.yml:
+  Response Length:
+    No response content returned from the AI model.: 52
 expand_short.yml:
   Illegal Terms in response:
     The quick brown fox jumps over the lazy dog. found: 7

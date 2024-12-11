@@ -1,6 +1,7 @@
 {%- if instructs %}
 # 3. Instructions (INST)
-The following outlines the main instructions about, what to do with the content of this prompt. The model response will be evaluated based on how well it follows these instructions.
+You where provided with text inside the {{ instructs.inputs }} tag.
+The following instructions will outline, what to do with {{ instructs.inputs }}. Your response will be evaluated based on how well you follow the instructions.
 {{ instructs.assi_role }}
 {{ instructs.intro }}
 

@@ -7,7 +7,6 @@ import altered.settings as sts
 from colorama import Fore, Style
 import altered.prompt_strategies as Strats
 import altered.prompt_io as Io
-from altered.prompt_user_prompt import UserPrompt
 from altered.yml_parser import YmlParser
 
 
@@ -20,23 +19,20 @@ class Instructions:
     def __init__(self, name, *args, fmt:str=None, **kwargs):
         self.name = name
         self.fmt = fmt
+        self.inputs = None
         self.context = {}
         self.params = {}
-        self.user_prompt = None
 
     def __call__(self, *args, **kwargs):
         self.get_instruct_params(*args, **kwargs)
         strat_context, self.fmt = self.run_strats(*args, **kwargs)
         strat_io = self.run_io(*args, **kwargs)
-        user_prompt_context = self.get_user_prompt(*args, **kwargs)
-        self.check_context(user_prompt_context, *args, **kwargs)
-        self.mk_context(strat_context, user_prompt_context, strat_io, *args, **kwargs)
+        self.mk_context(strat_context, strat_io, *args, **kwargs)
         return self
 
-    def mk_context(self, strat_context, user_prompt_context, strat_io, *args, **kwargs, ):
+    def mk_context(self, strat_context, strat_io, *args, **kwargs, ):
         self.context = {
                     'strats': strat_context, 
-                    'user_prompt': user_prompt_context, 
                     'io': strat_io,
                 }
         # if time revise how num_predict is derrived (check kwargs['num_predict'])
@@ -72,18 +68,3 @@ class Instructions:
         io = getattr(Io, io_template.split('_', 1)[0].capitalize())(*args, **kwargs,
             )(io_template, *args, fmt=self.fmt, **kwargs)
         return io
-
-    def get_user_prompt(self, *args, **kwargs):
-        user_prompt_context = UserPrompt(*args, **kwargs)(*args, **kwargs)
-        try:
-            self.check_context(user_prompt_context, *args, **kwargs)
-        except ValueError as e:
-            user_prompt_context = UserPrompt(*args, **kwargs)(*args, user_prompt='', **kwargs)
-        self.user_prompt = user_prompt_context.get('user_prompt')
-        return user_prompt_context
-
-    def check_context(self, user_prompt_context:dict, *args, **kwargs):
-        if self.params.get('method') == 'default' and \
-                                            user_prompt_context.get('user_prompt') is None:
-            msg = f"{Fore.RED}ERROR:{Fore.RESET} default strat requires a user_prompt"
-            raise ValueError(msg)

@@ -19,7 +19,6 @@
 
 import colorama as color
 from colorama import Fore, Style, Back
-color.init()
 import importlib, os
 
 import altered.settings as sts
@@ -29,7 +28,7 @@ import altered.contracts as contracts
 
 def runable(*args, api, **kwargs):
     """
-    imports api as a package and executes it
+    imports api as a package
     returns the runable result
     """
     if not api.startswith('api_'):
@@ -47,11 +46,15 @@ def main(*args, **kwargs):
     to runable from shell these arguments are passed in
     runs api if legidemit and prints outputs
     """
+    # arguments from argparse
     kwargs = arguments.mk_args().__dict__
-
     # kwargs are vakidated against enforced contract
     kwargs = contracts.checks(*args, **kwargs)
-    if kwargs.get("api") != "help":
+    # the imported api runable package is executed
+    if kwargs.get("api") == "help":
+        print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "
+                f"For parameter and package info run: 'alter info'")
+    else:
         return runable(*args, **kwargs).main(*args, **kwargs)
 
 

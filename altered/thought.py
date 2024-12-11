@@ -47,7 +47,7 @@ class Thought:
     def filters(self, *args, r_filters:list=[], verbose:int=0, user_prompt:str=None, **kwargs
         ) -> dict:
         if not r_filters:
-            self.r['user_prompt'] = self.p.I.user_prompt
+            self.r['user_prompt'] = self.p.user_prompt
             return self.r
         # we filter self.r by the keys provided in r_filters
         if type(r_filters) == str: r_filters = [r_filters]
