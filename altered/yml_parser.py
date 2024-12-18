@@ -80,7 +80,6 @@ class YmlParser:
         if match:
             self.fields_example = json.loads(match.group(2))
 
-
     def add_labels(self, *args, description=None, **kwargs):
         self.fields = self.parse_meta(*args, **kwargs)
         self.data = yaml.safe_load(self.fields_text)

@@ -77,6 +77,26 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         help="Current workfile (root file for package import graph)"
     )
+    # user question, comment
+    parser.add_argument(
+        "-up", "--user_prompt",
+        type=str,
+        help="user question or problem to solve"
+    )
+
+    # deliverable
+    parser.add_argument(
+        "-dl", "--deliverable_path",
+        type=str,
+        help="path to the deliverable"
+    )
+
+    # deliverable
+    parser.add_argument(
+        "-ds", "--selection",
+        type=str,
+        help="selected point of interest and deliverable"
+    )
 
     parser.add_argument(
         "-rx", "--file_match_regex",

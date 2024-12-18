@@ -24,6 +24,7 @@ logs_dir = os.path.join(resources_dir, "logs")
 
 time_strf = "%Y-%m-%d_%H-%M-%S-%f"
 time_stamp = lambda: dt.now().strftime(time_strf)
+run_time_start = time_stamp()
 # name of table data when stored to disk
 data_dir = os.path.join(resources_dir, "data")
 max_files, data_file_exts = 100, {'csv', 'npy'}

@@ -164,7 +164,7 @@ class ModelConnect:
                         f"{url}, {context['model']}, {server = }, "
                         f"{context.get('repeats', 'no repeats for embeddings')}, "
                         f"{len(context['prompts']) = }, {kwargs.get('fmt') = }, "
-                        f"num_predict: {context.get('options', {}).get('num_predict')}"
+                        f"num_predict: {context.get('options')}"
                         )
         elif verbose >= 2:
             hlpp.unroll_print_dict(context, 'prompts')

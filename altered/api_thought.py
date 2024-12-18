@@ -2,14 +2,14 @@
 api_thought.py
 """
 
-import colorama as color
+from colorama import Fore, Style, Back
 from datetime import datetime
 
 import altered.settings as sts
 import altered.hlp_printing as hlpp
 from altered.thought import Thought
 
-color.init()
+
 def thought(*args, api:str, verbose:int, **kwargs):
     """
     Display basic information about the system and configuration
@@ -17,7 +17,10 @@ def thought(*args, api:str, verbose:int, **kwargs):
     """
     thought = Thought(api, *args, verbose=verbose, **kwargs)
     response = thought.think(*args, verbose=verbose, **kwargs)
-    hlpp.pretty_prompt(response.get('response'), *args, verbose=1, **kwargs)
+    if response is not None:
+        hlpp.pretty_prompt(response.get('response'), *args, verbose=1, **kwargs)
+    else:
+        print(f"{Fore.RED}api_thought: No response!{Fore.RESET}")
 
 def main(*args, **kwargs):
     """

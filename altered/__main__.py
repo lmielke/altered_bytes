@@ -53,7 +53,7 @@ def main(*args, **kwargs):
     # the imported api runable package is executed
     if kwargs.get("api") == "help":
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "
-                f"For parameter and package info run: 'alter info'")
+                f"For parameter and package info, run: 'alter info'")
     else:
         return runable(*args, **kwargs).main(*args, **kwargs)
 

@@ -180,5 +180,5 @@ overwrites:
     server: while-ai_1
 params:
   ollama_host: http://localhost:11434
-  timeout: 60
+  timeout: 120
   max_retries: 3

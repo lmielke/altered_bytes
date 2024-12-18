@@ -1,5 +1,5 @@
 ## User and System Activities
-The following shows recent activities performed by the user. Reading this can improve context understanding.
+The following shows some stats about recent user activities and their intensity.
 {%- if context.user_info.user_act %}
 {%- for activity in context.user_info.user_act %}
 ### Activity {{ loop.index }}
@@ -13,6 +13,7 @@ The following shows recent activities performed by the user. Reading this can im
 {%- if activity.keyboard_shortcuts %}
 - **Elevator Keys History:** {{ activity.keyboard_shortcuts }}
 {%- endif %}
+Overall the user spend {{ activity.intensity | default('little') }} time in this activity.
 {% endfor %}
 {%- endif %}
 

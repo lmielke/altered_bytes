@@ -17,6 +17,7 @@ def checks(*args, verbose:int, **kwargs):
     kwargs = prep_user_info(*args, **kwargs)
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
+        print(f"contracts.checks.kwargs: \n{kwargs = }")
     return kwargs
 
 

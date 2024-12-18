@@ -176,7 +176,7 @@ class ActivityHistory:
         end_time_str = end_time.strftime(sts.time_strf[:-3])
         window_title = old_window_info["active_window"].replace(sts.project_dir, 
                                                                         f'/sts.project_dir')
-        log_entry = {
+        log_entries = {
                         "timestamp_entered": start_time.strftime(sts.time_strf[:-3]),
                         "timestamp_exited": end_time_str,
                         "duration_seconds": duration,
@@ -186,20 +186,39 @@ class ActivityHistory:
                         "key_press_count": self.user_activity.key_press_count,
                         "keyboard_shortcuts": self.user_activity.keyboard_shortcuts
                     }
+        # add intensity as measure how significant the activity was
+        log_entries["intensity"] = self.get_intensity(*args, **log_entries)
         # Reset the counters and history after logging
         self.user_activity.mouse_click_count = 0
         self.user_activity.key_press_count = 0
         self.user_activity.keyboard_shortcuts = []  # Reset elevator keys history
-        self.save_log_file(end_time_str, log_entry, *args, **kwargs)
+        self.save_log_file(end_time_str, log_entries, *args, **kwargs)
 
-    def save_log_file(self, end_time_str:str, log_entry:str, *args, **kwargs):
+    def get_intensity(self, *args, key_press_count:int, keyboard_shortcuts:list, **kwargs):
+        """
+        Calculate the activity intensity based on the number, key presses 
+        and keyboard shortcuts.
+        Intensity can have several levels: little, moderate, significant, and extreme.
+        """
+        # shortcut might have a counter int appended to the shortcut string like Ctrl+S*2
+        was_saved = any([shortcut.startswith('Ctrl+S') for shortcut in keyboard_shortcuts])
+        if not was_saved or key_press_count <= 10:
+            return 'little'
+        elif keyboard_shortcuts and (10 < key_press_count <= 50):
+            return 'moderate'
+        elif keyboard_shortcuts and (50 < key_press_count <= 100):
+            return 'significant'
+        elif keyboard_shortcuts and key_press_count > 100:
+            return 'extreme'
+
+    def save_log_file(self, end_time_str:str, log_entries:str, *args, **kwargs):
         # due to handling reasons we limit the length of the log file to log_max_len entries
         if self.log_counter >= self.log_max_len:
             self.log_file_name = f"{end_time_str}_{self.log_name}"
             self.log_counter = 0
         # Append the log entry to the log file
         with open(os.path.join(sts.logs_dir, self.log_file_name), "a") as f:
-            json.dump(log_entry, f)
+            json.dump(log_entries, f)
             f.write("\n")
         self.log_counter += 1
 

@@ -29,7 +29,7 @@ class Prompt:
         self.I = Instructions(name, *args, **kwargs)
         self.RD = Render(*args, **kwargs)
         self.stats = PromptStats(*args, **kwargs)
-        self.delv = Deliverable(*args, **kwargs)
+        self.D = Deliverable(*args, **kwargs)
         self.data = None # contains the rendered prompt
         self.warnings = {}
         self.context = {} # contains the context for rendering the prompt
@@ -110,7 +110,7 @@ class Prompt:
         self.context_dict = self.C(*args, **kwargs)
 
     def get_deliverable(self, *args, **kwargs):
-        self.deliverable = self.delv.mk_context(*args, **kwargs)
+        self.deliverable = self.D.mk_context(*args, **kwargs)
         # self.deliverable = {'content': 'this is a test', }
 
     def get_user_prompt(self, *args, strat_template:str=None, **kwargs):

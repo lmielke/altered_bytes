@@ -48,7 +48,6 @@ class ContextActivities:
             data['git_diffs'] = self.context['git_diffs'][-num_activities:]
         return {'user_info': data}
 
-
     def find_most_recent_act_log(self, *args, **kwargs):
         """
         Search the logs directory for the most recent log file based on the timestamp in the filename.

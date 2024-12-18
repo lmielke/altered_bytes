@@ -21,6 +21,9 @@ playwright = "*"
 openai = "*"
 pywin32 = "*"
 pynput = "*"
+astor = "*"
+libcst = "*"
+pygetwindow = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

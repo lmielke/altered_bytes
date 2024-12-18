@@ -2,14 +2,12 @@
 api_prompt.py
 """
 
-import colorama as color
 from datetime import datetime
 
 import altered.settings as sts
 import altered.hlp_printing as hlpp
 from altered.prompt import Prompt
 
-color.init()
 def prompt(*args, api:str, verbose:int, **kwargs):
     """
     Display basic information about the system and configuration

@@ -15,6 +15,7 @@ from colorama import Fore, Style
 import altered.settings as sts
 from altered.model_connect import SingleModelConnect
 from altered.prompt import Prompt, Response
+from typing import List, Dict, Any
 
 
 class Thought:
@@ -27,19 +28,24 @@ class Thought:
         # prompt constructor for LLM interaction
         self.prompt = Prompt(name, *args, **kwargs)
         self.response, self.last_response = Response(name, *args, **kwargs), None
+        self.log_path = os.path.join(   sts.logs_dir, 'prompts',
+                                        f"{sts.run_time_start}_{self.name}.md")
 
     def think(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, **kwargs)
         kwargs['num_predict'] = self.p.I.context.get('num_predict', kwargs.get('num_predict'))
-        for p_cnt in range(1, 5):
+        for self.p_cnt in range(1, 3):
             # post calls the model and response handles post model cleanup
-            self.r = self.response(self.post(p_cnt, *args, **kwargs), *args, **kwargs)
+            self.r = self.response(self.post(*args, **kwargs), *args, **kwargs)
             if self.r:
                 self.last_response = self.r.get('content')
+                self.log_prompts([self.last_response], 'Response', *args, **kwargs)
                 break
+            else:
+                self.log_prompts(['Thought.think: No response.'], 'Response', *args, **kwargs)
         else:
-            print(  f"{Fore.RED}Thought.think ERROR: {p_cnt}{Fore.RESET} "
+            print(  f"{Fore.RED}Thought.think ERROR: {self.p_cnt}{Fore.RESET} "
                     f"No valid response received!")
             return None
         return self.filters(*args, **kwargs)
@@ -62,13 +68,24 @@ class Thought:
         else:
             return r
 
-    def post(self, p_cnt, *args, **kwargs):
+    def post(self, *args, **kwargs):
         server_params = self.mk_model_params(*args, **kwargs)
-        if p_cnt >= 2:
-            pr = self.modify_prompt(p_cnt, *args, **kwargs)
-        return self.assi.post([pr if p_cnt >= 2 else self.p.data], *args, **server_params)
+        if self.p_cnt >= 2:
+            pr = self.modify_prompt(*args, **kwargs)
+        final_prompts = [pr if self.p_cnt >= 2 else self.p.data]
+        self.log_prompts(final_prompts, 'Prompt', *args, **kwargs)
+        return self.assi.post(final_prompts, *args, **server_params)
 
-    def modify_prompt(self, p_cnt, *args, verbose:int=0, **kwargs):
+    def log_prompts(self, final_prompts:List[str], content_type:str, *args, **kwargs):
+        """
+        Takes a list of strings and writes them to a log file.
+        If the file does not exist, it is created. if the log file exists, it appends to it.
+        """
+        with open(self.log_path, "a") as f:
+            for i, pr in enumerate(final_prompts):
+                f.write(f"# {content_type} {self.p_cnt}_{i}\n{pr}\n\n")
+
+    def modify_prompt(self, *args, verbose:int=0, **kwargs):
         """
         Modifies the existing prompt to force a alternative response
         """
@@ -76,10 +93,10 @@ class Thought:
         # Generate unique indices and sort them to ensure we traverse left-to-right
         # 500 is a devider that reduces the amound of charactes changed in the text
         idxs = sorted({rd.randint(0, len(self.p.data) - 1) 
-                        for _ in range(max(5, len(self.p.data) // 500 * p_cnt ))})
-        if p_cnt >= 1 and verbose:
+                        for _ in range(max(5, len(self.p.data) // 500 * self.p_cnt ))})
+        if self.p_cnt >= 1 and verbose:
             print(  f"{Fore.YELLOW}Thought.post WARNING: {Fore.RESET}"
-                    f"{p_cnt = }, modifying {idxs = }")
+                    f"{self.p_cnt = }, modifying {idxs = }")
         # Use slicing to remove characters at the specified indices
         new_data, new_idx = [], 0
         for ix in idxs:

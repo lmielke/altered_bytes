@@ -20,9 +20,12 @@ The following section shows used Package information.
 
 {% if context.package_info.selected_files %}
 ### Top {{ context.package_info.selected_files|length }} Selected Package Files
+Here are some files of interest. They may be relevant for solving the problem.
 {% for file in context.package_info.selected_files %}
 {% if loop.index == 1 %}
-#### File {{ loop.index }}:  {{ file.file_path }} <- Current Work File
+#### File {{ loop.index }}:  {{ file.file_path }}
+The user specifically attached this file because it may be relevant for solving the problem.
+{% elif loop.index == 2 %}
 {% else %}
 #### File {{ loop.index }}:  {{ file.file_path }}
 {% endif %}

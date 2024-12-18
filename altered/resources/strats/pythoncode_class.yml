@@ -8,15 +8,14 @@ name: Write Python Class
 # meta: {"name": "description", "type": "string", "default": "", "example": ""}
 # description of the task
 description: >
-    This task is about creating a Python implementation given the provided information. 
-    The implementation includes defining appropriate methods, attributes, and adding 
-    necessary type annotations. The output should follow Pythonic conventions, including 
-    type hints and docstrings, to ensure clarity and maintainability. 
-    All methods should include *args and **kwargs. External calls should preferably use 
-    keyword arguments (**kwargs), while internal calls use positional arguments (*args).
-    Used parameters are explicitly listed within the method definition.
+    This task is about creating a Python class using the provided information. 
+    The class includes defining pythonic methods, properties with type annotations and 
+    docstrings. Also all method definitions and method calls must include *args and **kwargs.
+    External calls should preferably use keyword arguments (**kwargs), 
+    while internal calls use positional arguments (*args). All used parameters are 
+    explicitly listed within the method definition header. 
     Docstrings should emphasize the 'why' over the 'what'. Docstrings can omit information
-    that already exsit otherwise (i.e. no need to list args and kwargs inside the docstring)
+    that already exist otherwise (i.e. no need to list args and kwargs inside the docstring)
 
 # meta: {"name": "example", "type": "string", "default": "", "example": ""}
 # This is an example about how to write a python class adhering to pep standards.
@@ -41,8 +40,8 @@ example: >
           
           def deposit(self, *args, amount:float=None, **kwargs) -> None:
               """
-              Deposits a specified amount into the bank account in order to increase 
-              the account balance.
+              For better readabiltiy withdraw and deposit have been seperated into
+              two seperate methods. deposit adds a specified amount to the bank account.
               """
               amount = amount
               self.balance += amount
@@ -50,9 +49,8 @@ example: >
           
           def withdraw(self, *args, amount:float=None, **kwargs) -> None:
               """
-              Withdraws a specified amount from the bank account if sufficient balance 
-              exists because transactions require validation of available funds 
-              in order to avoid overdrafts.
+              For better readabiltiy withdraw and deposit have been seperated into
+              two seperate methods. withdraw removes a specified amount from the bank account.
               """
               amount = amount
               if amount <= self.balance:
