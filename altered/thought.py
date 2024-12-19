@@ -1,5 +1,5 @@
 """
-chat.py
+thought.py
 This class orchestrates the communication between the user and the AI assistant.
 It creates the chat message for the next prompt and receives the response from the AI LLM.
 
@@ -76,20 +76,18 @@ class Thought:
         self.log_prompts(final_prompts, 'Prompt', *args, **kwargs)
         return self.assi.post(final_prompts, *args, **server_params)
 
-    def log_prompts(self, final_prompts:List[str], content_type:str, *args, **kwargs):
-        """
-        Takes a list of strings and writes them to a log file.
-        If the file does not exist, it is created. if the log file exists, it appends to it.
-        """
-        with open(self.log_path, "a") as f:
-            for i, pr in enumerate(final_prompts):
-                f.write(f"# {content_type} {self.p_cnt}_{i}\n{pr}\n\n")
+    def log_prompts(self, final_prompts:list[str], content_type:str, *args, alias:str=None, 
+        **kwargs) -> None:
+        """Writes a list of strings to a log file."""
+        with open(self.log_path, 'a') as file:
+            for i, prompt in enumerate(final_prompts, start=1):
+                header = f"# {content_type} {self.p_cnt}_{i} from {alias or ''}"
+                file.write(f"{header}\n{prompt}\n\n")
 
     def modify_prompt(self, *args, verbose:int=0, **kwargs):
         """
         Modifies the existing prompt to force a alternative response
         """
-        
         # Generate unique indices and sort them to ensure we traverse left-to-right
         # 500 is a devider that reduces the amound of charactes changed in the text
         idxs = sorted({rd.randint(0, len(self.p.data) - 1) 

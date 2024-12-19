@@ -69,6 +69,23 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     service = None  # This will be set when the server starts
     allowed_endpoints = {'get_generates', 'get_embeddings'}
 
+    def do_GET(self, *args, **kwargs):
+        """
+        Handles the GET requests. Specifically checks for /ping endpoint and returns
+        server start time and uptime.
+        """
+        if self.path == '/ping':
+            payload = {
+                'status': f"running since: {self.server.server_start_time}",
+            }
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload).encode('utf-8'))
+        else:
+            self.send_error(404, f"Not a valid endpoint: '{self.path}'")
+
+
     def do_POST(self, *args, **kwargs):
         """
         Handles the POST requests by routing to the appropriate service method 
@@ -170,7 +187,8 @@ def run(server_class=ServiceHTTPServer, handler_class=SimpleHTTPRequestHandler, 
     server_address = ('', port)
     print(f"{server_address = }")
     httpd = server_class(server_address, handler_class)
-    print(f"Starting the HTTP server on port {port}...")
+    httpd.server_start_time = sts.run_time_start
+    print(f"Starting the HTTP server at {httpd.server_start_time}, on port {port}...")
     httpd.serve_forever()
 
 

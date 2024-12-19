@@ -101,6 +101,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-rx", "--file_match_regex",
         type=str,
+        default=None,
         help="Regex pattern to match desired file names (e.g., 'api_.*.py')"
     )
 
@@ -128,6 +129,12 @@ def get_parser() -> argparse.ArgumentParser:
         "-y", "--yes",
         action="store_true",
         help="Run without confirmation prompts"
+    )
+
+    parser.add_argument(
+        "-cl", "--to_clipboard",
+        action="store_true",
+        help="Copy response to clipboard"
     )
 
     return parser

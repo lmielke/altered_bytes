@@ -60,3 +60,8 @@ def prep_user_info(*args, user_info:list, **kwargs):
     else:
         preped_kwargs['user_info'] = False
     return preped_kwargs
+
+def prep_file_match_regex(*args, file_match_regex:str=None, **kwargs):
+    if file_match_regex is None or file_match_regex == 'None':
+        file_match_regex = ""
+    return dict(**kwargs, file_match_regex=file_match_regex)
