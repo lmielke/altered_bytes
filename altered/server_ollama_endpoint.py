@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from colorama import Fore, Style
 from ollama import Client
 import random as rd
+import socket
 
 from altered.server_ollama_server import OllamaCall
 import altered.model_params as msts
@@ -189,6 +190,7 @@ def run(server_class=ServiceHTTPServer, handler_class=SimpleHTTPRequestHandler, 
     httpd = server_class(server_address, handler_class)
     httpd.server_start_time = sts.run_time_start
     print(f"Starting the HTTP server at {httpd.server_start_time}, on port {port}...")
+    print(f"ping me like: curl http://{socket.gethostbyname(socket.gethostname())}:{port}/ping")
     httpd.serve_forever()
 
 
