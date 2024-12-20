@@ -87,6 +87,10 @@ docs/_build/
 # PyBuilder
 target/
 
+# digraphtools
+digraph.pdf
+digraph.gv
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

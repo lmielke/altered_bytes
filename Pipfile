@@ -26,6 +26,7 @@ libcst = "*"
 pygetwindow = "*"
 pyperclip = "*"
 pyttsx3 = "*"
+rich = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

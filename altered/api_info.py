@@ -1,6 +1,7 @@
-import argparse
+import argparse, os
 from typing import List, Dict
 from tabulate import tabulate
+from colorama import Fore, Style, Back
 import altered.arguments as arguments
 
 def get_argument_details(parser: argparse.ArgumentParser) -> List[Dict[str, str]]:
@@ -44,11 +45,24 @@ def display_argument_info(*args, **kwargs):
     headers = ["Name", "Alias", "Required", "Type", "Default", "Help"]
     print(tabulate(argument_details_list, headers=headers, tablefmt="grid"))
 
+def check_environment_variables(*args, **kwargs):
+    print(f"\n{Fore.WHITE}Environment Variables:{Fore.RESET}")
+    if os.getenv('altered_bytes'):
+        print(f"{Fore.GREEN}$env:altered_bytes: {Fore.RESET}{os.getenv('altered_bytes')}")
+    else:
+        print(  
+                f"{Fore.RED}ERROR: altered_bytes env var not found."
+                f"$env:altered_bytes: {os.getenv('altered_bytes')}{Fore.RESET}"
+                f"Set altered_bytes env var to {sts.project_dir = }"
+                )
+
+
 def main(*args, **kwargs):
     """
     Main function to display argument information.
     """
     display_argument_info(*args, **kwargs)
+    check_environment_variables(*args, **kwargs)
 
 if __name__ == "__main__":
     main()
