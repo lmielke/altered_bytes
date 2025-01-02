@@ -1,4 +1,4 @@
-import argparse, os
+import argparse, os, subprocess
 from typing import List, Dict
 from tabulate import tabulate
 from colorama import Fore, Style, Back
@@ -56,6 +56,14 @@ def check_environment_variables(*args, **kwargs):
                 f"Set altered_bytes env var to {sts.project_dir = }"
                 )
 
+def call_curl(*args, **kwargs):
+    try:
+        address = 'localhost:5555/ping'
+        return subprocess.check_output(['curl', address]).decode('utf-8').strip()
+    except Exception as e:
+        e_str = f"{e}".replace(address, f"{Fore.YELLOW}{address}{Fore.RESET}")
+        print(f"{Fore.RED}Server unresponsive or not running:{Fore.RESET} \n{e_str}")
+        return None
 
 def main(*args, **kwargs):
     """
@@ -63,6 +71,7 @@ def main(*args, **kwargs):
     """
     display_argument_info(*args, **kwargs)
     check_environment_variables(*args, **kwargs)
+    print(f"{Fore.GREEN}{call_curl()}{Fore.RESET}")
 
 if __name__ == "__main__":
     main()
