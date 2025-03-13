@@ -26,11 +26,11 @@ ignore_dirs = {
 
 class PackageInfo:
 
-    def __init__(self, *args, work_file_name:str=sts.package_name, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.root_dir, self.package_name = self.find_root_dir(*args, **kwargs)
         if not self.root_dir:
             raise RuntimeError("Root directory not found.")
-        self.work_file_name = self.handle_file_name(work_file_name)
+        self.work_file_name = self.handle_file_name(*args, **kwargs)
         self.graph = graphviz.Digraph(comment='Package Dependency Graph')
         self.visited_files = set()
         self.incoming_edges = {}  # Track incoming edges for each node
@@ -38,10 +38,11 @@ class PackageInfo:
         self.graph.attr('node', style='filled', fillcolor='white')
         self.graph.attr('edge', fontsize='10')  # Smaller font size for edges
 
-    def handle_file_name(self, work_file_name, *args, **kwargs):
+    def handle_file_name(self, *args, work_file_name:str, **kwargs):
         """
         Handle the main file name to ensure it ends with '.py'.
         """
+        work_file_name = work_file_name if work_file_name is not None else sts.package_name
         if not work_file_name.endswith('.py') and not '.' in work_file_name:
             work_file_name += '.py'
         return work_file_name

@@ -25,6 +25,7 @@ class Strategy:
         self.template_name = None
         self.template_file_name = None
         self.template_path = None
+        self.lpw = 6
 
     def __call__(self, *args, **kwargs):
         self.mk_strat_params(*args, **kwargs)
@@ -43,7 +44,7 @@ class Strategy:
         req_terms_len = len(' '.join(self.validations['required_terms']).split())
         self.validations['inputs_len'] = inputs_len + req_terms_len
         # if expected_len is None or not provided, we default to (0, 0)
-        expected_len, self.lpw = self.validations.get('expected_len', (0, 0)), 6
+        expected_len = self.validations.get('expected_len', (0, 0))
         expected_len = expected_len if expected_len is not None else (0, 0)
         self.validations['expected_words'] = (   
                             int(self.validations['inputs_len'] * expected_len[0]) // self.lpw,

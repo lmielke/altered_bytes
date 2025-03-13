@@ -91,11 +91,18 @@ def get_parser() -> argparse.ArgumentParser:
         help="path to the deliverable"
     )
 
-    # deliverable
+    # selection
     parser.add_argument(
         "-ds", "--selection",
         type=str,
         help="selected point of interest and deliverable"
+    )
+    # application, some application (sublime) require special behavior (allowerd chars)
+    parser.add_argument(
+        "-ap", "--application",
+        type=str,
+        default="powershell",
+        help="calling application, sublime, powershell, ect."
     )
 
     parser.add_argument(

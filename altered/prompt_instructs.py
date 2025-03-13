@@ -13,7 +13,7 @@ from altered.yml_parser import YmlParser
 class Instructions:
     default_strats = 'default_user_prompt'
     default_io = None
-    max_words, letters_per_word = 250, 4
+    max_words, letters_per_word = 500, 4
     template_name = 'i_instructs.md'
 
     def __init__(self, name, *args, fmt:str=None, **kwargs):

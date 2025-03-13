@@ -19,7 +19,7 @@ try:
 except ImportError:
     SOUND_AVAILABLE = False
 
-def thought(*args, api: str, verbose: int, **kwargs):
+def thought(*args, api: str, verbose: int, application:str='powershell', **kwargs):
     """
     Main function to process a 'thought' using the given API and arguments.
     """
@@ -27,10 +27,16 @@ def thought(*args, api: str, verbose: int, **kwargs):
         thought = Thought(api, *args, verbose=verbose, **kwargs)
         play_sound("PROMPT")
         response = thought.think(*args, verbose=verbose, **kwargs)
-        if response is None or not response.get('response'):
-            print(f"{Fore.RED}api_thought: No valid response!{Fore.RESET}")
+        if response is None:
+            msg = "ERROR: api_thought.thought: Response is None!"
+            print(f"{Fore.RED}{msg}{Fore.RESET}")
             play_sound("ERROR")
-            return None
+            return msg
+        elif not response.get('response'):
+            msg = "ERROR: api_thought.thought: No model response in response dict!"
+            print(f"{Fore.RED}{msg}{Fore.RESET}")
+            play_sound("ERROR")
+            return msg
         response_text = response.get('response', '').strip()
         code_blocks = copy_response(response_text, *args, **kwargs)
         log_path = os.path.join(
@@ -47,11 +53,15 @@ def thought(*args, api: str, verbose: int, **kwargs):
                                         'response': response.get('response'),
                                         'log_path': log_path,
                                     }, indent=4)
-        print(f"\n\nTHOUGHT RESPONSE: {output_json}")
+        if any([app in application.lower() for app in ['sublime', 'voice']]):
+            print(f"\n{application} {output_json}")
+            return output_json
+        return response.get('response')
     except Exception as e:
-        print(f"{Fore.RED}Error in thought: {e}{Fore.RESET}")
+        msg = f"ERROR: altered.api_thought.thought: {e}"
+        print(f"{Fore.RED}{msg}{Fore.RESET}")
         play_sound("ERROR")
-        return None
+        return msg
 
 def copy_response(response: str, *args, to_clipboard: bool = False, **kwargs):
     """
@@ -101,6 +111,8 @@ def copy_response(response: str, *args, to_clipboard: bool = False, **kwargs):
         code_blocks = get_code_blocks(response)
     if '```markdown' in response and not code_blocks:
         code_blocks = get_code_blocks(response.replace('```markdown', '```unknown'))
+    else:
+        code_blocks = None
     if not code_blocks:
         code_blocks = f"No code blocks found in the response. \n{response = }"
     elif code_blocks and to_clipboard:

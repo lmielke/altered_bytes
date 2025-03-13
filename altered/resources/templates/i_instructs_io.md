@@ -7,7 +7,7 @@ Belows template example '{{ instructs.io.name }}' answers a hypothetical '{{ ins
 ```
 
 Respond with a '{{ instructs.io.fmt.upper() }}' string containing all entries shown in the Response Layout.
-Your response should be shorter than {{ instructs.num_predict | default('250') }} words. Do NOT include comment lines starting with {{ instructs.io.fmt_comment }}!
+Your response should be shorter than {{ instructs.num_predict | default('500') }} words. Do NOT include comment lines starting with {{ instructs.io.fmt_comment }}!
 {%- else %}
 The requested response format is MARKDOWN text, like shown below:
 ```markdown

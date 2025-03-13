@@ -13,6 +13,7 @@ from datetime import datetime as dt
 import warnings
 import pandas as pd
 
+
 class ModelConnect:
     """
     ModelConnect handles the communication with an AI assistant of your choice.
@@ -41,16 +42,17 @@ class ModelConnect:
         self.times_df = pd.DataFrame([{col: None for col in self.columns}], index=[0])
 
     @staticmethod
-    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1
-        ) -> float:
+    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1, 
+        verbose:int=0, **kwargs ) -> float:
         if temp is not None:
             return temp
         bias = math.log(scale, 1000)
         lower = (0.1 + bias) if lower is None else (lower + bias)
         upper = (0.1 + bias) if upper is None else (upper + bias)
         rd_temp = min(max(lower, rd.random()), upper)
-        print(  f"{Fore.YELLOW}Warning: set_rd_temp setting temperature:{Fore.RESET} "
-                f"temp: {rd_temp:.2f}, {bias = }, {scale = }")
+        if verbose:
+            print(  f"{Fore.YELLOW}Warning: set_rd_temp setting temperature:{Fore.RESET} "
+                    f"temp: {rd_temp:.2f}, {bias = }, {scale = }")
         return rd_temp
 
     def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs
@@ -97,9 +99,8 @@ class ModelConnect:
                 temperature = 0.
         # repeats refers to the number of times the prompt is repeated
         # we increase the temperature for repeats > 1 to get more diverse responses
-        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats['num'])
+        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats['num'], **kwargs)
         # we estimate the context length based on the messages length
-
         num_ctx = self.get_context_length(messages, context_length, *args, **kwargs)
         messages = self.to_msgs(messages) if name.startswith('gpt') else messages
         return fmt, messages, name, temperature, num_ctx, num_predict,\
@@ -114,11 +115,13 @@ class ModelConnect:
                      self.get_params(*args, name=name, **kwargs)
         # we create a context dictionary with model parameter
         # context len is calculated dynamically in a range between 2000 and context_lenght
-        context = {'model': name, 'verbose': verbose}
+        context = {'model': name,}
         if name.startswith('gpt'):
             context['messages'] = messages
+            context['messages'][0]['content'] = "\n".join(messages[0]['content'])
             context['temperature'] = temperature
         else:
+            context['verbose'] = verbose
             context['service_endpoint'] = msts.config.defaults.get('service_endpoint') \
                                             if service_endpoint is None else service_endpoint
             context['prompts'] = messages
@@ -140,61 +143,82 @@ class ModelConnect:
         # keep_alive seems to be in seconds (docs say minutes)
         return context
 
-    def set_service_endpoint(self, *args, service_endpoint:str=None, **kwargs) -> str:
-        # if no sub-domain is specified we get it from default params
-        if service_endpoint is None:
-            service_endpoint = msts.config.defaults.get('service_endpoint')
-        return {'service_endpoint': service_endpoint}
-
-    def post(self, *args, verbose=0, **kwargs) -> dict:
+    def post(self, *args, **kwargs) -> dict:
         """
         Sends a message to the appropriate assistant and handles the response.
         """
-        kwargs.update(self.set_service_endpoint(*args, **kwargs))
-        if verbose >= 2:
-            print(f"\n{Fore.CYAN}ModelConnect.post:{Fore.RESET} {verbose = } >= 2")
-            hlpp.unroll_print_dict(kwargs, 'service_endpoint')
-        # print(msts.config.get_model(*args, **kwargs).get('model_file'))
-        model_params = msts.config.get_model(*args, **kwargs)
-        context = self.prep_context(*args, **model_params.get('model_file'), verbose=verbose, 
-                                            **kwargs, )
-        url, server = msts.config.get_url(*args, **kwargs), model_params.get('server')
+        m_params = msts.config.get_model(*args, **kwargs)
+        context = self.prep_context(*args, **m_params.get('model_file'), **kwargs)
+        response = self.call_model(m_params, context, *args, **kwargs)
+        self.validate_response(response, *args, **kwargs)
+        if not m_params.get('model_file').get('name').startswith('gpt'):
+            self.get_stats(response, context, *args, **kwargs)
+        return response
+
+    def call_model(self, m_params, context, *args, **kwargs) -> dict:
+        self.print_calling_params(m_params, context, *args, **kwargs)
+        # chat-gpt and ollama use different methods in this class which are defined
+        # by the model_file['host'] key in the models_servers.yml file
+        response = getattr(self, m_params['model_file']['host'])(m_params.get('url'), context)
+        # we append some parameter context for documentation purposes
+        response['model'] = m_params.get('model_file').get('name')
+        response['server'] = m_params.get('server')
+        return response
+
+    def print_calling_params(self, m_params, context, *args, fmt, verbose, **kwargs):
         if verbose:
-            print(      f"{Fore.MAGENTA}ModelConnect.post: {Fore.RESET} {verbose = } >= 1 \n"
-                        f"{url}, {context['model']}, {server = }, "
-                        f"{context.get('repeats', 'no repeats for embeddings')}, "
-                        f"{len(context['prompts']) = }, {kwargs.get('fmt') = }, "
-                        f"num_predict: {context.get('options')}"
+            m_func = m_params['model_file']['host']
+            print(  f"{Fore.MAGENTA}ModelConnect.post {m_func}: {Fore.RESET}\n"
+                    f"\tmodel={context['model']}, "
+                    f"server={m_params.get('server')}, "
+                    f"url={m_params.get('url')}, \n"
+                    f"\trepeats={context.get('repeats', 'no repeats for embeddings')}, "
+                    f"num_prompts={len(context.get('prompts', []))}\n"
+                    f"\t{fmt = }, num_predict={context.get('options')}\n"
+                    f"\t{verbose = } >= 1 \n"
                         )
         elif verbose >= 2:
-            hlpp.unroll_print_dict(context, 'prompts')
-        # chat-gpt and ollama use different methods, Here we call ollama method.
-        r_dict = self._ollama(url, context, *args, verbose=verbose, **kwargs )
-        self.validate_response(r_dict, *args, **kwargs)
-        if verbose >= 1:
-            print(f"{Fore.MAGENTA}ModelConnect.post.r:{Fore.RESET} {r_dict['num_results'] = }")
-        r_dict['model'], r_dict['server'] = model_params.get('model_file').get('name'), server
-        self.get_stats(r_dict, context, *args, verbose=verbose, **kwargs)
-        return r_dict
+            hlpp.unroll_print_dict(context, 'context')
 
-    def _ollama(self, url, context: dict, *args, **kwargs, ) -> dict:
+    def _ollama(self, url, context: dict) -> dict:
         """
         Handles communication with a custom AI assistant.
         service_endpoint: str, ['get_embeddings', 'generate']
         """
         # we are sending the request to the server
         context['network_up_time'] = time.time()
-        r = requests.post(  url,
-                            headers={'Content-Type': 'application/json'},
-                            data=json.dumps(context),
-        )
+        try:
+            r = requests.post(  url,
+                                headers={'Content-Type': 'application/json'},
+                                data=json.dumps(context),
+            )
+        except requests.exceptions.RequestException as e:
+            print(f"{Fore.RED}ModelConnect._ollama Error!"
+                  f"\nNOTE: {msts.config.used_defaults = } "
+                  f"might be the cause of the error.{Fore.RESET}")
+            raise e
         r.raise_for_status()
-        r_dict = r.json()
-        r_dict['num_results'] = len(r_dict['responses'])
-        return r_dict
+        response = r.json()
+        response['num_results'] = len(response['responses'])
+        return response
 
-    def validate_response(self, r_dict:dict, *args, **kwargs) -> bool:
+    def openAI(self, _, context: dict) -> dict:
+        """
+        Handles communication with the OpenAI assistant.
+        """
+        self.client = OpenAI(api_key=msts.config.api_key)
+        response = self.client.chat.completions.create(**context).choices[0].message.__dict__
+        # we harmonize the response data struture for latter processing
+        response = {'responses': [{'response': response['content']}]}
+        return response
+
+    def validate_response(self, r_dict:dict, *args, verbose:int=0, **kwargs) -> bool:
         # the response might contain model errors such as 'error': 'Model not found'
+        if verbose >= 2:
+            # we shorten the 'context' in response because it contains token ids
+            print_dict = self.shorten_context(r_dict)
+            print(f"\n{Fore.MAGENTA}ModelConnect.validate_response:{Fore.RESET}")
+            hlpp.unroll_print_dict(print_dict, 'print_dict')
         for response in r_dict['responses']:
             if 'error' in response:
                 if re.match(r"model '.*' not found", response['error']):
@@ -203,6 +227,17 @@ class ModelConnect:
                             f"{Fore.RED}Check model name for this server {Fore.RESET}"
                             f"{Fore.RED}in models_servers.yml{Fore.RESET}"
                             )
+
+    def shorten_context(self, r_dict:dict) -> dict:
+        """
+        We shorten the 'context' key in the response dictionary because it contains token ids.
+        """
+        print_dict = r_dict.copy()
+        for resp in print_dict['responses']:
+            if 'context' in resp:
+                num_tokens = len(resp['context'])
+                resp['context'] = f"{resp['context'][:3]}".replace(']', f', {num_tokens = }]')
+        return print_dict
 
     def get_stats(self, r, context, *args, context_length: int = 8000, verbose: int = 0, 
         **kwargs) -> dict:
@@ -233,13 +268,6 @@ class ModelConnect:
             print(f"\n{Fore.MAGENTA}ModelConnect.get_stats:{Fore.RESET}")
             hlpp.pretty_print_df(self.times_df, *args, sum_color=Fore.MAGENTA, **kwargs)
 
-    def openAI(self, context: dict, *args, **kwargs) -> dict:
-        """
-        Handles communication with the OpenAI assistant.
-        """
-        self.client = OpenAI(api_key=msts.config.api_key)
-        response = self.client.chat.completions.create(**context).choices[0].message.__dict__
-        return response
 
 class SingleModelConnect(ModelConnect):
     """

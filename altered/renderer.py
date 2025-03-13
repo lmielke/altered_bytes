@@ -56,6 +56,7 @@ class Render:
         Returns:
             str: The rendered template.
         """
+        # print(f"{Fore.RED}now rendering template_str: {template_str}{Fore.RESET}\n")
         template = jinja2.Template(template_str)
         return template.render(context)
 

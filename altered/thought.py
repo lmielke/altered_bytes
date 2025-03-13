@@ -74,12 +74,19 @@ class Thought:
             pr = self.modify_prompt(*args, **kwargs)
         final_prompts = [pr if self.p_cnt >= 2 else self.p.data]
         self.log_prompts(final_prompts, 'Prompt', *args, **kwargs)
+        # print(f"{Fore.YELLOW}Thought.post: {Fore.RESET}{final_prompts}\n\n{server_params}")
         return self.assi.post(final_prompts, *args, **server_params)
 
     def log_prompts(self, final_prompts:list[str], content_type:str, *args, alias:str=None, 
-        **kwargs) -> None:
+        verbose:int=0, **kwargs) -> None:
         """Writes a list of strings to a log file."""
-        with open(self.log_path, 'a') as file:
+        if verbose >2:
+            print(f"{Fore.YELLOW}logging prompt:{Fore.RESET} {self.log_path}")
+        _kwargs = kwargs.copy()
+        _kwargs.update({'verbose': verbose, 'alias': alias})
+        _kwargs_str = ', '.join([f"{k}={v}" for k, v in _kwargs.items()])
+        with open(self.log_path, 'a', encoding="utf-8") as file:
+            file.write(_kwargs_str + '\n')
             for i, prompt in enumerate(final_prompts, start=1):
                 header = f"# {content_type} {self.p_cnt}_{i} from {alias or ''}"
                 file.write(f"{header}\n{prompt}\n\n")

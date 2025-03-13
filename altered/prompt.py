@@ -151,10 +151,11 @@ class Response:
         else:
             return False
 
-    def params_to_table(self, checks_ok, *args, **kwargs):
+    def params_to_table(self, checks_ok, *args, verbose:int=0, **kwargs):
         kwargs['checks'] = checks_ok
         kwargs.update(self.V.validations)
-        print(hlpp.dict_to_table('Response.params_to_table.kwargs', kwargs, *args, **kwargs))
+        if verbose:
+            print(hlpp.dict_to_table('Response.params_to_table.kwargs', kwargs, *args, **kwargs))
 
     def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:
         # r comes as a dictionary with 'results' containing a list of dictionaries
@@ -199,7 +200,7 @@ class Validations(Prompt):
         self.instruct_params = self.I.get_instruct_params(*args, **kwargs)
         self.strat_params, self.fmt = self.strats(*args, params=self.instruct_params, **kwargs)
         self.validations = self.strat_params.get('validations')
-        self.validate(r, *args, **kwargs)
+        self.validate(r, *args, verbose=verbose, **kwargs)
         self.error_tracking(*args, **kwargs)
         if verbose:
             print(f"{Fore.CYAN}\nprompt.Validations.__call__.response:{Fore.RESET}", end=' ')
@@ -207,15 +208,17 @@ class Validations(Prompt):
             print(f"\n{Fore.RED}ERROR: {r['responses'][0].get('response') = }{Fore.RESET}\n")
             return False
         else:
-            print(f"{Fore.GREEN}OK{Fore.RESET}")
+            if verbose:
+                print(f"{Fore.GREEN}OK{Fore.RESET}")
             return True
 
-    def validate(self, *args, **kwargs) -> dict:
+    def validate(self, *args, verbose:int=1, **kwargs) -> dict:
         response = self.get_response(*args, **kwargs)
         if not response:
             return
         if not self.strat_params.get('validations'):
-            print(f"{Fore.YELLOW}No validations found{Fore.RESET}")
+            if verbose:
+                print(f"{Fore.YELLOW}No validations found{Fore.RESET}")
             return
         self.resp_len_check(response, *args, **kwargs)
         self.resp_check_format(response, *args, **kwargs)

@@ -22,7 +22,7 @@ class ModelParams:
         self.aliasses = self.config.get('aliasses', {})
         self.servers = self.config.get('servers', {})
         self.models = self.config.get('models', {})
-        self.defaults = self.config.get('defaults', {})
+        self.defaults, self.used_defaults = self.config.get('defaults', {}), {}
         self.overwrites = self.config.get('overwrites', {})
         self.params = self.config.get('params', {})
         self.last_update = dt.now().strftime('%Y-%m-%d')
@@ -120,10 +120,13 @@ class ModelParams:
         model_name, server_name = None, None
         if (alias is None) and (service_endpoint is None):
             service_endpoint = self.defaults.get('service_endpoint')
+            used_defaults['service_endpoint'] = service_endpoint
         if alias is None:
             model_alias, server_alias = None, None
             model_name = self.defaults.get(service_endpoint)['model'] if model is None else model
+            used_defaults['model_name'] = model_name
             server_name = self.defaults.get(service_endpoint)['server'] if server is None else server
+            used_defaults['server_name'] = server_name
             # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
         elif type(alias) in [tuple, list]:
@@ -149,6 +152,7 @@ class ModelParams:
         server_name = server_name if server is None else server
         if not server_name: 
             server_name = self.defaults.get('get_embeddings', {})['server']
+            self.used_defaults['server_name'] = server_name
         if model_name:
             return model_name, server_name
         else:
@@ -177,9 +181,10 @@ class ModelParams:
             params = self.servers.get(server_name)
             if params is None:
                 raise ValueError(f"Parameters for server '{server_name}' not found")
-        return {'model_file': model_file, 'server': server_name, 'params': params, }
+        url = self.get_url(params, *args, **kwargs)
+        return {'model_file': model_file, 'server': server_name, 'params': params, 'url': url}
 
-    def get_url(self, *args, service_endpoint:str=None, **kwargs) -> str:
+    def get_url(self, params, *args, service_endpoint:str=None, **kwargs) -> str:
         """
         Retrieves the URL for the specified model alias.
         alias:str combined model_server alias i.e. 'l31:8b_0' or 'l31:8b_1'.
@@ -188,9 +193,10 @@ class ModelParams:
         Returns:
             str: The URL for the model alias.
         """
-        sp = self.get_model(*args, service_endpoint=service_endpoint, **kwargs).get('params')
-        port = sp.get(f'{service_endpoint}_port', '')
-        url = f"{sp.get('model_address', '')}:{port}/api/{service_endpoint}"
+        if service_endpoint is None:
+            service_endpoint = self.defaults.get('service_endpoint')
+        port = params.get(f'{service_endpoint}_port', '')
+        url = f"{params.get('model_address', '')}:{port}/api/{service_endpoint}"
         return url
 
     def get_api_key(self, *args, **kwargs) -> str:

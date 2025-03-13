@@ -22,12 +22,13 @@ class Deliverable:
         Get the content of the deliverable file. This can be code or any kind of text.
         """
         if deliverable_path is not None:
-            with open(deliverable_path, 'r') as f:
+            with open(deliverable_path, 'r', encoding="utf-8") as f:
                 self.deliverable = f.read()
         if selection is not None:
             self.selection += "Note: "
             if selection in self.deliverable:
-                self.selection += f"This section was highlighted from above deliverable. \n\n"
+                self.selection += (f"This section was highlighted by the user "
+                                    f"and points to above deliverable. \n\n")
                 selection = f"```\n\n{selection}\n\n```"
             else:
                 pass

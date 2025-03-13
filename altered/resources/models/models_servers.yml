@@ -9,6 +9,8 @@ aliasses:
     l3:8b: llama3.1
     l3.2: llama3.2:3b
     l3.3: llama3.3
+    ds: deepseek-r1:32b
+    qwq: qwq:32b
     m8: mixtral:8x22b
     q2b: qwen2:72b
     nemo: nemotron
@@ -22,6 +24,7 @@ models:
     context_length: 8192
     embedding_length: 4096
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 3 months ago
     name: dolphin-llama3
@@ -31,6 +34,7 @@ models:
     context_length: 8192
     embedding_length: 4096
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 3 months ago
     name: dolphin-llama3:8b-256k
@@ -40,6 +44,7 @@ models:
     context_length: null
     embedding_length: null
     general.architecture: null
+    host: openAI
     general.file_type: null
     last_update: null
     name: gpt-3.5-turbo-0125
@@ -49,6 +54,7 @@ models:
     context_length: 8192
     embedding_length: null
     general.architecture: null
+    host: openAI
     general.file_type: null
     last_update: null
     name: gpt-4-1106-preview
@@ -58,6 +64,7 @@ models:
     context_length: 8192
     embedding_length: null
     general.architecture: null
+    host: openAI
     general.file_type: null
     last_update: null
     name: gpt-4o
@@ -67,6 +74,7 @@ models:
     context_length: 131072
     embedding_length: 8192
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 8 days ago
     name: llama3.1:70b
@@ -76,6 +84,7 @@ models:
     context_length: 131072
     embedding_length: 8192
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 8 days ago
     name: nemotron
@@ -85,6 +94,7 @@ models:
     context_length: 131072
     embedding_length: 4096
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 8 days ago
     name: llama3.1
@@ -94,6 +104,7 @@ models:
     context_length: 131072
     embedding_length: 3072
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 8 days ago
     name: llama3.2:3b
@@ -103,15 +114,37 @@ models:
     context_length: 131072
     embedding_length: 3072
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 8 days ago
     name: llama3.3
+    new_update_available: false
+  deepseek-r1:32b:
+    blob_id: 8eeb52dfb3bb
+    context_length: 131072
+    embedding_length: 3072
+    general.architecture: llama
+    host: _ollama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: deepseek-r1:32b
+    new_update_available: false
+  qwq:32b:
+    blob_id: 8eeb52dfb3bb
+    context_length: 131072
+    embedding_length: 3072
+    general.architecture: llama
+    host: _ollama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: qwq:32b
     new_update_available: false
   mixtral:8x22b:
     blob_id: 94e70a590f93
     context_length: 65536
     embedding_length: 6144
     general.architecture: llama
+    host: _ollama
     general.file_type: Q4_0
     last_update: 4 weeks ago
     name: mixtral:8x22b
@@ -121,6 +154,7 @@ models:
     context_length: 32768
     embedding_length: 8192
     general.architecture: qwen2
+    host: _ollama
     general.file_type: Q4_0
     last_update: 2 months ago
     name: qwen2:72b

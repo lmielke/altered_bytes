@@ -56,14 +56,42 @@ def check_environment_variables(*args, **kwargs):
                 f"Set altered_bytes env var to {sts.project_dir = }"
                 )
 
-def call_curl(*args, **kwargs):
+def ping_altered_server(*args, **kwargs) -> str | None:
+    """
+    Pings the altered server to check if it is running.
+    
+    Returns:
+        str: The server's response if successful.
+        None: If the server is unresponsive or an error occurs.
+    """
+    address = 'localhost:5555/ping'
     try:
-        address = 'localhost:5555/ping'
-        return subprocess.check_output(['curl', address]).decode('utf-8').strip()
+        result = subprocess.run(['curl', address], timeout=3, capture_output=True, text=True)
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            print(
+                f"{Fore.RED}Error pinging server:{Fore.RESET} "
+                f"{result.stderr.strip() or 'Unknown error'}"
+            )
+            return None
+    except subprocess.TimeoutExpired:
+        print(f"{Fore.RED}Server unresponsive (timeout):{Fore.RESET} {address}")
+        return None
     except Exception as e:
         e_str = f"{e}".replace(address, f"{Fore.YELLOW}{address}{Fore.RESET}")
-        print(f"{Fore.RED}Server unresponsive or not running:{Fore.RESET} \n{e_str}")
+        print(f"{Fore.RED}Server unresponsive or not running:{Fore.RESET} {e_str}")
         return None
+
+def call_commands(*args, **kwargs):
+    """
+    Prints alter call commands as part of info
+    """
+    msg = f"""alter thought -si sys_info_ops sys_info_usr -pi pg_requirements -na 3 -wf api_prompt -rx "None" -up "Help me solving my problem!" -dl "{__file__}" -v 3 -al l3.2_0"""
+    print(f"{Fore.BLUE}EXAMPLES:{Fore.RESET}")
+    print(f"{Fore.BLUE}\t-{msg}{Fore.RESET}")
+    msg = msg.replace('thought', 'prompt')
+    print(f"{Fore.BLUE}\t-{msg}{Fore.RESET}")
 
 def main(*args, **kwargs):
     """
@@ -71,7 +99,8 @@ def main(*args, **kwargs):
     """
     display_argument_info(*args, **kwargs)
     check_environment_variables(*args, **kwargs)
-    print(f"{Fore.GREEN}{call_curl()}{Fore.RESET}")
+    call_commands(*args, **kwargs)
+    print(f"{Fore.GREEN}{ping_altered_server()}{Fore.RESET}")
 
 if __name__ == "__main__":
     main()
