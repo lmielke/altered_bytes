@@ -1,49 +1,68 @@
-# assistant.py
+from dataclasses import dataclass, field
+from typing import List, Dict, Any, Optional
+import math, random as rd, json, re, requests, time
+from datetime import datetime as dt
+import pandas as pd
 
 import altered.model_params as msts
 import altered.hlp_printing as hlpp
 import altered.settings as sts
-from typing import Dict, Union, Tuple
 from openai import OpenAI
-import json, re, requests, time
 from colorama import Fore, Style, Back
-import random as rd
-import math
-from datetime import datetime as dt
-import warnings
-import pandas as pd
 
 
-class ModelConnect:
+@dataclass
+class ConParams:
     """
-    ModelConnect handles the communication with an AI assistant of your choice.
-    For some assistants, Ollama is currently hosting and running the models. 
-    See model_settings.models for the assistants and their respective models.
-    The remote Ollama machines are listening on 0.0.0.0:11434 and are accessible 
-    via the local private Network.
-    On how to use see project_dir/altered/test/test_ut/test_assistant.py
+    Dataclass encapsulating all parameter and context settings for a model API call.
     """
+    model: str
+    messages: Optional[Any] = None
+    temperature: Optional[float] = None
+    num_predict: Optional[int] = None
+    context_length: int = 8000
+    repeats: Dict[str, Any] = field(default_factory=lambda: sts.repeats)
+    fmt: str = 'markdown'
+    prompt_summary: Optional[Dict] = None
+    service_endpoint: Optional[str] = None
+    verbose: int = 0
 
-    def __init__(self, *args, **kwargs) -> None:
-        self.min_context_len = 2000
-        self.to_msgs = lambda msg: [{'role': 'user', 'content': msg}]
-        self.times = {
-                        'network_up_time': 0.0, 
-                        'network_down_time': 0.0, 
-                        'server_time': 0.0,
-                        'total_time': 0.0,
-                        }
-        self.columns = [
-            'network_up_time', 'server_time', 'network_down_time', 'total_time',
-            'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_prompt',
-            'num_ctx_response', 'server', 'model'
-        ]
-        # Create an initial DataFrame with one row filled with None values and an index of [0]
-        self.times_df = pd.DataFrame([{col: None for col in self.columns}], index=[0])
+    options: Dict[str, Any] = field(init=False, default_factory=dict)
+
+    def __post_init__(self, *args, **kwargs) -> None:
+        # Normalize messages for GPT-based models.
+        if self.messages is None:
+            self.messages = []
+        if self.model.startswith('gpt'):
+            if not isinstance(self.messages, list):
+                self.messages = [str(self.messages)]
+            self.messages = [
+                msg if isinstance(msg, dict)
+                else {'role': 'user', 'content': str(msg)}
+                for msg in self.messages
+            ]
+            if self.messages and isinstance(self.messages[0].get('content'), list):
+                self.messages[0]['content'] = "\n".join(self.messages[0]['content'])
+        # Set temperature.
+        self.temperature = self._set_rd_temp(
+            lower=0.1,
+            upper=0.5,
+            temp=self.temperature,
+            scale=self.repeats.get('num', 1),
+            verbose=self.verbose,
+            *args, **kwargs
+        )
+        # Compute effective context length.
+        num_ctx = self._compute_num_ctx(self.context_length, default_min=2000, *args, **kwargs)
+        self.options = {'temperature': self.temperature, 'num_ctx': num_ctx}
+        # Set a default service_endpoint if none provided.
+        if not self.service_endpoint:
+            self.service_endpoint = msts.config.defaults.get('service_endpoint')
 
     @staticmethod
-    def set_rd_temp(lower:float=None, upper:float=None, temp:float=None, scale:int=1, 
-        verbose:int=0, **kwargs ) -> float:
+    def _set_rd_temp(lower: float, upper: float, temp: Optional[float],
+                     scale: int, verbose: int = 0, *args, **kwargs) -> float:
+        """Return provided temperature or generate a bounded random temperature."""
         if temp is not None:
             return temp
         bias = math.log(scale, 1000)
@@ -51,223 +70,206 @@ class ModelConnect:
         upper = (0.1 + bias) if upper is None else (upper + bias)
         rd_temp = min(max(lower, rd.random()), upper)
         if verbose:
-            print(  f"{Fore.YELLOW}Warning: set_rd_temp setting temperature:{Fore.RESET} "
-                    f"temp: {rd_temp:.2f}, {bias = }, {scale = }")
+            print(f"{Fore.YELLOW}Warning: setting temperature to {rd_temp:.2f} "
+                  f"with bias {bias} and scale {scale}{Fore.RESET}")
         return rd_temp
 
-    def get_context_length(self, messages:[str, list], context_length:int, *args, **kwargs
+    def _compute_num_ctx(self, context_length: int, default_min: int = 2000, *args, **kwargs
         ) -> int:
-        # we estimate the context length based on the messages length
-        # num_ctx will be get_num_ctx for the longest message in messages
-        num_ctx = max(max([len(msg) // 3 for msg in messages]), self.min_context_len)
-        # if num_ctx is larger than we print an alert
+        """Estimate context length based on message sizes."""
+        lengths = []
+        for msg in self.messages:
+            content = (msg.get('content') if isinstance(msg, dict) and 'content' in msg
+                       else str(msg))
+            lengths.append(len(content) // 3)
+        num_ctx = max(max(lengths) if lengths else default_min, default_min)
         if num_ctx > context_length:
-            print(
-                f"{Fore.YELLOW}WARNING{Fore.RESET}: "
-                f"num_ctx: {Fore.YELLOW}{num_ctx}{Fore.RESET} is greater than "
-                f"context_length: {Fore.YELLOW}{context_length}{Fore.RESET}. "
-                f"Setting num_ctx to context_length."
-                )
-        num_ctx = min(num_ctx, context_length)
-        return num_ctx
+            print(f"{Fore.YELLOW}WARNING{Fore.RESET}: Computed num_ctx "
+                  f"({num_ctx}) exceeds context_length ({context_length}); "
+                  f"using context_length instead.")
+        return min(num_ctx, context_length)
 
-
-    def get_params(self, messages:[str, list], *args, service_endpoint:str,
-                                                        name:str,
-                                                        context_length:int,
-                                                        temperature:float=None,
-                                                        num_predict:int=None,
-                                                        repeats:int=sts.repeats,
-                                                        fmt:str='markdown',
-                                                        prompt_summary:dict=None,
-                                                        **kwargs,
-        ) -> dict:
-        # print(f"{Fore.YELLOW}service_endpoint:{Fore.RESET} {service_endpoint}")
-        if service_endpoint in ['get_embeddings', 'get_generates']:
-            # for embeddings and generate[s]! messages is a list, to allow for 
-            # multiple messages to be embedded with a single server call
-            msg = ( 
-                    f"{Fore.YELLOW}WARNING{Fore.RESET}: "
-                    f"Expected messages to be a list, "
-                    f"but got {Fore.YELLOW}{type(messages)}{Fore.RESET} instead.\n"
-                    f"Converting to List"
-                    )
-            if type(messages) != list:
-                messages = [str(messages)]
-            # for embeddings we want the temperature to be low to be more deterministic
-            if service_endpoint == 'get_embeddings':
-                temperature = 0.
-        # repeats refers to the number of times the prompt is repeated
-        # we increase the temperature for repeats > 1 to get more diverse responses
-        temperature = ModelConnect.set_rd_temp(0.1, 0.5, temperature, repeats['num'], **kwargs)
-        # we estimate the context length based on the messages length
-        num_ctx = self.get_context_length(messages, context_length, *args, **kwargs)
-        messages = self.to_msgs(messages) if name.startswith('gpt') else messages
-        return fmt, messages, name, temperature, num_ctx, num_predict,\
-                     repeats, service_endpoint, prompt_summary
-
-    def prep_context(self, *args, name:str, verbose:int=0, **kwargs, ) -> dict:
-        """
-        Prepares the context based on the method name and model.
-        """
-        fmt, messages, name, temperature, num_ctx, num_predict,\
-        repeats, service_endpoint, prompt_summary = \
-                     self.get_params(*args, name=name, **kwargs)
-        # we create a context dictionary with model parameter
-        # context len is calculated dynamically in a range between 2000 and context_lenght
-        context = {'model': name,}
-        if name.startswith('gpt'):
-            context['messages'] = messages
-            context['messages'][0]['content'] = "\n".join(messages[0]['content'])
-            context['temperature'] = temperature
+    def to_dict(self, *args, **kwargs) -> Dict[str, Any]:
+        """Convert the ConParams instance into the dictionary required by the API."""
+        context = {'model': self.model, 'temperature': self.temperature, }
+        if self.model.startswith('gpt'):
+            context['messages'] = self.messages
         else:
-            context['verbose'] = verbose
-            context['service_endpoint'] = msts.config.defaults.get('service_endpoint') \
-                                            if service_endpoint is None else service_endpoint
-            context['prompts'] = messages
-            context['keep_alive'] = msts.config.defaults.get('keep_alive')
-            context['options'] = {  
-                                    'temperature': temperature,
-                                    'num_ctx': num_ctx,
-                                }
-            if context.get('service_endpoint') == 'get_generates':
-                if num_predict is not None: 
-                    context['options']['num_predict'] = num_predict
-                    # num_predict is also used by server_ollama_endpoint, so we add it here to
-                    context['num_predict'] = num_predict
-                context['fmt'] = fmt
-                context['stream'] = False
-                context['repeats'] = repeats
-                context['prompt_summary'] = prompt_summary
-        # print(f"{Fore.YELLOW}ModelConnect.prep_context.context:{Fore.RESET} \n{context}")
-        # keep_alive seems to be in seconds (docs say minutes)
+            context['prompts'] = self.messages
+            context['options'] = self.options
+            context['fmt'] = self.fmt
+            context['verbose'] = self.verbose
+            context['network_up_time'] = time.time()
+            if self.service_endpoint:
+                context['service_endpoint'] = self.service_endpoint
+            if self.prompt_summary:
+                context['prompt_summary'] = self.prompt_summary
+            if self.repeats:
+                context['repeats'] = self.repeats
+            if self.num_predict is not None:
+                context['num_predict'] = self.num_predict
         return context
+
+
+class ModelConnect:
+    """
+    Handles the connection to the remote AI assistant.
+    This class is very stripped down. It uses composition with ConParams to handle
+    parameter configuration and ModelStats for tracking statistics.
+    Example:
+        from altered.model_connect import ModelConnect
+        mc = ModelConnect()
+        response = mc.post(messages=["Hello, how are you?"], model="gpt-3.5-turbo")
+        print(response)
+    """
+    def __init__(self, *args, **kwargs) -> None:
+        self.stats = ModelStats(*args, **kwargs)
+        self.m_params: Mandatory[Dict[str, Any]] = {}
 
     def post(self, *args, **kwargs) -> dict:
         """
-        Sends a message to the appropriate assistant and handles the response.
+        Sends a message to the remote AI assistant and returns the response.
         """
-        m_params = msts.config.get_model(*args, **kwargs)
-        context = self.prep_context(*args, **m_params.get('model_file'), **kwargs)
-        response = self.call_model(m_params, context, *args, **kwargs)
-        self.validate_response(response, *args, **kwargs)
-        if not m_params.get('model_file').get('name').startswith('gpt'):
-            self.get_stats(response, context, *args, **kwargs)
-        return response
-
-    def call_model(self, m_params, context, *args, **kwargs) -> dict:
-        self.print_calling_params(m_params, context, *args, **kwargs)
-        # chat-gpt and ollama use different methods in this class which are defined
-        # by the model_file['host'] key in the models_servers.yml file
-        response = getattr(self, m_params['model_file']['host'])(m_params.get('url'), context)
-        # we append some parameter context for documentation purposes
-        response['model'] = m_params.get('model_file').get('name')
-        response['server'] = m_params.get('server')
-        return response
-
-    def print_calling_params(self, m_params, context, *args, fmt, verbose, **kwargs):
-        if verbose:
-            m_func = m_params['model_file']['host']
-            print(  f"{Fore.MAGENTA}ModelConnect.post {m_func}: {Fore.RESET}\n"
-                    f"\tmodel={context['model']}, "
-                    f"server={m_params.get('server')}, "
-                    f"url={m_params.get('url')}, \n"
-                    f"\trepeats={context.get('repeats', 'no repeats for embeddings')}, "
-                    f"num_prompts={len(context.get('prompts', []))}\n"
-                    f"\t{fmt = }, num_predict={context.get('options')}\n"
-                    f"\t{verbose = } >= 1 \n"
-                        )
-        elif verbose >= 2:
-            hlpp.unroll_print_dict(context, 'context')
-
-    def _ollama(self, url, context: dict) -> dict:
-        """
-        Handles communication with a custom AI assistant.
-        service_endpoint: str, ['get_embeddings', 'generate']
-        """
-        # we are sending the request to the server
-        context['network_up_time'] = time.time()
         try:
-            r = requests.post(  url,
-                                headers={'Content-Type': 'application/json'},
-                                data=json.dumps(context),
-            )
+            self.m_params = msts.config.get_model(*args, **kwargs)
+            self.print_connect_params(*args, **kwargs)
+        except Exception as e:
+            print(f"{Fore.RED}ModelConnect.post prep_params Error!\n{e}{Fore.RESET}")
+            raise
+        try:
+            response = RmConnect()( *args,
+                                        func=self.m_params['model_file']['host'],
+                                        name=self.m_params['model_file']['name'],
+                                        url=self.m_params['url'],
+                                    **kwargs
+                                    )
+            response['model'] = self.m_params['model_file']['name']
+            response['server'] = self.m_params.get('server')
+        except Exception as e:
+            print(f"{Fore.RED}ModelConnect.post RmConnect Error!\n{e}{Fore.RESET}")
+            raise
+        try:
+            self.validate_response(response, *args, **kwargs)
+        except Exception as e:
+            print(f"{Fore.RED}ModelConnect.post validate_response Error!\n{e}{Fore.RESET}")
+            raise
+        try:
+            self.stats(response, *args, model=self.m_params['model_file']['name'], **kwargs)
+        except Exception as e:
+            print(f"{Fore.RED}ModelConnect.post stats Error!\n{e}{Fore.RESET}")
+            raise
+        return response
+
+    def validate_response(self, r_dict: dict, *args, verbose: int = 0, **kwargs) -> bool:
+        """
+        Validates the response from the model API call.
+        """
+        for response in r_dict.get('responses', []):
+            if 'error' in response:
+                if re.match(r"model '.*' not found", response['error']):
+                    raise ValueError(f"{Fore.RED}Error in response: {response['error']}"
+                                     f"{Fore.RESET}")
+        return True
+
+    def print_connect_params(self, *args, fmt:str, verbose:int, **kwargs):
+        """
+        Prints parameters and context for debugging purposes.
+        """
+        if verbose:
+            print(  
+                    f"{Fore.MAGENTA}ModelConnect.post {self.m_params['model_file']['host']}: "
+                    f"{Fore.RESET}\n"
+                    f"\tserver={self.m_params.get('server')}\n"
+                    f"\turl={self.m_params.get('url')}\n"
+                    f"\t{fmt = }, {verbose = }")
+        elif verbose >= 2:
+            hlpp.unroll_print_dict(ctx, 'context', *args, **kwargs)
+
+class RmConnect:
+
+    def __call__(self, *args, func:str, name:str, **kwargs) -> dict:
+        """
+        Dispatch the model call according to the given parameters.
+        """
+        ctx = self.mk_context(*args, model=name, **kwargs)
+        self.print_calling_params(func, *args, ctx=ctx, **kwargs)
+        # Call the appropriate model function.
+        response = getattr(self, func)(*args, ctx=ctx, **kwargs)
+        return response
+
+    def mk_context(self, messages, *args, model:str, verbose:int, **kwargs) -> None:
+        # Set up the context with model parameters.
+        try:
+            return ConParams(   *args,
+                                messages=messages,
+                                model=model, 
+                                verbose=verbose,
+                                # we filter for the parameters available in ConParams
+                                **{k: v for k, v in kwargs.items() 
+                                        if k in set(ConParams.__dataclass_fields__.keys())}
+                    ).to_dict(*args, **kwargs)
+        except Exception as e:
+            print(f"{Fore.RED}RmConnect.prep_params Error!\n{e}{Fore.RESET}")
+            raise
+
+    def print_calling_params(self, func, *args, url:str, ctx:dict, verbose:int, **kwargs):
+        """
+        Prints parameters and context for debugging purposes.
+        """
+        if verbose:
+            print(f"{Fore.MAGENTA}RmConnect.post {func}, {url = }: {Fore.RESET}\n"
+                  f"\tmodel={ctx['model']},  "
+                  f"repeats={ctx.get('repeats', 'N/A')}, "
+                  f"num_prompts={len(ctx.get('prompts', []))} "
+                  f"num_predict={ctx.get('options')}, "
+                  )
+        elif verbose >= 2:
+            hlpp.unroll_print_dict(ctx, 'context', *args, **kwargs)
+
+    @staticmethod
+    def _ollama(*args, url:str, ctx:dict, **kwargs) -> dict:
+        """
+        Internal method to send a request to an Ollama-hosted model.
+        Example:
+            from altered.model_connect import RmConnect
+            url = 'http://192.168.0.235:5555/api/get_generates'
+            ctx = {
+                        "model": "llama3.2:3b",
+                        "temperature": 0.5,
+                        "prompts": ["Why is the sky blue?"],
+                        "options": {"temperature": 0.5, "num_ctx": 2000},
+                        "fmt": "markdown",
+                        "verbose": 3,
+                        "network_up_time": 1744625021.660603,
+                        "service_endpoint": "get_generates",
+                        "prompt_summary": "Why is the sky blue?",
+                        "repeats": {"num": 1, "agg": None},
+                        "num_predict": 500
+                    }
+            RmConnect._ollama(url=url, ctx=ctx)
+
+        """
+        try:
+            r = requests.post(url,
+                              headers={'Content-Type': 'application/json'},
+                              data=json.dumps(ctx),
+                              )
         except requests.exceptions.RequestException as e:
-            print(f"{Fore.RED}ModelConnect._ollama Error!"
-                  f"\nNOTE: {msts.config.used_defaults = } "
-                  f"might be the cause of the error.{Fore.RESET}")
+            print(f"{Fore.RED}RmConnect._ollama Error!{Fore.RESET}")
             raise e
         r.raise_for_status()
         response = r.json()
-        response['num_results'] = len(response['responses'])
+        response['num_results'] = len(response.get('responses', []))
+        response['num_ctx_pr'] = ctx.get('options', {}).get('num_ctx', 0)
         return response
 
-    def openAI(self, _, context: dict) -> dict:
+    def openAI(self, *args, ctx:dict, **kwargs) -> dict:
         """
         Handles communication with the OpenAI assistant.
         """
-        self.client = OpenAI(api_key=msts.config.api_key)
-        response = self.client.chat.completions.create(**context).choices[0].message.__dict__
-        # we harmonize the response data struture for latter processing
-        response = {'responses': [{'response': response['content']}]}
-        return response
-
-    def validate_response(self, r_dict:dict, *args, verbose:int=0, **kwargs) -> bool:
-        # the response might contain model errors such as 'error': 'Model not found'
-        if verbose >= 2:
-            # we shorten the 'context' in response because it contains token ids
-            print_dict = self.shorten_context(r_dict)
-            print(f"\n{Fore.MAGENTA}ModelConnect.validate_response:{Fore.RESET}")
-            hlpp.unroll_print_dict(print_dict, 'print_dict')
-        for response in r_dict['responses']:
-            if 'error' in response:
-                if re.match(r"model '.*' not found", response['error']):
-                    raise ValueError( 
-                            f"{Fore.RED}Error in response: {response['error']}{Fore.RESET} "
-                            f"{Fore.RED}Check model name for this server {Fore.RESET}"
-                            f"{Fore.RED}in models_servers.yml{Fore.RESET}"
-                            )
-
-    def shorten_context(self, r_dict:dict) -> dict:
-        """
-        We shorten the 'context' key in the response dictionary because it contains token ids.
-        """
-        print_dict = r_dict.copy()
-        for resp in print_dict['responses']:
-            if 'context' in resp:
-                num_tokens = len(resp['context'])
-                resp['context'] = f"{resp['context'][:3]}".replace(']', f', {num_tokens = }]')
-        return print_dict
-
-    def get_stats(self, r, context, *args, context_length: int = 8000, verbose: int = 0, 
-        **kwargs) -> dict:
-        """
-        We add the current model times to the total times.
-        We create a pandas dataframe containing all times for each call of get_stats.
-        Also, we calculate and update the cumulative times at each call.
-        """
-        # Calculate network times
-        r['network_down_time'] = time.time() - r['network_down_time']
-        time_delta = (r['network_down_time'] - r['network_up_time']) / 2
-        r['network_up_time'] += time_delta
-        r['network_down_time'] -= time_delta
-        r['total_time'] = r['network_down_time'] + r['network_up_time'] + r['server_time']
-        # Prepare the new record for the current stats
-        r['num_ctx_prompt'] = context['options']['num_ctx']
-        all_responses = [resp.get('response', []) for resp in r.get('responses', [])]
-        r['num_ctx_response'] = self.get_context_length(all_responses, context_length)
-        r['time_stamp'] = dt.now()
-        # Update the cumulative times
-        for col in self.times: self.times[col] += r.get(col, 0)
-        # Overwrite the last row (totals row) with the new record
-        self.times_df.iloc[-1] = {k: r.get(k, None) for k in self.columns}
-        # Update cumulative times row directly as the new last row
-        self.times_df.loc[len(self.times_df)] = {col: self.times.get(col, 0) 
-                                                                    for col in self.columns}
-        if verbose:
-            print(f"\n{Fore.MAGENTA}ModelConnect.get_stats:{Fore.RESET}")
-            hlpp.pretty_print_df(self.times_df, *args, sum_color=Fore.MAGENTA, **kwargs)
-
+        client = OpenAI(api_key=msts.config.api_key)
+        response = client.chat.completions.create(**ctx).choices[0].message.__dict__
+        return {'responses': [{'response': response['content']}]}
 
 class SingleModelConnect(ModelConnect):
     """
@@ -286,3 +288,51 @@ class SingleModelConnect(ModelConnect):
         if not self._initialized:
             super().__init__(*args, **kwargs)
             self._initialized = True
+
+
+class ModelStats:
+    """
+    Encapsulates timing statistics and logging for model calls.
+    """
+    def __init__(self, *args, columns: Optional[List[str]] = None, **kwargs) -> None:
+        self.times = {
+            'network_up_time': 0.0,
+            'network_down_time': 0.0,
+            'server_time': 0.0,
+            'total_time': 0.0,
+        }
+        self.columns = columns or [
+            'network_up_time', 'server_time', 'network_down_time', 'total_time',
+            'time_stamp', 'api_counter', 'prompt_counter', 'num_ctx_pr',
+            'num_ctx_resp', 'server', 'model'
+        ]
+        self.times_df = pd.DataFrame([{col: None for col in self.columns}], index=[0])
+
+    def __call__(self, r:dict, *args, model:str, **kwargs) -> dict:
+        if model.startswith('gpt'):
+            return r
+        return self.update_stats(r, *args, **kwargs)
+
+    def update_stats(self, r: dict, *args, context_length: int = 8000,
+                     verbose: int = 0, **kwargs) -> dict:
+        """Update timing stats based on the response and context."""
+        r['network_down_time'] = time.time() - r.get('network_down_time', time.time())
+        time_delta = (r['network_down_time'] - r.get('network_up_time', 0)) / 2
+        r['network_up_time'] = r.get('network_up_time', 0) + time_delta
+        r['network_down_time'] -= time_delta
+        r['total_time'] = (         r['network_down_time'] +
+                                    r.get('network_up_time', 0) +
+                                    r.get('server_time', 0)
+        )
+        all_responses = [resp.get('response', []) for resp in r.get('responses', [])]
+        r['num_ctx_resp'] = (max(len(resp) // 3 for resp in all_responses)
+                             if all_responses else 0)
+        r['time_stamp'] = dt.now().strftime("%H:%M")
+        for col in self.times:
+            self.times[col] += r.get(col, 0)
+        self.times_df.iloc[-1] = {k: r.get(k, None) for k in self.columns}
+        self.times_df.loc[len(self.times_df)] = {col: self.times.get(col, 0)
+                                                  for col in self.columns}
+        if verbose:
+            hlpp.pretty_print_df(self.times_df, *args, sum_color=Fore.MAGENTA, **kwargs)
+        return r

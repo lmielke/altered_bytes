@@ -1,8 +1,11 @@
 """
 settings.py
 """
+import altered.logs_timeit as logs_timeit
+from altered.logs_events import init_event_logger, logprint
 import os, re, sys, time, yaml
 from datetime import datetime as dt
+
 
 package_name = "altered"
 package_dir = os.path.dirname(__file__)
@@ -22,9 +25,23 @@ test_data_dir = os.path.join(test_dir, "data")
 
 logs_dir = os.path.join(resources_dir, "logs")
 
+### setup runtime measures ###
 time_strf = "%Y-%m-%d_%H-%M-%S-%f"
 time_stamp = lambda: dt.now().strftime(time_strf)
 run_time_start = time_stamp()
+timer_logs_name = f"{time_stamp()}_timer.log"
+timer_logs_path = os.path.join(logs_dir, 'statistics', 'performance')
+# Initialize logs_timeit logging with your settings.
+logs_timeit.init_timer(timer_logs_path, timer_logs_name)
+
+# Assume logs_dir and time_strf are already defined.
+time_stamp = lambda: dt.now().strftime(time_strf)
+event_logs_name = f"{time_stamp()}_events.log"
+event_logs_path = os.path.join(logs_dir, 'events')
+
+# Initialize the event logger.
+init_event_logger(event_logs_path, event_logs_name)
+
 # name of table data when stored to disk
 data_dir = os.path.join(resources_dir, "data")
 max_files, data_file_exts = 100, {'csv', 'npy'}

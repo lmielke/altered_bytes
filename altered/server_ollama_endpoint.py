@@ -121,7 +121,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     'prompt_counter': self.service.prompt_counter
                     }
 
-    def start_timing(self, *args, network_up_time: float, **kwargs ) -> tuple:
+    def start_timing(self, *args, network_up_time: float=None, **kwargs ) -> tuple:
         """
         Explicitly handles network_up_time passed from kwargs.
         
@@ -134,6 +134,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         # Calculate elapsed network up time
         time.sleep(0.01)
+        if network_up_time is None:
+            print(f"{Fore.YELLOW}Warning: No network_up_time passed from client!{Fore.RESET}")
+            network_up_time = time.time()
         self.network_up_time = time.time() - network_up_time
         self.server_time = time.time()
 

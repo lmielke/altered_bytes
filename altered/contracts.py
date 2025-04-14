@@ -2,7 +2,7 @@
 import altered.settings as sts
 import os, sys
 import altered.arguments as arguments
-
+from colorama import Fore
 import altered.hlp_printing as hlpp
 
 
@@ -17,7 +17,9 @@ def checks(*args, verbose:int, **kwargs):
     kwargs = prep_user_info(*args, **kwargs)
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
-        print(f"contracts.checks.kwargs: \n{kwargs = }")
+        print(  f"contracts.checks.kwargs to be copied below:\n"
+                f"{Fore.CYAN}kwargs{Fore.RESET} = {kwargs}"
+        )
     return kwargs
 
 

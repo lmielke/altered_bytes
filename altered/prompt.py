@@ -2,7 +2,7 @@
 prompt.py
 
 """
-import os, yaml
+import os, time, yaml
 from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
@@ -34,6 +34,7 @@ class Prompt:
         self.warnings = {}
         self.context = {} # contains the context for rendering the prompt
 
+    @sts.logs_timeit.timed("prompt.Prompt.__call__")
     def __call__(self, *args, **kwargs):
         self.get_context(*args, **kwargs)
         self.get_deliverable(*args, **kwargs)
@@ -136,6 +137,8 @@ class Prompt:
         elif not self.deliverable.get('content') and not self.up.get('user_prompt'):
             raise ValueError(f"{Fore.RED}ERROR:{Fore.RESET} No inputs found")
 
+
+
 class Response:
 
     def __init__(self, name:str, *args, **kwargs):
@@ -143,11 +146,13 @@ class Response:
         self.r = {}
         self.V = Validations(name, *args, **kwargs)
 
+    @sts.logs_timeit.timed("prompt.Response.__call__")
     def __call__(self, *args, **kwargs):
         checks_ok = self.V(*args, **kwargs)
         self.params_to_table(checks_ok, *args, **kwargs)
         if checks_ok:
-            return self.extract(*args, **kwargs)
+            extracted = self.extract(*args, **kwargs)
+            return extracted
         else:
             return False
 
@@ -181,6 +186,7 @@ class Response:
         return record
 
 
+
 from altered.prompt_strategies import Strategy
 from collections import Counter
 import json, yaml
@@ -195,6 +201,7 @@ class Validations(Prompt):
         self.strats = Strategy(*args, **kwargs)
         self.errors = {}
 
+    @sts.logs_timeit.timed("prompt.Validations.__call__")
     def __call__(self, r:dict, *args, verbose:int=0, **kwargs):
         self.errors = {}
         self.instruct_params = self.I.get_instruct_params(*args, **kwargs)

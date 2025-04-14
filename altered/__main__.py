@@ -40,7 +40,7 @@ def runable(*args, api, **kwargs):
                                 )
     return importlib.import_module(f"altered.{api}")
 
-
+@sts.logs_timeit.timed("__main__.main")
 def main(*args, **kwargs):
     """
     to runable from shell these arguments are passed in
@@ -55,7 +55,8 @@ def main(*args, **kwargs):
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "
                 f"For parameter and package info, run: 'alter info'")
     else:
-        return runable(*args, **kwargs).main(*args, **kwargs)
+        out = runable(*args, **kwargs).main(*args, **kwargs)
+        return out
 
 
 if __name__ == "__main__":

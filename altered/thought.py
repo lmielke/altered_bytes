@@ -7,7 +7,7 @@ Run like: pipenv run python -m altered.server_ollama_endpoint
 
 """
 
-import os, re, sys, yaml
+import os, re, sys, time, yaml
 import random as rd
 from tabulate import tabulate as tb
 from colorama import Fore, Style
@@ -31,6 +31,7 @@ class Thought:
         self.log_path = os.path.join(   sts.logs_dir, 'prompts',
                                         f"{sts.run_time_start}_{self.name}.md")
 
+    @sts.logs_timeit.timed("thought.Thought.think")
     def think(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, **kwargs)
@@ -48,7 +49,9 @@ class Thought:
             print(  f"{Fore.RED}Thought.think ERROR: {self.p_cnt}{Fore.RESET} "
                     f"No valid response received!")
             return None
-        return self.filters(*args, **kwargs)
+        filtered = self.filters(*args, **kwargs)
+        return filtered
+
 
     def filters(self, *args, r_filters:list=[], verbose:int=0, user_prompt:str=None, **kwargs
         ) -> dict:

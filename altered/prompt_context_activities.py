@@ -15,7 +15,6 @@ from altered.info_git_diff import GitDiffs
 class ContextActivities:
 
     template_name = 'i_context_user_info.md'
-    logs_dir = sts.logs_dir
     log_name = 'activity_log'
     trigger = 'user_act'
 
@@ -37,13 +36,15 @@ class ContextActivities:
                                     num_activities:int=1,
         **kwargs):
         data = {}
-        if user_act:
+        if any([user_act, ps_hist, git_diff]) and num_activities == 0:
+            num_activities = 1
+        if user_act and num_activities >= 1:
             self.load_activities(*args, **kwargs)
             data['user_act'] = self.context['user_act'][-num_activities:]
-        if ps_hist:
+        if ps_hist and num_activities >= 1:
             self.load_ps_history(*args, **kwargs)
             data['ps_history'] = self.context['ps_history'][-num_activities*2:]
-        if git_diff:
+        if git_diff and num_activities >= 1:
             self.load_git_diffs(*args, **kwargs)
             data['git_diffs'] = self.context['git_diffs'][-num_activities:]
         return {'user_info': data}
@@ -52,10 +53,10 @@ class ContextActivities:
         """
         Search the logs directory for the most recent log file based on the timestamp in the filename.
         """
-        log_pattern = os.path.join(self.logs_dir, f'*_{self.log_name}.json')
+        log_pattern = os.path.join(sts.logs_dir, 'activities', f'*_{self.log_name}.json')
         log_files = glob.glob(log_pattern)
         if not log_files:
-            raise FileNotFoundError(f"No log files found in {self.logs_dir}")
+            raise FileNotFoundError(f"No log files found in {sts.logs_dir}")
         # Extract the timestamp from each filename and find the most recent
         log_files.sort()
         # Return the path to the most recent log file

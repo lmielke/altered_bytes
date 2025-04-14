@@ -1,4 +1,4 @@
-import os, re, yaml
+import os, re, time, yaml
 import jinja2
 from jinja2 import Environment, FileSystemLoader
 from colorama import Fore, Style
@@ -25,6 +25,7 @@ class Render:
         except FileNotFoundError as e:
             return {}
 
+    @sts.logs_timeit.timed("renderer.Render.render")
     def render(self, *args, template_name: str, context: dict=None, verbose:int=0, **kwargs):
         self.context = self._load_context(*args, context=context, **kwargs)
         template = self.env.get_template(template_name)
@@ -35,6 +36,7 @@ class Render:
         self.document = template.render(sorted)
         self.document = Render.render_from_string(self.document, sorted, *args, **kwargs)
         self.document = Render.correct_ansi_codes(self.document, *args, **kwargs)
+        from colorama import Fore, Style        
         return self.document
 
     def save_rendered(self, *args, template_name:str, output_file:str=None, **kwargs):

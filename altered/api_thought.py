@@ -19,6 +19,7 @@ try:
 except ImportError:
     SOUND_AVAILABLE = False
 
+@sts.logs_timeit.timed("api_thought.thought")
 def thought(*args, api: str, verbose: int, application:str='powershell', **kwargs):
     """
     Main function to process a 'thought' using the given API and arguments.
@@ -141,7 +142,8 @@ def play_sound(status: str):
             winsound.Beep(1600, 100)  # Higher pitch
             time.sleep(.1)
         elif status == "ERROR":
-            winsound.Beep(200, 550)
+            winsound.Beep(200, 150)
+            winsound.Beep(100, 550)
 
 def speak_response(response: str, code_blocks, *args, **kwargs):
     spoken = response

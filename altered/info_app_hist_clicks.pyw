@@ -217,7 +217,7 @@ class ActivityHistory:
             self.log_file_name = f"{end_time_str}_{self.log_name}"
             self.log_counter = 0
         # Append the log entry to the log file
-        with open(os.path.join(sts.logs_dir, self.log_file_name), "a") as f:
+        with open(os.path.join(sts.logs_dir, 'activities', self.log_file_name), "a") as f:
             json.dump(log_entries, f)
             f.write("\n")
         self.log_counter += 1
