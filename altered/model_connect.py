@@ -118,9 +118,8 @@ class ModelConnect:
     parameter configuration and ModelStats for tracking statistics.
     Example:
         from altered.model_connect import ModelConnect
-        mc = ModelConnect()
-        response = mc.post(messages=["Hello, how are you?"], model="gpt-3.5-turbo")
-        print(response)
+        print(ModelConnect().post(messages=['Why is the sky blue?'], alias='l3.2_1' ))
+
     """
     def __init__(self, *args, **kwargs) -> None:
         self.stats = ModelStats(*args, **kwargs)
@@ -171,7 +170,7 @@ class ModelConnect:
                                      f"{Fore.RESET}")
         return True
 
-    def print_connect_params(self, *args, fmt:str, verbose:int, **kwargs):
+    def print_connect_params(self, *args, fmt:str=None, verbose:int=0, **kwargs):
         """
         Prints parameters and context for debugging purposes.
         """
@@ -197,7 +196,7 @@ class RmConnect:
         response = getattr(self, func)(*args, ctx=ctx, **kwargs)
         return response
 
-    def mk_context(self, messages, *args, model:str, verbose:int, **kwargs) -> None:
+    def mk_context(self, messages, *args, model:str, verbose:int=0, **kwargs) -> None:
         # Set up the context with model parameters.
         try:
             return ConParams(   *args,
@@ -212,7 +211,7 @@ class RmConnect:
             print(f"{Fore.RED}RmConnect.prep_params Error!\n{e}{Fore.RESET}")
             raise
 
-    def print_calling_params(self, func, *args, url:str, ctx:dict, verbose:int, **kwargs):
+    def print_calling_params(self, func, *args, url:str, ctx:dict, verbose:int=0, **kwargs):
         """
         Prints parameters and context for debugging purposes.
         """

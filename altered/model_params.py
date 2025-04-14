@@ -120,13 +120,13 @@ class ModelParams:
         model_name, server_name = None, None
         if (alias is None) and (service_endpoint is None):
             service_endpoint = self.defaults.get('service_endpoint')
-            used_defaults['service_endpoint'] = service_endpoint
+            self.used_defaults['service_endpoint'] = service_endpoint
         if alias is None:
             model_alias, server_alias = None, None
             model_name = self.defaults.get(service_endpoint)['model'] if model is None else model
-            used_defaults['model_name'] = model_name
+            self.used_defaults['model_name'] = model_name
             server_name = self.defaults.get(service_endpoint)['server'] if server is None else server
-            used_defaults['server_name'] = server_name
+            self.used_defaults['server_name'] = server_name
             # server_name = self.defaults['servers'].get(service_endpoint)
             return model_name, server_name
         elif type(alias) in [tuple, list]:
