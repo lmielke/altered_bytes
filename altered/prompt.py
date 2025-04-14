@@ -21,7 +21,6 @@ class Prompt:
 
     template_name = 'prompt.md'
 
-
     def __init__(self, name, *args, **kwargs):
         self.name = name
         self.C = Context(name, *args, **kwargs)

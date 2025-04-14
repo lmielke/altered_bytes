@@ -47,6 +47,9 @@ class ContextActivities:
         if git_diff and num_activities >= 1:
             self.load_git_diffs(*args, **kwargs)
             data['git_diffs'] = self.context['git_diffs'][-num_activities:]
+        if git_diff and num_activities >= 1:
+            self.load_git_status(*args, **kwargs)
+            data['git_status'] = self.context['git_status']
         return {'user_info': data}
 
     def find_most_recent_act_log(self, *args, **kwargs):
@@ -105,17 +108,23 @@ class ContextActivities:
             # Reverse the list back to the original order with last occurrences preserved
             self.context['ps_history'] = list(OrderedDict.fromkeys(lines[::-1]))[::-1]
 
-    def load_git_diffs(self, *args, num_activities:int=3, **kwargs):
+    def load_git_diffs(self, *args, num_activities: int = 3, **kwargs):
         """
-        Load the specified number of recent git diffs and add them to self.context['git_diffs'].
+        Load the specified number of recent git diffs and add them to the context.
 
         Args:
-            num_changes (int): The number of recent git changes to load.
+            num_activities (int): The number of recent git changes to load.
         """
-        # Initialize the GitDiffs class with the number of changes
-        git_diffs = GitDiffs(*args, **kwargs)
+        # Load git diffs as a list (which can be sliced later)
+        self.context['git_diffs'] = GitDiffs(*args, **kwargs).get_git_diffs(
+            num_activities=num_activities, *args, **kwargs)
 
-        # Get the recent git diffs in a structured dictionary
-        diffs = git_diffs.get_git_diffs(*args, num_activities=num_activities, **kwargs)
-        # Add the parsed git diffs to the context dictionary
-        self.context['git_diffs'] = diffs
+    def load_git_status(self, *args, num_activities: int = 3, **kwargs):
+        """
+        Load the specified number of recent git status and add them to the context.
+
+        Args:
+            num_activities (int): The number of recent git changes to load.
+        """
+        # Load git status as a dictionary (remains separate)
+        self.context['git_status'] = GitDiffs(*args, **kwargs).get_git_status(*args, **kwargs)

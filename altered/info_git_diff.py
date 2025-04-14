@@ -3,113 +3,169 @@ info_git_diff.py
 """
 
 import subprocess
-from colorama import Fore, Style, init
 import re
 
 
 class GitDiffs:
     """
-    A class to handle extracting and formatting Git diff results.
+    A class to handle extracting and formatting Git diff and status results.
     """
     
     def __init__(self, *args, **kwargs):
         """
         Initialize the class.
         """
+        # Optionally, you might not need to keep self.changes now.
         self.changes = []
+
+    def extract_git_status(self, *args, **kwargs) -> str:
+        """
+        Extract the raw git status output using subprocess.
+        
+        Returns:
+            str: The raw git status output.
+        """
+        try:
+            git_status_cmd = ['git', 'status', '--porcelain']
+            result = subprocess.run(git_status_cmd, capture_output=True,
+                                      text=True, check=True)
+            return result.stdout.strip()
+        except subprocess.CalledProcessError as e:
+            return f"Error retrieving git status: {e}"
+
+    def parse_git_status(self, raw_status: str, *args, **kwargs) -> dict:
+        """
+        Parse the raw git status output and build a dictionary of file paths.
+        
+        Args:
+            raw_status (str): The raw output from git status --porcelain.
+        
+        Returns:
+            dict: A dictionary with keys 'modified', 'new', and 'deleted'.
+        """
+        status_dict = {'modified': [], 'new': [], 'deleted': []}
+        for line in raw_status.splitlines():
+            if not line.strip():
+                continue
+            # Split each line into status code and file path.
+            parts = line.split(maxsplit=1)
+            if len(parts) < 2:
+                continue
+            code, file_path = parts[0], parts[1].strip()
+            if code == "??" or "A" in code:
+                status_dict['new'].append(file_path)
+            elif "D" in code:
+                status_dict['deleted'].append(file_path)
+            else:
+                status_dict['modified'].append(file_path)
+        return status_dict
+
+    def get_git_status(self, *args, **kwargs) -> dict:
+        """
+        Get the git status as a dictionary.
+        
+        Returns:
+            dict: The dictionary containing keys 'modified', 'new', and 'deleted'.
+        """
+        raw_status = self.extract_git_status(*args, **kwargs)
+        return self.parse_git_status(raw_status, *args, **kwargs)
 
     def extract_git_diff(self, *args, **kwargs) -> str:
         """
         Extract the raw git diff output using subprocess.
-
+        
         Returns:
             str: The raw git diff output.
         """
         try:
-            # Run git diff to get the changes
             git_diff_cmd = ['git', 'diff']
-            result = subprocess.run(git_diff_cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(git_diff_cmd, capture_output=True,
+                                    text=True, check=True)
             return result.stdout.strip()
-
         except subprocess.CalledProcessError as e:
             return f"Error retrieving git diff: {e}"
 
-    def parse_git_diff(self, raw_diff: str, *args, num_activities: int, **kwargs) -> None:
+    def parse_git_diff(self, raw_diff: str, num_activities: int,
+                       *args, **kwargs) -> list:
         """
-        Parse the raw git diff output and store changes in the class list.
+        Parse the raw git diff output and return a list of change dictionaries.
+        
         Args:
             raw_diff (str): The raw output from the git diff command.
             num_activities (int): Number of recent changes to extract.
+        
+        Returns:
+            list: A list containing dictionaries for each parsed git diff.
         """
-        # Split and reverse the changes to prioritize recent changes
+        diff_changes = []
         changes = raw_diff.split('diff --git')
-        # Extract the first 'num_activities' blocks and process them
         for change in changes[:num_activities + 1]:
             change = change.strip()
             if change:
                 lines = change.splitlines()
-                # Extract the filename from the first line in the block
                 if lines:
-                    file_line = lines[0]  # The first line contains the file paths
-                    file_path = file_line.split()[-1].split('/')[-1]  # Extract filename
-                    # Find the starting line and range from the '@@' line
-                    start_end_match = re.search(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@', change)
+                    file_line = lines[0]
+                    file_path = file_line.split()[-1].split('/')[-1]
+                    start_end_match = re.search(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@',
+                                                change)
                     if start_end_match:
                         start_old = int(start_end_match.group(1))
                         length_old = int(start_end_match.group(2))
                         start_new = int(start_end_match.group(3))
                         length_new = int(start_end_match.group(4))
-                        start_ends = [f"{start_old}+{length_old}", f"{start_new}+{length_new}"]
+                        start_ends = [f"{start_old}+{length_old}",
+                                      f"{start_new}+{length_new}"]
                     else:
                         start_ends = ["unknown", "unknown"]
-                    # Collect the content of the change
                     content = '\n'.join(lines)
                     cleaned_content = self.escape_jinja_syntax(content)
-                    # Add the change data to the list
-                    self.changes.append({
+                    diff_changes.append({
                         'file_path': file_path,
                         'start_ends': start_ends,
                         'content': cleaned_content
                     })
+        return diff_changes
 
     def escape_jinja_syntax(self, content: str) -> str:
         """
         Escape Jinja-like syntax in git diff content by replacing special characters.
-
+        
         Args:
             content (str): The raw git diff content.
-
+        
         Returns:
             str: The escaped git diff content.
         """
-        # Replace problematic Jinja-related characters with HTML-safe versions
         content = content.replace('{{', '$').replace('}}', '$')
         content = content.replace('{%', '$').replace('%}', '$')
         return content
 
-    def get_git_diffs(self, *args, **kwargs) -> list:
+    def get_git_diffs(self, num_activities: int, *args, **kwargs) -> list:
         """
-        Main method to extract and parse the git diffs, then return the results as a list.
+        Get the git diffs as a list.
 
         Args:
             num_activities (int): Number of recent changes to extract.
 
         Returns:
-            list: A list containing dictionaries for each parsed git diff.
+            list: A list of parsed git diff dictionaries.
         """
-        # Step 1: Extract raw git diff
         raw_diff = self.extract_git_diff(*args, **kwargs)
-
-        # Step 2: Parse the raw diff and store in the list
-        self.parse_git_diff(raw_diff, *args, **kwargs)
-
-        # Step 3: Return the list with parsed changes
-        return self.changes
+        diff_changes = self.parse_git_diff(raw_diff, num_activities, *args, **kwargs)
+        return diff_changes
 
 
 # Example usage
 if __name__ == "__main__":
-    git_diffs = GitDiffs()  # Instantiate the GitDiffs class
-    recent_changes = git_diffs.get_git_diffs(num_activities=3)  # Specify how many changes to track
-    for i, change in enumerate(recent_changes):
-        print(f"\n{i}: {change}")
+    git_diffs = GitDiffs()
+
+    # Get and print git status separately.
+    status = git_diffs.get_git_status()
+    print("\nGit Status:")
+    print(status)
+
+    # Get and print git diffs separately.
+    diffs = git_diffs.get_git_diffs(num_activities=3)
+    print("\nGit Diffs:")
+    for i, diff in enumerate(diffs):
+        print(f"\n{i}: {diff}")

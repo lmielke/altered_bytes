@@ -25,6 +25,27 @@ The following shows the recent {{ context.user_info.ps_history|length }} Powersh
 {%- endfor %}
 {% endif %}
 
+{%- if context.user_info.git_status %}
+## Git Status
+- **Modified Files:**
+  {%- for file in context.user_info.git_status.modified %}
+  - {{ file }}
+  {%- endfor %}
+
+- **New Files:**
+  {%- for file in context.user_info.git_status.new %}
+  - {{ file }}
+  {%- endfor %}
+
+- **Deleted Files:**
+  {%- for file in context.user_info.git_status.deleted %}
+  - {{ file }}
+  {%- endfor %}
+{%- else %}
+## Git Status
+No git status found.
+{%- endif %}
+
 ## Git Diffs Log
 The following section shows the recent {{ context.user_info.git_diffs|length }} `git diff` code changes, listed as txt files, sorted from recent to oldest.
 {% if context.user_info.git_diffs %}
