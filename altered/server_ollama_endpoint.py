@@ -69,6 +69,7 @@ class Endpoints:
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     service = None  # This will be set when the server starts
     allowed_endpoints = {'get_generates', 'get_embeddings'}
+    notams = {}
 
     def do_GET(self, *args, **kwargs):
         """
@@ -133,10 +134,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             A tuple containing network_up_time and total server time.
         """
         # Calculate elapsed network up time
-        time.sleep(0.01)
         if network_up_time is None:
-            print(f"{Fore.YELLOW}Warning: No network_up_time passed from client!{Fore.RESET}")
-            network_up_time = time.time()
+            self.network_up_time = False
+            self.notams['network_up_time'] = self.network_up_time
+            return
+        time.sleep(0.01)
         self.network_up_time = time.time() - network_up_time
         self.server_time = time.time()
 
@@ -152,6 +154,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         Returns:
             Updated response data with additional metadata.
         """
+        if not self.network_up_time:
+            return {}
         time.sleep(0.001)
         return {
                             'network_up_time': (self.network_up_time),
