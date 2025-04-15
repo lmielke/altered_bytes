@@ -3,6 +3,7 @@ from typing import List, Dict
 from tabulate import tabulate
 from colorama import Fore, Style, Back
 import altered.arguments as arguments
+import altered.model_params as msts
 
 def get_argument_details(parser: argparse.ArgumentParser) -> List[Dict[str, str]]:
     """
@@ -87,11 +88,21 @@ def call_commands(*args, **kwargs):
     """
     Prints alter call commands as part of info
     """
-    msg = f"""alter thought -si sys_info_ops sys_info_usr -pi pg_requirements -na 3 -wf api_prompt -rx "None" -up "Help me solving my problem!" -dl "{__file__}" -v 3 -al l3.2_0"""
-    print(f"{Fore.BLUE}EXAMPLES:{Fore.RESET}")
-    print(f"{Fore.BLUE}\t-{msg}{Fore.RESET}")
-    msg = msg.replace('thought', 'prompt')
-    print(f"{Fore.BLUE}\t-{msg}{Fore.RESET}")
+    msg = ( f"""alter thought -si sys_info_ops sys_info_usr -pi pg_requirements -na 3 """
+            f"""-wf api_prompt -rx "None" -up "Your question here!" """
+            f"""-dl ".../{os.path.relpath(__file__, os.getcwd())}" -v 3 -al l3.2_0""")
+    print(f"{Fore.YELLOW}EXAMPLES:{Fore.RESET}")
+    print(f"-{msg}\n-{msg.replace('thought', 'prompt')}")
+
+def get_model_aliasse(*args, **kwargs):
+    models = msts.config.aliasses.get('models')
+    servers = msts.config.aliasses.get('servers')
+    # we print models and servers using tabulate in a plain table
+    p_models = {f'{Fore.YELLOW}alias{Fore.RESET}': models.keys(), f'{Fore.YELLOW}name{Fore.RESET}': models.values()}
+    print(f"\n{Fore.YELLOW}Servers:{Fore.RESET} {[f'{k}: {vs}' for k, vs in servers.items()]}")
+    print(tabulate(p_models, headers='keys', tablefmt='plain'))
+    print(  f"{Fore.YELLOW}Alias is composed using model_server:{Fore.RESET} "
+            f"{list(models.items())[0][0]}_{list(servers.items())[0][0]}\n")
 
 def main(*args, **kwargs):
     """
@@ -100,6 +111,7 @@ def main(*args, **kwargs):
     display_argument_info(*args, **kwargs)
     check_environment_variables(*args, **kwargs)
     call_commands(*args, **kwargs)
+    get_model_aliasse(*args, **kwargs)
     print(f"{Fore.GREEN}{ping_altered_server()}{Fore.RESET}")
 
 if __name__ == "__main__":

@@ -17,17 +17,21 @@ class ConParams:
     Dataclass encapsulating all parameter and context settings for a model API call.
     """
     model: str
-    messages: Optional[Any] = None
+    messages: Optional[Any] = None # prompts or messages
+    # optins is a nested dict with multiple elements (temperature, num_ctx, num_predict)
+    options: Dict[str, Any] = field(init=False, default_factory=dict)
     temperature: Optional[float] = None
+    num_ctx: Optional[int] = None
     num_predict: Optional[int] = None
+    keep_alive: Optional[int] = 200
+    service_endpoint: Optional[str] = None
+    stream: Optional[bool] = False
+    # helper parameters
     context_length: int = 8000
     repeats: Dict[str, Any] = field(default_factory=lambda: sts.repeats)
     fmt: str = 'markdown'
     prompt_summary: Optional[Dict] = None
-    service_endpoint: Optional[str] = None
     verbose: int = 0
-
-    options: Dict[str, Any] = field(init=False, default_factory=dict)
 
     def __post_init__(self, *args, **kwargs) -> None:
         # Normalize messages for GPT-based models.
@@ -53,8 +57,8 @@ class ConParams:
             *args, **kwargs
         )
         # Compute effective context length.
-        num_ctx = self._compute_num_ctx(self.context_length, default_min=2000, *args, **kwargs)
-        self.options = {'temperature': self.temperature, 'num_ctx': num_ctx}
+        self.num_ctx = self._compute_num_ctx(self.context_length, default_min=2000)
+        self.options = {'temperature': self.temperature, 'num_ctx': self.num_ctx}
         # Set a default service_endpoint if none provided.
         if not self.service_endpoint:
             self.service_endpoint = msts.config.defaults.get('service_endpoint')
@@ -74,8 +78,7 @@ class ConParams:
                   f"with bias {bias} and scale {scale}{Fore.RESET}")
         return rd_temp
 
-    def _compute_num_ctx(self, context_length: int, default_min: int = 2000, *args, **kwargs
-        ) -> int:
+    def _compute_num_ctx(self, context_length: int, default_min: int = 2000) -> int:
         """Estimate context length based on message sizes."""
         lengths = []
         for msg in self.messages:
@@ -118,7 +121,9 @@ class ModelConnect:
     parameter configuration and ModelStats for tracking statistics.
     Example:
         from altered.model_connect import ModelConnect
-        print(ModelConnect().post(messages=['Why is the sky blue?'], alias='l3.2_1' ))
+        messages = ['Why is the sky blue?']
+        alias = 'l3.2_1'
+        ModelConnect().post(*args, messages=messages, alias=alias, **kwargs)
 
     """
     def __init__(self, *args, **kwargs) -> None:
@@ -229,7 +234,7 @@ class RmConnect:
     def _ollama(*args, url:str, ctx:dict, **kwargs) -> dict:
         """
         Internal method to send a request to an Ollama-hosted model.
-        Example:
+        Example python:
             from altered.model_connect import RmConnect
             url = 'http://192.168.0.235:5555/api/get_generates'
             ctx = {
@@ -246,7 +251,27 @@ class RmConnect:
                         "num_predict": 500
                     }
             RmConnect._ollama(url=url, ctx=ctx)
-
+        
+        Example curl:
+            $url = "http://192.168.0.245:5555/api/get_generates"
+            $ct = "application/json"
+            # Create a JSON object with the message
+            $context = @{
+                        model = 'llama3.2'
+                        prompts = @($Msg)
+                        options = @{
+                                        temperature = 0.1
+                                        num_ctx = 8000
+                                        num_predict = 100
+                        }
+                        keep_alive = 200
+                        service_endpoint = 'get_generates'
+                        stream = $false
+                        network_up_time = 0.0
+            } | ConvertTo-Json            
+            # Send the request
+            $response = Invoke-RestMethod -Method Post -Uri $url -Body $context -ContentType $ct
+            return $response[0].responses.response
         """
         try:
             r = requests.post(url,
