@@ -19,13 +19,13 @@ class ConParams:
     model: str
     messages: Optional[Any] = None # prompts or messages
     # optins is a nested dict with multiple elements (temperature, num_ctx, num_predict)
-    options: Dict[str, Any] = field(init=False, default_factory=dict)
-    temperature: Optional[float] = None
-    num_ctx: Optional[int] = None
-    num_predict: Optional[int] = None
-    keep_alive: Optional[int] = 200
-    service_endpoint: Optional[str] = None
-    stream: Optional[bool] = False
+    options:            Dict[str, Any] = field(init=False, default_factory=dict)
+    temperature:        Optional[float] = None
+    num_ctx:            Optional[int] = None
+    num_predict:        Optional[int] = None
+    keep_alive:         Optional[int] = 200
+    service_endpoint:   Optional[str] = None
+    stream:             Optional[bool] = False
     # helper parameters
     context_length: int = 8000
     repeats: Dict[str, Any] = field(default_factory=lambda: sts.repeats)
