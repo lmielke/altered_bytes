@@ -16,8 +16,8 @@ class ConParams:
     """
     Dataclass encapsulating all parameter and context settings for a model API call.
     """
-    model: str
-    messages: Optional[Any] = None # prompts or messages
+    model:              str
+    messages:           Optional[Any] = None # prompts or messages
     # optins is a nested dict with multiple elements (temperature, num_ctx, num_predict)
     options:            Dict[str, Any] = field(init=False, default_factory=dict)
     temperature:        Optional[float] = None
@@ -27,11 +27,11 @@ class ConParams:
     service_endpoint:   Optional[str] = None
     stream:             Optional[bool] = False
     # helper parameters
-    context_length: int = 8000
-    repeats: Dict[str, Any] = field(default_factory=lambda: sts.repeats)
-    fmt: str = 'markdown'
-    prompt_summary: Optional[Dict] = None
-    verbose: int = 0
+    context_length:     int = 8000
+    repeats:            Dict[str, Any] = field(default_factory=lambda: sts.repeats)
+    fmt:                str = 'markdown'
+    prompt_summary:     Optional[Dict] = None
+    verbose:            int = 0
 
     def __post_init__(self, *args, **kwargs) -> None:
         # Normalize messages for GPT-based models.
