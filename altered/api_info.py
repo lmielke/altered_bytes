@@ -5,6 +5,7 @@ from colorama import Fore, Style, Back
 import altered.arguments as arguments
 import altered.model_params as msts
 
+
 def get_argument_details(parser: argparse.ArgumentParser) -> List[Dict[str, str]]:
     """
     Extract detailed information for each argument from the parser.
@@ -67,7 +68,11 @@ def ping_altered_server(*args, **kwargs) -> str | None:
     """
     address = 'localhost:5555/ping'
     try:
-        result = subprocess.run(['curl', address], timeout=3, capture_output=True, text=True)
+        result = subprocess.run(['curl', address], 
+                                    timeout=3, 
+                                    capture_output=True, 
+                                    text=True
+                    )
         if result.returncode == 0:
             return result.stdout.strip()
         else:
@@ -107,7 +112,8 @@ def get_model_aliasse(*args, **kwargs):
             )
     print(tabulate(p_models, headers='keys', tablefmt='plain'))
     print(  f"{Fore.YELLOW}Alias is composed using model_server:{Fore.RESET} "
-            f"{list(models.items())[0][0]}_{list(servers.items())[0][0]}\n")
+            f"{list(models.items())[0][0]}_{list(servers.items())[0][0]}\n"
+            )
 
 def main(*args, **kwargs):
     """
