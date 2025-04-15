@@ -98,8 +98,13 @@ def get_model_aliasse(*args, **kwargs):
     models = msts.config.aliasses.get('models')
     servers = msts.config.aliasses.get('servers')
     # we print models and servers using tabulate in a plain table
-    p_models = {f'{Fore.YELLOW}alias{Fore.RESET}': models.keys(), f'{Fore.YELLOW}name{Fore.RESET}': models.values()}
-    print(f"\n{Fore.YELLOW}Servers:{Fore.RESET} {[f'{k}: {vs}' for k, vs in servers.items()]}")
+    p_models = {    f'{Fore.YELLOW}alias{Fore.RESET}': models.keys(), 
+                    f'{Fore.YELLOW}name{Fore.RESET}': models.values()
+                    }
+    print(
+            f"\n{Fore.YELLOW}Servers:{Fore.RESET} "
+            f"{[f'{k}: {vs}' for k, vs in servers.items()]}"
+            )
     print(tabulate(p_models, headers='keys', tablefmt='plain'))
     print(  f"{Fore.YELLOW}Alias is composed using model_server:{Fore.RESET} "
             f"{list(models.items())[0][0]}_{list(servers.items())[0][0]}\n")
