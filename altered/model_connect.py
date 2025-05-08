@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
-import math, random as rd, json, re, requests, time
+import json, math, re, requests, time
+import random as rd
 from datetime import datetime as dt
 import pandas as pd
 
@@ -9,6 +10,9 @@ import altered.hlp_printing as hlpp
 import altered.settings as sts
 from openai import OpenAI
 from colorama import Fore, Style, Back
+
+from altered.model_ollama_connect import OllamaConnect
+from altered.prompt_function_calling import Function
 
 
 @dataclass
@@ -32,6 +36,8 @@ class ConParams:
     fmt:                str = 'markdown'
     prompt_summary:     Optional[Dict] = None
     verbose:            int = 0
+    tool_choice:        Optional[str] = None
+    tools:              Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self, *args, **kwargs) -> None:
         # Normalize messages for GPT-based models.
@@ -93,25 +99,73 @@ class ConParams:
         return min(num_ctx, context_length)
 
     def to_dict(self, *args, **kwargs) -> Dict[str, Any]:
-        """Convert the ConParams instance into the dictionary required by the API."""
-        context = {'model': self.model, 'temperature': self.temperature, }
-        if self.model.startswith('gpt'):
-            context['messages'] = self.messages
+        """
+        Build request-dict for backend.
+        • GPT/OpenAI  → only keys they support.
+        • Non-GPT     → legacy fields plus tools/chat when present.
+        """
+        is_gpt = self.model.startswith("gpt")
+        ctx: Dict[str, Any] = {"model": self.model,
+                               "temperature": self.temperature}
+        with_tools = bool(self.tools)
+        if is_gpt or with_tools:
+            ctx["messages"] = (self.messages if is_gpt
+                               else [{'role': 'user', 'content': p}
+                                     for p in self.messages])
         else:
-            context['prompts'] = self.messages
-            context['options'] = self.options
-            context['fmt'] = self.fmt
-            context['verbose'] = self.verbose
-            context['network_up_time'] = time.time()
+            ctx["prompts"] = self.messages
+        if not is_gpt:                  # ← only non-GPT gets these extras
+            ctx.update(options=self.options, fmt=self.fmt,
+                       verbose=self.verbose, network_up_time=time.time())
             if self.service_endpoint:
-                context['service_endpoint'] = self.service_endpoint
+                ctx["service_endpoint"] = self.service_endpoint
             if self.prompt_summary:
-                context['prompt_summary'] = self.prompt_summary
+                ctx["prompt_summary"] = self.prompt_summary
             if self.repeats:
-                context['repeats'] = self.repeats
+                ctx["repeats"] = self.repeats
             if self.num_predict is not None:
-                context['num_predict'] = self.num_predict
-        return context
+                ctx["num_predict"] = self.num_predict
+            if self.keep_alive:
+                ctx["keep_alive"] = self.keep_alive
+        if self.tools:
+            ctx["tools"] = self.tools
+            ctx["tool_choice"] = self.tool_choice
+        return ctx
+
+    def _build_tool_def(self, *args, **kwargs) -> list[dict]:
+        """
+        Wrap `Function.get_function_data()` and normalise the result into a list.
+        """
+        tool_def = Function(*args, **kwargs).get_function_data(*args, **kwargs)
+        return tool_def if isinstance(tool_def, list) else [tool_def]
+
+    def _norm_tool_choice(self, tool_choice: str | dict) -> str | dict:
+        """
+        Convert legacy / shorthand tool choices into the explicit dict
+        required by OpenAI and accepted by Ollama.
+        """
+        if tool_choice in {"auto", "none"}:
+            return tool_choice
+        if tool_choice == "required":
+            # pick the first tool’s name
+            return {"type": "function",
+                    "function": {"name": self.tools[0]["function"]["name"]}}
+        # any other string must match a declared tool → wrap it
+        if isinstance(tool_choice, str):
+            tool_names = {t["function"]["name"] for t in self.tools
+                          if t.get("type") == "function"}
+            if tool_choice not in tool_names:
+                raise ValueError(f"tool_choice '{tool_choice}' not in {sorted(tool_names)}")
+            return {"type": "function", "function": {"name": tool_choice}}
+        # already a dict → pass through
+        return tool_choice
+
+    def add_tools(self, *args, tool_choice: str | dict = "auto", **kwargs) -> None:
+        """
+        Attach one tool definition to the current request context.
+        """
+        self.tools = self._build_tool_def(*args, **kwargs)
+        self.tool_choice = self._norm_tool_choice(tool_choice)
 
 
 class ModelConnect:
@@ -181,13 +235,14 @@ class ModelConnect:
         """
         if verbose:
             print(  
-                    f"{Fore.MAGENTA}ModelConnect.post {self.m_params['model_file']['host']}: "
+                    f"{Fore.MAGENTA}ModelConnect.print_connect_params {self.m_params['model_file']['host']}: "
                     f"{Fore.RESET}\n"
                     f"\tserver={self.m_params.get('server')}\n"
                     f"\turl={self.m_params.get('url')}\n"
                     f"\t{fmt = }, {verbose = }")
         elif verbose >= 2:
             hlpp.unroll_print_dict(ctx, 'context', *args, **kwargs)
+
 
 class RmConnect:
 
@@ -204,23 +259,25 @@ class RmConnect:
     def mk_context(self, messages, *args, model:str, verbose:int=0, **kwargs) -> None:
         # Set up the context with model parameters.
         try:
-            return ConParams(   *args,
+            cp = ConParams(   *args,
                                 messages=messages,
                                 model=model, 
                                 verbose=verbose,
                                 # we filter for the parameters available in ConParams
                                 **{k: v for k, v in kwargs.items() 
                                         if k in set(ConParams.__dataclass_fields__.keys())}
-                    ).to_dict(*args, **kwargs)
+                    )
+            cp.add_tools(*args, **kwargs)
+            return cp.to_dict(*args, **kwargs)
         except Exception as e:
-            print(f"{Fore.RED}RmConnect.prep_params Error!\n{e}{Fore.RESET}")
+            print(f"{Fore.RED}RmConnect.mk_context Error!\n{e}{Fore.RESET}")
             raise
 
     def print_calling_params(self, func, *args, url:str, ctx:dict, verbose:int=0, **kwargs):
         """
         Prints parameters and context for debugging purposes.
         """
-        if verbose:
+        if 0 < verbose < 2:
             print(f"{Fore.MAGENTA}RmConnect.post {func}, {url = }: {Fore.RESET}\n"
                   f"\tmodel={ctx['model']},  "
                   f"repeats={ctx.get('repeats', 'N/A')}, "
@@ -273,27 +330,56 @@ class RmConnect:
             $response = Invoke-RestMethod -Method Post -Uri $url -Body $context -ContentType $ct
             return $response[0].responses.response
         """
-        try:
-            r = requests.post(url,
-                              headers={'Content-Type': 'application/json'},
-                              data=json.dumps(ctx),
-                              )
-        except requests.exceptions.RequestException as e:
-            print(f"{Fore.RED}RmConnect._ollama Error!{Fore.RESET}")
-            raise e
-        r.raise_for_status()
-        response = r.json()
-        response['num_results'] = len(response.get('responses', []))
-        response['num_ctx_pr'] = ctx.get('options', {}).get('num_ctx', 0)
-        return response
+        print(f"{Fore.YELLOW}\nSending request to Ollama at {url}{Fore.RESET}")
+        return OllamaConnect(url=url, **kwargs)(ctx=ctx)
 
-    def openAI(self, *args, ctx:dict, **kwargs) -> dict:
+    # ───────────────────────── helpers ─────────────────────────
+    @staticmethod
+    def _extract_tool_call(msg: Any) -> Optional[Dict[str, Any]]:
         """
-        Handles communication with the OpenAI assistant.
+        Return only the `{name, arguments}` part of the first tool-call, or None.
+        """
+        tc = (msg.tool_calls[0] if getattr(msg, "tool_calls", None)
+              else getattr(msg, "function_call", None))
+        if not tc:
+            return None
+        name = tc.function.name if hasattr(tc, "function") else tc.name
+        args = tc.function.arguments if hasattr(tc, "function") else tc.arguments
+        return {"name": name, "arguments": json.loads(args or "{}")}
+
+    def _norm_response(self, *args, msg:Any, tool_call:Optional[dict]=None, **kwargs) -> str:
+        """
+        Ensure every OpenAI reply yields *some* text.
+        Cases handled
+        1. text only           → keep original text
+        2. tool-call only       → inject placeholder
+        3. text + tool-call     → keep original text
+        4. neither (invalid)    → raise for validator
+        """
+        has_text: bool = bool(msg.content and msg.content.strip())
+        has_tool: bool = tool_call is not None
+        if has_text:
+            return msg.content
+        if has_tool:
+            return json.dumps({'tool_call': tool_call})
+        raise ValueError("OpenAI returned neither text nor tool-call.")
+
+    def openAI(self, *args, ctx: dict, **kwargs) -> dict:
+        """
+        Dispatch a chat request to the OpenAI backend and normalise the answer
+        into the project’s canonical response structure.
         """
         client = OpenAI(api_key=msts.config.api_key)
-        response = client.chat.completions.create(**ctx).choices[0].message.__dict__
-        return {'responses': [{'response': response['content']}]}
+        ctx = {k: v for k, v in ctx.items() if k != "keep_alive"}  # OpenAI ignores this
+        msg = client.chat.completions.create(**ctx).choices[0].message
+        tool_call = self._extract_tool_call(msg)
+        response_txt: str = self._norm_response(msg=msg, tool_call=tool_call)
+        return {
+            "responses": [
+                {"response": response_txt, "tool_call": tool_call}
+            ]
+        }
+
 
 class SingleModelConnect(ModelConnect):
     """
@@ -302,7 +388,6 @@ class SingleModelConnect(ModelConnect):
     """
     _instance = None
     _initialized = False
-
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(SingleModelConnect, cls).__new__(cls)

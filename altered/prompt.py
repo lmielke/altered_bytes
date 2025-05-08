@@ -170,6 +170,7 @@ class Response:
                         'user_prompt': r.get('user_prompt'),
                         'role': 'assistant',
                         'model': r.get('model'),
+                        'content': None,
                     }
         # r might have a single result or mulitple responses. We only return a single result.
         for i, result in enumerate(r.get('responses')):

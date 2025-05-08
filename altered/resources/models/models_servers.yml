@@ -169,8 +169,8 @@ servers:
     model_address: null
     models_to_load: null
   while-ai_0:
-    get_embeddings_port: 5555
-    get_generates_port: 5555
+    get_embeddings_port: 11434
+    get_generates_port: 11434
     generate_port: 11434
     key_path: null
     model_address: http://192.168.0.235
@@ -178,8 +178,8 @@ servers:
     - codellama:70b
     - dolphin-llama3.1:70b
   while-ai_1:
-    get_embeddings_port: 5555
-    get_generates_port: 5555
+    get_embeddings_port: 11434
+    get_generates_port: 11434
     generate_port: 11434
     key_path: null
     model_address: http://192.168.0.245
@@ -202,7 +202,7 @@ defaults:
     server: while-ai_1
   service_endpoint: get_generates
   keep_alive: 2000
-  port: 5555
+  port: 11434
 services:
   google_se:
     url: https://www.googleapis.com/customsearch/v1

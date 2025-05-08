@@ -44,6 +44,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Model (i.e. l3.2) and Server (i.e. 1) alias to use. (default: l3.2_1)"
     )
 
+
+    parser.add_argument(
+        "-tc", "--tool_choice",
+        type=str,
+        default='none',
+        help=("Tool-choice: 'none', 'auto', or 'my_func_name'")
+        )
+
     # System information options
     parser.add_argument(
         "-si", "--sys_info",

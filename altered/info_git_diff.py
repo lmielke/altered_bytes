@@ -21,17 +21,21 @@ class GitDiffs:
     def extract_git_status(self, *args, **kwargs) -> str:
         """
         Extract the raw git status output using subprocess.
-        
         Returns:
             str: The raw git status output.
         """
         try:
-            git_status_cmd = ['git', 'status', '--porcelain']
-            result = subprocess.run(git_status_cmd, capture_output=True,
-                                      text=True, check=True)
+            git_cmd = ['git', 'status', '--porcelain']
+            # Specify encoding and error handling
+            result = subprocess.run(git_cmd, capture_output=True, text=True, check=True,
+                                    encoding='utf-8', errors='replace')
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            return f"Error retrieving git status: {e}"
+            # Also decode stderr for better error reporting
+            stderr_output = e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else ""
+            return f"Error retrieving git status: {e}. Stderr: {stderr_output}"
+        except Exception as e: # Catch other potential errors
+             return f"An unexpected error occurred during git status: {e}"
 
     def parse_git_status(self, raw_status: str, *args, **kwargs) -> dict:
         """
@@ -73,17 +77,22 @@ class GitDiffs:
     def extract_git_diff(self, *args, **kwargs) -> str:
         """
         Extract the raw git diff output using subprocess.
-        
         Returns:
             str: The raw git diff output.
         """
         try:
-            git_diff_cmd = ['git', 'diff']
-            result = subprocess.run(git_diff_cmd, capture_output=True,
-                                    text=True, check=True)
-            return result.stdout.strip()
+            git_cmd = ['git', 'diff']
+            # Specify encoding and error handling
+            result = subprocess.run(git_cmd, capture_output=True, text=True, check=True,
+                                    encoding='utf-8', errors='replace')
+            return result.stdout.strip() # Now result.stdout should be a string
         except subprocess.CalledProcessError as e:
-            return f"Error retrieving git diff: {e}"
+            # Also decode stderr for better error reporting
+            stderr_output = e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else ""
+            return f"Error retrieving git diff: {e}. Stderr: {stderr_output}"
+        except Exception as e: # Catch other potential errors
+            return f"An unexpected error occurred during git diff: {e}"
+
 
     def parse_git_diff(self, raw_diff: str, num_activities: int,
                        *args, **kwargs) -> list:
@@ -140,13 +149,11 @@ class GitDiffs:
         content = content.replace('{%', '$').replace('%}', '$')
         return content
 
-    def get_git_diffs(self, num_activities: int, *args, **kwargs) -> list:
+    def get_git_diffs(self, num_activities:int=1, *args, **kwargs) -> list:
         """
         Get the git diffs as a list.
-
         Args:
             num_activities (int): Number of recent changes to extract.
-
         Returns:
             list: A list of parsed git diff dictionaries.
         """

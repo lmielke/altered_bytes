@@ -25,6 +25,8 @@ test_data_dir = os.path.join(test_dir, "data")
 
 logs_dir = os.path.join(resources_dir, "logs")
 
+apis_json_dir = os.path.join(resources_dir, "apis_json")
+open_ai_func_prefix = "openai"
 ### setup runtime measures ###
 time_strf = "%Y-%m-%d_%H-%M-%S-%f"
 time_stamp = lambda: dt.now().strftime(time_strf)

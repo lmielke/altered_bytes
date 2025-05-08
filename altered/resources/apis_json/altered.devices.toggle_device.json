@@ -1,0 +1,53 @@
+{
+    "base": {
+        "name": "Devices.toggle_device",
+        "description": "\n        Toggles a Tasmota device via the custom host using its name and room.\n        Args:\n            room (str): The room where the device is located.\n                        E.g. 'office', 'living', 'terrasse'.\n            name (str): The calling name of the device.\n                        E.g. 'panel_led_lamp', 'gold_lamp', 'side_lamp', 'light_strip'.\n            *args: Arbitrary positional arguments (ignored).\n            **kwargs: Arbitrary keyword arguments (ignored).\n        Returns:\n            bool: True if the request was successfully made (received 2xx status), \n            False otherwise.\n        ",
+        "import_path": "altered.devices",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\devices.py",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "room": {
+                    "type": "string",
+                    "default": null,
+                    "required": true
+                },
+                "name": {
+                    "type": "string",
+                    "default": null,
+                    "required": true
+                }
+            }
+        },
+        "body": "@classmethod\n    def toggle_device(cls, *args, room: str, name: str, **kwargs) -> bool:\n        \"\"\"\n        Toggles a Tasmota device via the custom host using its name and room.\n        Args:\n            room (str): The room where the device is located.\n                        E.g. 'office', 'living', 'terrasse'.\n            name (str): The calling name of the device.\n                        E.g. 'panel_led_lamp', 'gold_lamp', 'side_lamp', 'light_strip'.\n            *args: Arbitrary positional arguments (ignored).\n            **kwargs: Arbitrary keyword arguments (ignored).\n        Returns:\n            bool: True if the request was successfully made (received 2xx status), \n            False otherwise.\n        \"\"\"\n        full_name = f\"{name}_{room}\"\n        print(f\"Attempting to toggle device: '{full_name}')\")\n        # construct url: url = f\"http://{host}{cls.base_path}/toggle?name={full_name}\"\n        url = cls.prep_url(full_name)\n        if url is None:\n            print(\"Toggle aborted due to URL preparation failure.\")\n            return False\n        # make request: r = requests.get(url, timeout=cls.request_timeout)\n        return cls._make_request_and_report(url, full_name, cls.request_timeout)",
+        "returns": "boolean",
+        "example": "@FunctionToJson(schemas={\"openai\"}, write=True)\n    def test_toggle_device(self, *args, **kwargs):\n        expected = False\n        out = True\n        # --- MINIMAL ADJUSTMENT HERE ---\n        # Change 'device_name' to 'room' and 'name' as keyword arguments\n        # Pass *args and **kwargs through as they were in the original call\n        Devices.toggle_device(*args, room=\"office\", name=\"panel_led_lamp\", **kwargs)\n        # --- END MINIMAL ADJUSTMENT ---\n        self.assertEqual(self.msg, expected) # Keep original assertion"
+    },
+    "execution": {
+        "import_path": "altered.devices",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\devices.py"
+    },
+    "openai": {
+        "name": "Devices.toggle_device",
+        "description": "@classmethod\n    def toggle_device(cls, *args, room: str, name: str, **kwargs) -> bool:\n        \"\"\"\n        Toggles a Tasmota device via the custom host using its name and room.\n        Args:\n            room (str): The room where the device is located.\n                        E.g. 'office', 'living', 'terrasse'.\n            name (str): The calling name of the device.\n                        E.g. 'panel_led_lamp', 'gold_lamp', 'side_lamp', 'light_strip'.\n            *args: Arbitrary positional arguments (ignored).\n            **kwargs: Arbitrary keyword arguments (ignored).\n        Returns:\n            bool: True if the request was successfully made (received 2xx status), \n            False otherwise.\n        \"\"\"\n        full_name = f\"{name}_{room}\"\n        print(f\"Attempting to toggle device: '{full_name}')\")\n        # construct url: url = f\"http://{host}{cls.base_path}/toggle?name={full_name}\"\n        url = cls.prep_url(full_name)\n        if url is None:\n            print(\"Toggle aborted due to URL preparation failure.\")\n            return False\n        # make request: r = requests.get(url, timeout=cls.request_timeout)\n        return cls._make_request_and_report(url, full_name, cls.request_timeout)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "room": {
+                    "type": "string",
+                    "default": null,
+                    "enum": []
+                },
+                "name": {
+                    "type": "string",
+                    "default": null
+                }
+            },
+            "required": [
+                "room",
+                "name"
+            ]
+        },
+        "returns": "boolean"
+    }
+}

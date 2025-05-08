@@ -28,6 +28,7 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
         thought = Thought(api, *args, verbose=verbose, **kwargs)
         play_sound("PROMPT")
         response = thought.think(*args, verbose=verbose, **kwargs)
+        print(f"\n{Fore.GREEN}Thought: {response.get('content') = }{Fore.RESET}")
         if response is None:
             msg = "ERROR: api_thought.thought: Response is None!"
             print(f"{Fore.RED}{msg}{Fore.RESET}")

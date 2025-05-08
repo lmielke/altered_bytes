@@ -1,0 +1,40 @@
+{
+    "base": {
+        "name": "GitDiffs.get_git_diffs",
+        "description": "\n        Get the git diffs as a list.\n        Args:\n            num_activities (int): Number of recent changes to extract.\n        Returns:\n            list: A list of parsed git diff dictionaries.\n        ",
+        "import_path": "altered.info_git_diff",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\info_git_diff.py",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "num_activities": {
+                    "type": "integer",
+                    "default": 1,
+                    "required": false
+                }
+            }
+        },
+        "body": "def get_git_diffs(self, num_activities:int=1, *args, **kwargs) -> list:\n        \"\"\"\n        Get the git diffs as a list.\n        Args:\n            num_activities (int): Number of recent changes to extract.\n        Returns:\n            list: A list of parsed git diff dictionaries.\n        \"\"\"\n        raw_diff = self.extract_git_diff(*args, **kwargs)\n        diff_changes = self.parse_git_diff(raw_diff, num_activities, *args, **kwargs)\n        return diff_changes",
+        "returns": "array",
+        "example": "@FunctionToJson(schemas={\"openai\"}, write=True)\n    def test_get_git_diffs(self, *args, **kwargs):\n        expected = False\n        out = True\n        self.assertEqual(self.msg, expected)"
+    },
+    "execution": {
+        "import_path": "altered.info_git_diff",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\info_git_diff.py"
+    },
+    "openai": {
+        "name": "GitDiffs.get_git_diffs",
+        "description": "def get_git_diffs(self, num_activities:int=1, *args, **kwargs) -> list:\n        \"\"\"\n        Get the git diffs as a list.\n        Args:\n            num_activities (int): Number of recent changes to extract.\n        Returns:\n            list: A list of parsed git diff dictionaries.\n        \"\"\"\n        raw_diff = self.extract_git_diff(*args, **kwargs)\n        diff_changes = self.parse_git_diff(raw_diff, num_activities, *args, **kwargs)\n        return diff_changes",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "num_activities": {
+                    "type": "integer",
+                    "default": 1
+                }
+            },
+            "required": []
+        },
+        "returns": "array"
+    }
+}
