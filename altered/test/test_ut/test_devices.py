@@ -34,7 +34,11 @@ class Test_Devices(unittest.TestCase):
         # Pass *args and **kwargs through as they were in the original call
         Devices.toggle_device(*args, room="office", name="panel_led_lamp", **kwargs)
         # --- END MINIMAL ADJUSTMENT ---
-        self.assertEqual(self.msg, expected) # Keep original assertion
+        self.assertEqual(self.msg, expected)
+
+    def test_list_devices(*args, **kwargs):
+        devices = Devices.list_devices()
+        print(f"devices: \n{devices}")
 
 if __name__ == "__main__":
     unittest.main()
