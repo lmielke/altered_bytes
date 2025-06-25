@@ -1,7 +1,11 @@
+"""
+devices.py
+C:/Users/lars/python_venvs/packages/altered_bytes/altered/devices.py
+"""
+import os, re
 import requests
 import socket
-# Remove BeautifulSoup, re imports as they are no longer needed for scraping
-import json # Import json for parsing the response
+import json
 from typing import Optional, Dict, Any
 
 class Devices:
@@ -68,16 +72,11 @@ class Devices:
         Args:
             room (str): The room where the device is located.
             name (str): The specific name of the device.
-            *args: Arbitrary positional arguments (ignored).
-            **kwargs: Arbitrary keyword arguments (ignored).
-
-        Returns:
-            bool: True if the request was successfully made (received 2xx status), False otherwise.
         """
         full_device_name = f"{name}_{room}"
         # REQUEST_TIMEOUT variable removed as cls.request_timeout is used directly
-        print(f"Attempting to toggle device: '{full_device_name}')")
         url = cls.prep_url(full_device_name)
+        print(f"Attempting to toggle device: '{full_device_name}'), \nURL: {url}")
         if url is None:
             print("Toggle aborted due to URL preparation failure.")
             return False
@@ -90,7 +89,6 @@ class Devices:
     def list_devices(cls) -> Dict[str, Dict[str, Any]]:
         """
         Queries the server's JSON device status endpoint to get the list of devices and their states.
-
         Returns:
             Dict[str, Dict[str, Any]]: A dictionary like {ip: {'title': ..., 'state': ...}, ...}.
                                        Returns an empty dictionary if fetching/parsing fails.
@@ -106,31 +104,24 @@ class Devices:
             except Exception as e:
                  print(f"Warning: Error resolving {cls.server_hostname} for list: {e}. Using {cls.server_ip}.")
                  server_host = cls.server_ip
-
             if not server_host:
                 print("Error: Could not determine server address for list.")
                 return {} # Return empty dict on failure
-
             # Construct the URL for the new JSON status endpoint
             status_url = f"http://{server_host}{cls.base_path}/device_status"
             print(f"Fetching JSON from URL: {status_url}")
-
             # Make the request
             r = requests.get(status_url, timeout=cls.request_timeout)
             r.raise_for_status() # Check for HTTP errors (e.g., 404 if endpoint is wrong, 500 from server)
-
             # Parse the JSON response
             devices_data = r.json()
-
             # Basic validation: Ensure it's a dictionary
             if not isinstance(devices_data, dict):
                  print(f"Error: Received unexpected data format from server ({type(devices_data)}). Expected a dictionary.")
                  # print(f"Response content: {r.text}") # Optional: print response text if parsing fails
                  return {} # Return empty dict if format is wrong
-
             print(f"Successfully fetched status for {len(devices_data)} devices.")
             return devices_data # Return the parsed dictionary
-
         except requests.exceptions.Timeout:
             print(f"Error: Request timed out getting list from server.")
             return {}
@@ -146,3 +137,57 @@ class Devices:
         except Exception as e:
              print(f"An unexpected error occurred while fetching list: {e}")
              return {}
+
+    @classmethod
+    def save_to_file(self, *args, category:str, datetime_str:str, **kwargs) -> None:
+        """
+        Saves the content of a document to a file in the specified directory. The file name
+        must derived from the provided file_content i.e. (classification label, datetime_str).
+        The goal of this is to categorize files inside a directory based on their content.
+        Example: 
+        16.06.2025
+
+        Hi friends, lets have a party next weekend.
+        cu soon
+
+        Expected file name: invites_2025-06-16.txt, 
+                            kwargs = {'category': 'invites', 'datetime': '2025-06-16'}
+        Expected tool_call:
+                            {'name': 'save_to_file', 
+                            'arguments': {'category': 'invites', 'datetime_str': '2025-06-16'}}
+        Args:
+            category (str): The category or label for the file, used in the file name.
+            datetime_str (str): A string representing the date and time, used in the file name.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Allowed categories:
+            - invites
+            - gas_provider
+            - electricity_provider
+            - water_provider
+            - spam
+            - work
+            - personal
+            - undefined
+        """
+        # first we load the file_content that we want to save
+        # NOTE: this is the same file_content that was given to the LLM for categorization
+        file_content = Devices.get_next_file_content(*args, **kwargs)
+        # we create the file name and remove any unwanted characters
+        file_name = re.sub(r'[\\/*?:"<>|]', '', f"{category}_{datetime_str}.txt")
+        # we save the file inside the os.cwd
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(file_content)
+
+    @staticmethod
+    def get_next_file_content(*args, file_dir:str=r'C:/temp/file_saver', **kwargs):
+        with open(os.path.join(file_dir, 'source_files', 'some_text.txt'), 'r', encoding='utf-8') as file:
+            file_content = file.read()
+        os.chdir(os.path.join(file_dir, 'target_files'))
+        return file_content.strip()
+
+if __name__ == "__main__":
+    # Example usage
+    devices = Devices.list_devices()
+    print(devices)

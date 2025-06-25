@@ -9,17 +9,13 @@ import altered.hlp_printing as hlpp
 
 def checks(*args, verbose:int, **kwargs):
     kwargs['verbose'] = verbose
-    if verbose >= 2:
-        print(f"contracts.checks.kwargs: {kwargs = }")
     kwargs = clean_kwargs(*args, **kwargs)
     kwargs = prep_sys_infos(*args, **kwargs)
     kwargs = prep_package_info(*args, **kwargs)
     kwargs = prep_user_info(*args, **kwargs)
+    kwargs = clean_paths(*args, **kwargs)
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
-        print(  f"contracts.checks.kwargs to be copied below:\n"
-                f"{Fore.CYAN}kwargs{Fore.RESET} = {kwargs}"
-        )
     return kwargs
 
 
@@ -33,7 +29,7 @@ def clean_kwargs(*args, **kwargs):
             cleaned_kwargs[k.strip()] = vs
     return cleaned_kwargs
 
-def prep_sys_infos(*args, sys_info:list, **kwargs):
+def prep_sys_infos(*args, sys_info:list=None, **kwargs):
     preped_kwargs = dict(**kwargs)
     if sys_info:
         preped_kwargs['sys_info'] = True
@@ -43,7 +39,7 @@ def prep_sys_infos(*args, sys_info:list, **kwargs):
         preped_kwargs['sys_info'] = False
     return preped_kwargs
 
-def prep_package_info(*args, package_info:list, **kwargs):
+def prep_package_info(*args, package_info:list=None, **kwargs):
     preped_kwargs = dict(**kwargs)
     if package_info:
         preped_kwargs['package_info'] = True
@@ -53,7 +49,7 @@ def prep_package_info(*args, package_info:list, **kwargs):
         preped_kwargs['package_info'] = False
     return preped_kwargs
 
-def prep_user_info(*args, user_info:list, **kwargs):
+def prep_user_info(*args, user_info:list=None, **kwargs):
     preped_kwargs = dict(**kwargs)
     if user_info:
         preped_kwargs['user_info'] = True
@@ -67,3 +63,31 @@ def prep_file_match_regex(*args, file_match_regex:str=None, **kwargs):
     if file_match_regex is None or file_match_regex == 'None':
         file_match_regex = ""
     return dict(**kwargs, file_match_regex=file_match_regex)
+
+def clean_paths(*args, **kwargs):
+    """
+    Loops over known path parameters in kwargs, expands user ('~') and
+    environment variables (e.g., '%USERNAME%' or '$HOME'), and
+    converts them to absolute, normalized paths.
+
+    Returns the kwargs dictionary with path values updated.
+    """
+    KNOWN_PATH_KEYS = ['work_file_name', 'deliverable_path', 'work_dir', ]
+    cleaned_kwargs = dict(**kwargs)  # Work on a copy
+    for key in KNOWN_PATH_KEYS:
+        if key in cleaned_kwargs:
+            path_value = cleaned_kwargs[key]
+            if isinstance(path_value, str) and path_value.strip(): # Process non-empty strings
+                # 1. Expand environment variables (e.g., %VAR% on Windows, $VAR on Unix)
+                #    This handles variables like %USERNAME%, %APPDATA%, $HOME, $USER, etc.
+                expanded_vars_path = os.path.expandvars(path_value)
+                # 2. Expand user component (e.g., ~ or ~user)
+                expanded_user_path = os.path.expanduser(expanded_vars_path)
+                # 3. Convert to an absolute path.
+                #    Also normalizes path separators (e.g., converts '/' to '\' on Windows)
+                #    and resolves components like '.' or '..'.
+                absolute_path = os.path.abspath(expanded_user_path)
+                cleaned_kwargs[key] = absolute_path
+            # If path_value is None, an empty string after stripping, or not a string,
+            # remains unchanged in cleaned_kwargs. This avoids errors with os.path functions.
+    return cleaned_kwargs

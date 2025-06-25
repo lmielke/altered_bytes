@@ -1,5 +1,5 @@
 """
-info_app_hist_clicks.pyw
+info_app_hist_activities.pyw
 """
 
 import os, sys, time

@@ -4,11 +4,17 @@ from typing import Set
 
 from colorama import Fore, Style, Back
 
-import altered.settings as sts
+try:
+    import altered.settings as sts
+except ImportError:
+    global sts
+    sts = type('sts', (), {})  # Create a dummy 'sts' object for demonstration
+    sts.project_dir = os.getcwd()  # Set project_dir to current working directory
 
 
 class Tree:
     default_ignores = {'.git', 'altered.egg-info', 'build', '__pycache__', 'logs'}
+    default_ignore_files = {r'.*\.sublime-\w*',}
     file_types = {'.py': 'Python', '.yml': 'YAML', '.md': 'Markdown', '.txt': 'Text'}
 
     def __init__(self, *args, style=None, ignores:list=None, **kwargs):
@@ -145,15 +151,24 @@ class Tree:
 
     def load_matched_files(self, *args, **kwargs):
         selected_files = []
-        for file_path in self.matched_files:
-            with open(file_path, 'r') as file:
+        default_ignore_files = kwargs.pop('default_ignore_files', [])
+        file_paths_in_defaults = [file_path for file_path in self.matched_files if file_path.startswith(tuple(default_ignore_files))]
+        # Filter out files that are already marked as ignored
+        remaining_file_paths = [file_path for file_path in self.matched_files if file_path not in file_paths_in_defaults]
+        for file_path in remaining_file_paths:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                try:
+                    file_content = file.read()
+                except UnicodeDecodeError:
+                    print(f"{Fore.RED}Error reading file: {file_path}{Fore.RESET}")
+                    continue
                 selected_files.append(
                         {
                             'file_path': file_path,
                             'file_type': self.file_types.get(os.path.splitext(file_path)[1]),
-                            'file_content': file.read(), 
+                            'file_content': file_content, 
                         }
-                                        )
+                                    )
         return selected_files
 
     def parse_tree(self, tree: str, *args, **kwargs):
@@ -191,7 +206,7 @@ class Tree:
         return paths
 
 
-def main(**kwargs):
+def main(*args, load=False, **kwargs):
     """
     Main function to create a directory tree and collect matched files.
     
@@ -203,10 +218,14 @@ def main(**kwargs):
     result = tree(project_dir=os.getcwd(), **kwargs)  # Use __call__
     print(result['tree'])
     
-    if result['file_matches']:
+    if result['selected_files']:
         print("\nMatched Files:")
-        for file in result['file_matches']:
-            print(file)
+        for file in result['selected_files']:
+            if load:
+                print(f"{Fore.YELLOW}\n\nContent of {file['file_path']}:{Fore.RESET}\n")
+                print(file['file_content'])
+            else:
+                print(file['file_path'])
 
 
 if __name__ == "__main__":
@@ -219,6 +238,7 @@ if __name__ == "__main__":
                                         help="Regex to match files")
     p.add_argument("--max_depth", type=int, default=None, 
                                         help="Maximum depth for directory traversal")
+    p.add_argument("-l", "--load", action='store_true', help="Load matched files")
     
     # Parse arguments
     args = p.parse_args()

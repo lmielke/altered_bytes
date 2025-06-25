@@ -38,7 +38,7 @@ class PackageInfo:
         self.graph.attr('node', style='filled', fillcolor='white')
         self.graph.attr('edge', fontsize='10')  # Smaller font size for edges
 
-    def handle_file_name(self, *args, work_file_name:str, **kwargs):
+    def handle_file_name(self, *args, work_file_name:str=None, **kwargs):
         """
         Handle the main file name to ensure it ends with '.py'.
         """
@@ -52,6 +52,7 @@ class PackageInfo:
         Determine the root directory of a Python project by locating __main__.py.
         """
         start_dir = start_dir if start_dir is not None else os.getcwd()
+        # we log start_dir using open
         if not sts.package_name in start_dir and sts.package_name not in os.listdir(start_dir):
             raise Exception(
                                 f"{Fore.RED}package_name '{sts.package_name}' "

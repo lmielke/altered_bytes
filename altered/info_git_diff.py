@@ -3,7 +3,7 @@ info_git_diff.py
 """
 
 import subprocess
-import re
+import re, os
 
 
 class GitDiffs:
@@ -20,22 +20,37 @@ class GitDiffs:
 
     def extract_git_status(self, *args, **kwargs) -> str:
         """
-        Extract the raw git status output using subprocess.
+        Extract the raw git status output using subprocess, suppressing the window.
         Returns:
             str: The raw git status output.
         """
         try:
             git_cmd = ['git', 'status', '--porcelain']
+            
+            # --- For Windows: Prepare to hide the console window ---
+            flags = 0
+            if os.name == 'nt': # 'nt' is for Windows operating systems
+                flags = subprocess.CREATE_NO_WINDOW
+
             # Specify encoding and error handling
-            result = subprocess.run(git_cmd, capture_output=True, text=True, check=True,
-                                    encoding='utf-8', errors='replace')
+            result = subprocess.run(
+                git_cmd,
+                capture_output=True,
+                text=True,          # Ensures stdout/stderr are strings
+                check=True,         # Raises CalledProcessError on non-zero exit codes
+                encoding='utf-8',   # Specifies decoding for text=True
+                errors='replace',   # Handles decoding errors
+                creationflags=flags # Pass the flags to suppress window creation
+            )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            # Also decode stderr for better error reporting
-            stderr_output = e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else ""
+            # If text=True, e.stderr should already be a string (or None)
+            stderr_output = e.stderr.strip() if e.stderr else ""
+            # Your original decode was fine too, but often not needed with text=True for e.stderr
+            # stderr_output = e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else "" 
             return f"Error retrieving git status: {e}. Stderr: {stderr_output}"
-        except Exception as e: # Catch other potential errors
-             return f"An unexpected error occurred during git status: {e}"
+        except Exception as e: # Catch other potential errors like FileNotFoundError if git isn't installed
+            return f"An unexpected error occurred during git status: {e}"
 
     def parse_git_status(self, raw_status: str, *args, **kwargs) -> dict:
         """
@@ -76,21 +91,40 @@ class GitDiffs:
 
     def extract_git_diff(self, *args, **kwargs) -> str:
         """
-        Extract the raw git diff output using subprocess.
+        Extract the raw git diff output using subprocess, suppressing the window.
         Returns:
             str: The raw git diff output.
         """
         try:
             git_cmd = ['git', 'diff']
-            # Specify encoding and error handling
-            result = subprocess.run(git_cmd, capture_output=True, text=True, check=True,
-                                    encoding='utf-8', errors='replace')
-            return result.stdout.strip() # Now result.stdout should be a string
+            
+            # --- For Windows: Prepare to hide the console window ---
+            si = None
+            flags = 0
+            if os.name == 'nt': # 'nt' is for Windows
+                # This flag prevents the console window from appearing.
+                flags = subprocess.CREATE_NO_WINDOW
+                # You can also use startupinfo for more control if needed,
+                # but CREATE_NO_WINDOW is often sufficient.
+                # si = subprocess.STARTUPINFO()
+                # si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                # si.wShowWindow = subprocess.SW_HIDE
+
+            result = subprocess.run(
+                git_cmd,
+                capture_output=True,
+                text=True,
+                check=True,
+                encoding='utf-8',
+                errors='replace',
+                creationflags=flags, # Pass the flags here
+                # startupinfo=si # Use if you chose the startupinfo route
+            )
+            return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            # Also decode stderr for better error reporting
-            stderr_output = e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else ""
+            stderr_output = e.stderr.strip() if isinstance(e.stderr, str) else (e.stderr.decode('utf-8', errors='replace').strip() if e.stderr else "")
             return f"Error retrieving git diff: {e}. Stderr: {stderr_output}"
-        except Exception as e: # Catch other potential errors
+        except Exception as e:
             return f"An unexpected error occurred during git diff: {e}"
 
 

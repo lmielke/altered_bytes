@@ -36,6 +36,12 @@ class Test_Devices(unittest.TestCase):
         # --- END MINIMAL ADJUSTMENT ---
         self.assertEqual(self.msg, expected)
 
+    @FunctionToJson(schemas={"openai"}, write=True)
+    def test_save_to_file(self, *args, **kwargs):
+        kwargs = {'_class': 'system', 'datetime': '2025-05', }
+        Devices.save_to_file(text="This is a test document.", **kwargs )
+        self.assertEqual(self.msg, expected)
+
     def test_list_devices(*args, **kwargs):
         devices = Devices.list_devices()
         print(f"devices: \n{devices}")

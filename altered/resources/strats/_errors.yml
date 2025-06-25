@@ -73,7 +73,7 @@ compress_short.yml:
     'Length: 332 > Max: 218': 1
 default_user_prompt.yml:
   Response Length:
-    No response content returned from the AI model.: 82
+    No response content returned from the AI model.: 88
 expand_short.yml:
   Illegal Terms in response:
     The quick brown fox jumps over the lazy dog. found: 7

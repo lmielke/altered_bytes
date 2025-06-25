@@ -71,7 +71,7 @@ def alert() -> None:
 #     # Use the Python executable from the current environment
 #     python_executable = os.path.expanduser(DEFAULT_EXECUTABLE)
 #     # Define the command to run the script directly using the Python executable
-#     python_command = [python_executable, "-m", "altered.info_app_hist_clicks"]
+#     python_command = [python_executable, "-m", "altered.info_app_hist_activities"]
 #     # Run the Python command in a detached mode
 #     process = subprocess.Popen(python_command, 
 #                                 stdout=subprocess.PIPE, 

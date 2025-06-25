@@ -1,0 +1,12 @@
+sys_info:
+  - sys_info_ops
+  - sys_info_usr
+package_info:
+  - pg_requirements
+num_activities: 3
+work_file_name: api_prompt
+file_match_regex: None # This will be the string None
+user_prompt: Which colors are used here for printing?
+deliverable_path: ~/python_venvs/packages/altered_bytes/altered/api_info.py
+verbose: 1
+alias: l3.2_0

@@ -1,0 +1,79 @@
+The following text must be analyzed and the tool call for save_to_file must be returned.
+
+
+Allianz Lebensversicherungs-Aktiengesellschaft Allianz (A)
+
+Allianz Lebensversicherungs-AG, 10850 Berlin
+
+17 3045 98E 151 3002 5E7D
+
+DV 11.24 0.85 Deutsche Post AT
+
+*K0377°00108578*5401*0009703*2611*
+Herrn
+Thomas Rohnke-Höhne
+Ledebourstr. 57 b
+12623 Berlin
+
+Lebensversicherung@allianz.de
+www.allianz.de
+
+Postanschrift:
+Allianz Lebensversicherungs-AG
+10850 Berlin
+
+Service Mo.-Fr. 8-20 Uhr Datum
+
+Tel. 08 00.4 10 0104 25. November 2024
+
+Aus dem Ausland: Tel +49 89 2 07 00 29 00
+
+Ihr Betreuungswunsch
+Übertragung Ihrer Versicherung auf neuen Vermittler
+
+Vorgangsnummer: 2235085
+
+Sehr geehrter Herr Rohnke-Höhne,
+
+gerne bestätigen wir Ihnen den gewünschten Wechsel der Betreuung. Wir haben daher folgende Versiche-
+rung(en) zum 20.11.2024 in den Bestand des neuen Vermittlers Übertragen.
+
+Art des Vertragsnummer VN-Name Kollektiv-
+Vertrages vertragsart
+
+Leben 10 384 3799 Rohnke-Höhne Thomas
+
+Sowohl den bisherigen als auch den neuen Vermittler haben wir darüber bereits informiert.
+
+Neuer Betreuer Ihrer Versicherung ist:
+
+TauRes Gesellschaft für Investmentberatung mbH
+Amsinckstr. 40
+20097 Hamburg
+
+Telefon: 0 40.3 86 87 08 30
+Telefax: 0 40.3 86 87 0859
+eMail: info@taures.de
+
+Vorsitzender des Aufsichtsrats: Dr. Klaus-Peter Röhler. Bankverbindung
+Vorstand: Katja de la Via, Vorsitzende, Dr. Heinke Conrads, Henriette Götze, Commerzbank
+Dr. Alf Neumann, Dr. Volker Priebe, Dr. Martin Riesner, Dr. Thomas Wiesemann. IBAN DE25 6004 0071 0541 0519 00
+Für Umsatzsteuerzwecke: USt-IdNr.: DE 811 150 678; BIC COBADEFFAXX
+für Versicherungsteuerzwecke: VersSt-Nr.: 801/V90801011184.
+Finanz- und Versicherungsleistungen i.S.d. UStG/MwSi1SystRL sind von der Umsatzsteuer befreit.
+Sitz der Gesellschaft: Stuttgart. Registergericht: Amtsgericht Stuttgart HRB 20231
+
+Seite 1 von 2
+
+25. November 2024
+
+Haben Sie noch Fragen zu Ihren Versicherungen? Dann wenden Sie sich bitte an Ihren Versicherungsfach-
+mann oder direkt an uns.
+
+Wir stehen Ihnen als finanzstarker und verlässlicher Partner in Sachen Vorsorge und Vermögen zur Seite und
+helfen Ihnen gern.
+
+Mit freundlichen Grüßen
+Ihre Allianz
+
+Respond with a tool call!

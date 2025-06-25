@@ -28,6 +28,8 @@ pyperclip = "*"
 pyttsx3 = "*"
 rich = "*"
 pystray = "*"
+fastapi = "*"
+uvicorn = "*"
 
 [dev-packages]
 # logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}

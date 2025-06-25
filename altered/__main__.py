@@ -46,10 +46,8 @@ def main(*args, **kwargs):
     to runable from shell these arguments are passed in
     runs api if legidemit and prints outputs
     """
-    # arguments from argparse
-    kwargs = arguments.mk_args().__dict__
     # kwargs are vakidated against enforced contract
-    kwargs = contracts.checks(*args, **kwargs)
+    kwargs = contracts.checks(*args, **arguments.mk_args())
     # the imported api runable package is executed
     if kwargs.get("api") == "help":
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "

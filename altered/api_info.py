@@ -4,6 +4,7 @@ from tabulate import tabulate
 from colorama import Fore, Style, Back
 import altered.arguments as arguments
 import altered.model_params as msts
+import altered.settings as sts
 
 
 def get_argument_details(parser: argparse.ArgumentParser) -> List[Dict[str, str]]:
@@ -96,7 +97,7 @@ def call_commands(*args, **kwargs):
     msg = ( f"""alter thought -si sys_info_ops sys_info_usr -pi pg_requirements -na 3 """
             f"""-wf api_prompt -rx "None" -up "Your question here!" """
             f"""-dl ".../{os.path.relpath(__file__, os.getcwd())}" -v 3 -al l3.2_0""")
-    print(f"{Fore.YELLOW}EXAMPLES:{Fore.RESET}")
+    print(f"\n{Fore.YELLOW}EXAMPLES:{Fore.RESET}")
     print(f"-{msg}\n-{msg.replace('thought', 'prompt')}")
 
 def get_model_aliasse(*args, **kwargs):
@@ -115,15 +116,25 @@ def get_model_aliasse(*args, **kwargs):
             f"{list(models.items())[0][0]}_{list(servers.items())[0][0]}\n"
             )
 
+def display_kwargs_defaults(*args, **kwargs):
+    """
+    Display the file names in the kwargs_defaults directory.
+    """
+    print(f"\n{Fore.YELLOW}kwargs_defaults: {Fore.RESET}{sts.kwargs_defaults_dir}")
+    for name in os.listdir(sts.kwargs_defaults_dir):
+        if name.endswith('.yaml') and not name.startswith('#'):
+            print(f"- ./{name}{Fore.RESET}")
+        else:
+            print(f"{Style.DIM}- ./{name}{Fore.RESET}{Style.RESET_ALL}")
+
+
 def main(*args, **kwargs):
     """
     Main function to display argument information.
     """
     display_argument_info(*args, **kwargs)
+    display_kwargs_defaults(*args, **kwargs)
     check_environment_variables(*args, **kwargs)
     call_commands(*args, **kwargs)
     get_model_aliasse(*args, **kwargs)
     print(f"{Fore.GREEN}{ping_altered_server()}{Fore.RESET}")
-
-if __name__ == "__main__":
-    main()

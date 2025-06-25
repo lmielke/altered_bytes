@@ -1,0 +1,53 @@
+{
+    "base": {
+        "name": "Devices.save_to_file",
+        "description": "\n        Saves the content of a document to a file in the specified directory. The file name\n        must derived from the provided file_content i.e. (classification label, datetime_str).\n        The goal of this is to categorize files inside a directory based on their content.\n        Example: \n        16.06.2025\n\n        Hi friends, lets have a party next weekend.\n        cu soon\n\n        Expected file name: invites_2025-06-16.txt, \n                            kwargs = {'category': 'invites', 'datetime': '2025-06-16'}\n        Args:\n            category (str): The category or label for the file, used in the file name.\n            datetime_str (str): A string representing the date and time, used in the file name.\n            *args: Additional positional arguments.\n            **kwargs: Additional keyword arguments.\n\n        Allowed categories:\n            - invites\n            - gas\n            - electricity\n            - water\n            - spam\n            - work\n            - personal\n            - undefined\n        ",
+        "import_path": "altered.devices",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\devices.py",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "default": null,
+                    "required": true
+                },
+                "datetime_str": {
+                    "type": "string",
+                    "default": null,
+                    "required": true
+                }
+            }
+        },
+        "body": "@classmethod\n    def save_to_file(self, *args, category:str, datetime_str:str, **kwargs) -> None:\n        \"\"\"\n        Saves the content of a document to a file in the specified directory. The file name\n        must derived from the provided file_content i.e. (classification label, datetime_str).\n        The goal of this is to categorize files inside a directory based on their content.\n        Example: \n        16.06.2025\n\n        Hi friends, lets have a party next weekend.\n        cu soon\n\n        Expected file name: invites_2025-06-16.txt, \n                            kwargs = {'category': 'invites', 'datetime': '2025-06-16'}\n        Args:\n            category (str): The category or label for the file, used in the file name.\n            datetime_str (str): A string representing the date and time, used in the file name.\n            *args: Additional positional arguments.\n            **kwargs: Additional keyword arguments.\n\n        Allowed categories:\n            - invites\n            - gas\n            - electricity\n            - water\n            - spam\n            - work\n            - personal\n            - undefined\n        \"\"\"\n        # first we load the file_content that we want to save\n        # NOTE: this is the same file_content that was given to the LLM for categorization\n        file_content = get_next_file_content(*args, **kwargs)\n        # we create the file name and remove any unwanted characters\n        file_name = re.sub(r'[\\\\/*?:\"<>|]', '', f\"{category}_{datetime_str}.txt\")\n        # we save the file inside the os.cwd\n        with open(file_name, 'w', encoding='utf-8') as file:\n            file.write(file_content)",
+        "returns": "None",
+        "example": "@FunctionToJson(schemas={\"openai\"}, write=True)\n    def test_save_to_file(self, *args, **kwargs):\n        kwargs = {'_class': 'system', 'datetime': '2025-05', }\n        Devices.save_to_file(text=\"This is a test document.\", **kwargs )\n        self.assertEqual(self.msg, expected)"
+    },
+    "execution": {
+        "import_path": "altered.devices",
+        "module_path": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes\\altered\\devices.py"
+    },
+    "openai": {
+        "name": "Devices.save_to_file",
+        "description": "@classmethod\n    def save_to_file(self, *args, category:str, datetime_str:str, **kwargs) -> None:\n        \"\"\"\n        Saves the content of a document to a file in the specified directory. The file name\n        must derived from the provided file_content i.e. (classification label, datetime_str).\n        The goal of this is to categorize files inside a directory based on their content.\n        Example: \n        16.06.2025\n\n        Hi friends, lets have a party next weekend.\n        cu soon\n\n        Expected file name: invites_2025-06-16.txt, \n                            kwargs = {'category': 'invites', 'datetime': '2025-06-16'}\n        Args:\n            category (str): The category or label for the file, used in the file name.\n            datetime_str (str): A string representing the date and time, used in the file name.\n            *args: Additional positional arguments.\n            **kwargs: Additional keyword arguments.\n\n        Allowed categories:\n            - invites\n            - gas\n            - electricity\n            - water\n            - spam\n            - work\n            - personal\n            - undefined\n        \"\"\"\n        # first we load the file_content that we want to save\n        # NOTE: this is the same file_content that was given to the LLM for categorization\n        file_content = get_next_file_content(*args, **kwargs)\n        # we create the file name and remove any unwanted characters\n        file_name = re.sub(r'[\\\\/*?:\"<>|]', '', f\"{category}_{datetime_str}.txt\")\n        # we save the file inside the os.cwd\n        with open(file_name, 'w', encoding='utf-8') as file:\n            file.write(file_content)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "default": null,
+                    "enum": []
+                },
+                "datetime_str": {
+                    "type": "string",
+                    "default": null
+                }
+            },
+            "required": [
+                "category",
+                "datetime_str"
+            ]
+        },
+        "returns": "None"
+    }
+}
