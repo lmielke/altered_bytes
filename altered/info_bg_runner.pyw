@@ -28,6 +28,7 @@ from datetime import datetime as dt
 from pathlib import Path
 from typing import Callable, List, Optional, Pattern
 
+print(sys.executable)
 import psutil
 
 # ---------------------------------------------------------------------------

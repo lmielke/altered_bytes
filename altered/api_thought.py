@@ -24,6 +24,7 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     """
     Main function to process a 'thought' using the given API and arguments.
     """
+    application = 'powershell' if application is None else application.lower()
     try:
         thought = Thought(api, *args, verbose=verbose, **kwargs)
         play_sound("PROMPT")

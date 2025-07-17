@@ -8,7 +8,6 @@ colorama = "*"
 pyyaml = "*"
 requests = "*"
 tabulate = "*"
-psutil = "*"
 jinja2 = "*"
 graphviz = "*"
 setuptools = "*"
@@ -30,9 +29,9 @@ rich = "*"
 pystray = "*"
 fastapi = "*"
 uvicorn = "*"
+psutil = "*"
 
 [dev-packages]
-# logunittest = {editable = true, git = "https://github.com/lmielke/logunittest.git"}
 black = "*"
 pre-commit = "*"
 toml = "*"
@@ -40,7 +39,7 @@ tox = "*"
 pytest = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.13"
 
 [scripts]
 git_sync = "lut ut -g"

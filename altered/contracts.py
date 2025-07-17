@@ -1,8 +1,8 @@
 # contracts.py
 import altered.settings as sts
-import os, sys
+import importlib, os, sys
 import altered.arguments as arguments
-from colorama import Fore
+from colorama import Fore, Style
 import altered.hlp_printing as hlpp
 
 
@@ -14,6 +14,7 @@ def checks(*args, verbose:int, **kwargs):
     kwargs = prep_package_info(*args, **kwargs)
     kwargs = prep_user_info(*args, **kwargs)
     kwargs = clean_paths(*args, **kwargs)
+    check_req_kwargs(*args, **kwargs)
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
     return kwargs
@@ -91,3 +92,25 @@ def clean_paths(*args, **kwargs):
             # If path_value is None, an empty string after stripping, or not a string,
             # remains unchanged in cleaned_kwargs. This avoids errors with os.path functions.
     return cleaned_kwargs
+
+def check_req_kwargs(*args, api:str, **kwargs):
+    """
+    from the api file we import "required_args" if avalilable and veryfy 
+    the existence of minimum required arguments.
+    """
+    # here we create the import variable using importlib
+    try:
+        api_module = importlib.import_module(f"altered.api_{api}")
+        if hasattr(api_module, 'required_args'):
+            for kwarg in api_module.required_args:
+                if kwargs.get(kwarg) is None:
+                    raise ValueError(   f"\ncontracts.check_req_kwargs: "
+                                        f"missing {kwarg = }"
+                                        )
+    except ImportError as e:
+        print(f"{Fore.RED}ERROR: {e}{Style.RESET_ALL}")
+        raise
+    except ValueError as ve:
+        print(f"{Fore.RED}ERROR: {ve}{Style.RESET_ALL}")
+        raise
+

@@ -94,19 +94,17 @@ class ContextActivities:
         else:
             raise EnvironmentError("APPDATA environment variable not found.")
 
-    def load_ps_history(self, text_len:int=50, *args, **kwargs) -> None:
+    def load_ps_history(self, text_len: int = 50, *args, **kwargs) -> None:
         """
-        Loads PowerShell history from a file, removes duplicates (keeping the last occurrence)
-        and the 'clear' term, and stores it in the context.
-
-        Args:
-            text_len: (int) Number of recent lines to retrieve from the history.
+        Loads PowerShell history, skips invalid characters, removes duplicates
+        (keeping last), and filters out 'clear'.
         """
-        with open(self.get_ps_history_file_path(*args, **kwargs), 'r') as f:
-            # Read the lines and get the last 'text_len' lines, filtering out empty lines and 'clear'
-            lines = [l for l in f.read().split('\n')[-text_len:] if l and l != 'clear']
-            # Reverse the list back to the original order with last occurrences preserved
-            self.context['ps_history'] = list(OrderedDict.fromkeys(lines[::-1]))[::-1]
+        path = self.get_ps_history_file_path(*args, **kwargs)
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+            raw = f.read()
+        # take last `text_len`, drop empty/'clear', then de‑dupe preserving last
+        recent = [ln for ln in raw.splitlines()[-text_len:] if ln and ln != 'clear']
+        self.context['ps_history'] = list(OrderedDict.fromkeys(recent[::-1]))[::-1]
 
     def load_git_diffs(self, *args, num_activities: int = 3, **kwargs):
         """

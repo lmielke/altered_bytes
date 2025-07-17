@@ -1,0 +1,20 @@
+verbose: 1
+application: null
+num_activities: 3
+work_file_name: null
+user_info:
+  - git_diff
+  - user_act
+  - ps_hist
+selection: null
+deliverable_path: null
+to_clipboard: true
+alias: null
+user_prompt:
+    Based on the system info provided, write a git commit message for shown modifications!
+    Max length 150 characters.
+sys_info:
+  - sys_info_ops
+  - sys_info_usr
+package_info:
+  - pg_requirements

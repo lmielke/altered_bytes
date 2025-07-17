@@ -44,7 +44,7 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         default=None, 
         # Shorter help text
-        help="YAML file in kwargs_dir for defaults (e.g., 'sublime')."
+        help="YAML file in resources/kwargs_defaults for defaults (e.g., 'sublime')."
     )
 
     # Optional arguments

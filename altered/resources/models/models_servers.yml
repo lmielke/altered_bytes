@@ -10,6 +10,7 @@ aliasses:
     l3.2: llama3.2:3b
     l3.3: llama3.3
     ds: deepseek-r1:32b
+    gm: gemma3:27b
     qwq: qwq:32b
     m8: mixtral:8x22b
     q2b: qwen2:72b
@@ -128,6 +129,16 @@ models:
     general.file_type: Q4_0
     last_update: 8 days ago
     name: deepseek-r1:32b
+    new_update_available: false
+  gemma3:27b:
+    blob_id: 8eeb52dfb3bb
+    context_length: 131072
+    embedding_length: 3072
+    general.architecture: llama
+    host: _ollama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: gemma3:27b
     new_update_available: false
   qwq:32b:
     blob_id: 8eeb52dfb3bb

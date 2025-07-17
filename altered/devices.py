@@ -146,7 +146,6 @@ class Devices:
         The goal of this is to categorize files inside a directory based on their content.
         Example: 
         16.06.2025
-
         Hi friends, lets have a party next weekend.
         cu soon
 

@@ -25,3 +25,20 @@ def cleanup_data_dir(data_dir:str, max_files:int=sts.max_files, exts:set=None, *
         if verbose:
             print(f"{Fore.YELLOW}Removing: {Fore.RESET} {old_file}")
         os.remove(old_file)
+
+def normalize_path(path:str, *args, **kwargs) -> str:
+    """
+    Normalize the given path to ensure it is absolute and uses the correct separators.
+    """
+    n_path = ""
+    if not path:
+        return path
+    if path.startswith('~'):
+        n_path = os.path.expanduser(path)
+    elif path.startswith('/'):
+        n_path = os.path.join(os.sep, path[1:])
+    elif path.startswith('.'):
+        n_path = os.path.join(os.getcwd(), path[2:])
+    if os.path.exists(n_path):
+        return os.path.normpath(n_path)
+    return path

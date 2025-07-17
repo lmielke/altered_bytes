@@ -1,6 +1,7 @@
 """
 info_sys_info.py
 """
+import getpass
 import os
 import platform
 import psutil
@@ -14,74 +15,55 @@ from typing import Dict, Any, List # Added List for type hinting
 import altered.settings as sts
 
 # --- Silent Subprocess Helper ---
-def run_silent_subprocess(cmd_args: List[str] | str, # Command can be list or string (for shell=True)
+def run_silent_subprocess(cmd_args: List[str] | str,
                           capture_output: bool = True,
                           text: bool = True,
-                          check: bool = False, # Default to False like run, check_output will set it to True
+                          check: bool = False,
                           shell: bool = False,
-                          encoding: str = 'utf-8',
+                          encoding: str = 'utf-8-sig',
                           errors: str = 'replace',
                           **kwargs) -> subprocess.CompletedProcess:
     """
     Runs a subprocess, suppressing console window creation on Windows.
-    Mimics subprocess.run().
+    Honors text=False for raw bytes when needed.
     """
-    flags = 0
-    if os.name == 'nt':  # For Windows
-        flags = subprocess.CREATE_NO_WINDOW
-
-    # Ensure creationflags is in kwargs, respecting user-passed one if any,
-    # though this function's intent is to add CREATE_NO_WINDOW.
-    # For simplicity, we'll just set it.
+    flags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
     final_kwargs = kwargs.copy()
     final_kwargs['creationflags'] = flags
+    final_kwargs['capture_output'] = capture_output
+    final_kwargs['check'] = check
+    final_kwargs['shell'] = shell
+    final_kwargs['text'] = text
 
-    return subprocess.run(
-        cmd_args,
-        capture_output=capture_output,
-        text=text,
-        check=check,
-        shell=shell,
-        encoding=encoding,
-        errors=errors,
-        **final_kwargs
-    )
+    if text:
+        final_kwargs['encoding'] = encoding
+        final_kwargs['errors'] = errors
+    else:
+        # Don't pass encoding/errors if binary output is requested
+        final_kwargs.pop('encoding', None)
+        final_kwargs.pop('errors', None)
+
+    return subprocess.run(cmd_args, **final_kwargs)
+
 
 def check_output_silent(cmd_args: List[str] | str, shell: bool = False, **kwargs) -> str:
     """
     Mimics subprocess.check_output, but runs silently on Windows.
-    Returns stdout.
+    Returns UTF-8 decoded stdout.
     """
-    # check_output implies capture_output=True and check=True
-    process = run_silent_subprocess(
-        cmd_args,
-        capture_output=True,
-        check=True,
-        shell=shell,
-        **kwargs # Passes encoding, errors, text etc.
-    )
-    return process.stdout
+    kwargs.update(dict(capture_output=True, check=True, text=False))  # force raw bytes
+    process = run_silent_subprocess(cmd_args, shell=shell, **kwargs)
+    return process.stdout.decode('utf-8-sig', errors='replace')
 
 def getoutput_silent(cmd_string: str, **kwargs) -> str:
     """
     Mimics subprocess.getoutput, but runs silently on Windows.
-    Returns combined stdout and stderr.
+    Returns combined stdout+stderr, decoded as UTF-8.
     """
-    # getoutput implies shell=True, text=True, capture_output=True, check=False,
-    # and stderr=subprocess.STDOUT
-    kwargs.pop('check', None) # Ensure check is False
-    kwargs.pop('stderr', None) # Ensure we control stderr
+    kwargs.pop('check', None)
+    kwargs.pop('stderr', None)
+    return subprocess.call(["powershell", "-NoProfile", "-Command", cmd_string]).strip()
 
-    process = run_silent_subprocess(
-        cmd_string,
-        capture_output=True,
-        text=True, # getoutput uses text mode
-        check=False, # getoutput does not raise on error
-        shell=True,  # getoutput always uses a shell
-        stderr=subprocess.STDOUT,
-        **kwargs
-    )
-    return process.stdout
 # --- End Silent Subprocess Helper ---
 
 
@@ -91,8 +73,10 @@ class SysInfo:
     def __init__(self, *args, **kwargs):
         self.os_type = platform.system()
 
+
     def __call__(self, *args, **kwargs):
-        return self.load_data(*args, **kwargs)
+        sys_info = self.load_data(*args, **kwargs)
+        return sys_info
 
     def load_data(self, *args, **kwargs):
         sys_info = self.get_system_info(*args, **kwargs)
@@ -101,7 +85,7 @@ class SysInfo:
         models_clients_for_host = {}
         if hostname_lower:
             try:
-                with open(self.file_path, 'r', encoding='utf-8') as f: # Added encoding
+                with open(self.file_path, 'r', encoding='utf-8-sig') as f: # Added encoding
                     all_models_clients = yaml.safe_load(f)
                     if isinstance(all_models_clients, dict):
                         models_clients_for_host = all_models_clients.get(hostname_lower, {})
@@ -126,8 +110,9 @@ class SysInfo:
         if self.os_type == "Windows":
             try:
                 output = check_output_silent(
-                    ["powershell", "-NoProfile", "-Command", # Added -NoProfile
-                     "Get-CimInstance -ClassName Win32_Processor | Select-Object Name, LoadPercentage"]
+                        ["powershell", "-NoProfile", "-Command",
+                         "$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8; " +
+                         "Get-CimInstance -ClassName Win32_Processor | Select-Object Name, LoadPercentage"]
                     # universal_newlines=True is equivalent to text=True, handled by helper
                 )
                 lines = output.strip().splitlines()
@@ -142,6 +127,7 @@ class SysInfo:
                     cpu_info["LoadPercentage"] = "Unknown"
             except Exception as e:
                 cpu_info["Error"] = f"Error fetching CPU info (Win): {str(e)}"
+                print(cpu_info["Error"])
         elif self.os_type == "Linux":
             try:
                 output = check_output_silent("lscpu", shell=True)
@@ -256,7 +242,8 @@ class SysInfo:
     def get_user_info(self, *args, **kwargs) -> str:
         try:
             if self.os_type == "Windows":
-                return getoutput_silent("echo %username%").strip()
+                username = getpass.getuser()
+                return username
             elif self.os_type == "Linux":
                 return getoutput_silent("whoami").strip()
         except Exception as e:
@@ -270,6 +257,7 @@ class SysInfo:
         Returns:
             Dict[str, Any]: A dictionary containing various system information.
         """
+        print(f"Collecting system info for {self.os_type}...") # Debug print
         with concurrent.futures.ThreadPoolExecutor(max_workers=7) as executor:
             future_os = executor.submit(self.get_os_info)
             future_cpu = executor.submit(self.get_cpu_info)
@@ -285,29 +273,34 @@ class SysInfo:
             final_sys_info.update(future_os.result())
         except Exception as e:
             final_sys_info['os_error'] = str(e)
+            print(final_sys_info['os_error'])
         
         try:
             # Reverting to 'cpu_type' as the key for the CPU information dictionary
             final_sys_info['cpu_type'] = future_cpu.result()
         except Exception as e:
             final_sys_info['cpu_error'] = str(e)
+            print(final_sys_info['cpu_error'])
         
         try:
             final_sys_info['ram_size'] = future_ram.result()
         except Exception as e:
             final_sys_info['ram_error'] = str(e)
+            print(final_sys_info['ram_error'])
         
         try:
             # Reverting to 'disk_info' as the key for the disk information dictionary
             final_sys_info['disk_info'] = future_disk.result()
         except Exception as e:
             final_sys_info['disk_error'] = str(e)
+            print(final_sys_info['disk_error'])
         
         try:
             # Reverting to 'gpu_info' as the key for the GPU information dictionary
             final_sys_info['gpu_info'] = future_gpu.result()
         except Exception as e:
             final_sys_info['gpu_error'] = str(e)
+            print(final_sys_info['gpu_error'])
         
         try:
             # **future_network.result() will merge the dictionary from get_network_info directly
@@ -315,11 +308,13 @@ class SysInfo:
             final_sys_info.update(future_network.result())
         except Exception as e:
             final_sys_info['network_error'] = str(e)
+            print(final_sys_info['network_error'])
         
         try:
             final_sys_info['username'] = future_user.result()
         except Exception as e:
             final_sys_info['user_error'] = str(e)
+            print(final_sys_info['user_error'])
         return final_sys_info
 
 # Example usage
