@@ -22,7 +22,7 @@ class OllamaConnect:
 
     # ─── routing helpers ───────────────────────────────────────────────────
     def _route(self, ctx: Dict[str, Any]) -> Callable:
-        # print(f"\n\n\n{Fore.CYAN}_route with model:{Fore.RESET} \n{ctx}")
+        print(f"\n\n\n{Fore.CYAN}_route with model:{Fore.RESET} \n{ctx}")
         if ctx.get("service_endpoint") == "embeddings":
             return self._embeddings
         if ctx.get("tools"):
