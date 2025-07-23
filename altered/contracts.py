@@ -1,9 +1,10 @@
 # contracts.py
 import altered.settings as sts
-import importlib, os, sys
+import importlib, os, sys, yaml
 import altered.arguments as arguments
 from colorama import Fore, Style
 import altered.hlp_printing as hlpp
+from altered.hlp_directories import normalize_path as normpath
 
 
 
@@ -14,7 +15,7 @@ def checks(*args, verbose:int, **kwargs):
     kwargs = prep_package_info(*args, **kwargs)
     kwargs = prep_user_info(*args, **kwargs)
     kwargs = clean_paths(*args, **kwargs)
-    check_req_kwargs(*args, **kwargs)
+    # check_req_kwargs(*args, **kwargs)
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
     return kwargs
@@ -40,12 +41,23 @@ def prep_sys_infos(*args, sys_info:list=None, **kwargs):
         preped_kwargs['sys_info'] = False
     return preped_kwargs
 
-def prep_package_info(*args, package_info:list=None, **kwargs):
-    preped_kwargs = dict(**kwargs)
-    if package_info:
+def prep_package_info(*args, package_info:list=None, is_package:bool=None, **kwargs):
+    """
+    Unpacks package_info list into kwargs.
+    For example {'package_info': ['pg_requirements', 'pg_imports', 'pg_tree']}
+    """
+    preped_kwargs = dict(**kwargs, is_package=is_package)
+    if package_info and is_package:
         preped_kwargs['package_info'] = True
         for info in package_info:
             preped_kwargs[info] = True
+    elif package_info and not is_package:
+        if kwargs.get('verbose'):
+            print(f"{Fore.YELLOW}WARNING: package_info provided, but is_package is False! "
+                f"Only pg_tree is used!{Style.RESET_ALL}" )
+        preped_kwargs['package_info'] = True
+        if 'pg_tree' in package_info:
+            preped_kwargs['pg_tree'] = True
     else:
         preped_kwargs['package_info'] = False
     return preped_kwargs
@@ -114,3 +126,31 @@ def check_req_kwargs(*args, api:str, **kwargs):
         print(f"{Fore.RED}ERROR: {ve}{Style.RESET_ALL}")
         raise
 
+def get_kwargs_defaults(*args, kwargs_defaults:str=None, **kwargs):
+    """
+    Uses the kwargs_defaults string to return a dictionary of default values
+    """
+    if kwargs_defaults is None:
+        return {}
+    kwargs_defaults_file = os.path.join(sts.kwargs_defaults_dir, f"{kwargs_defaults}.yaml")
+    try:
+        with open(kwargs_defaults_file, 'r') as f:
+            loaded = yaml.safe_load(f)
+            for k, vs in loaded.items():
+                if any({w in k for w in {'path', 'dir', 'file'}}):
+                    loaded[k] = normpath(vs, *args, **kwargs)
+            return loaded
+    except FileNotFoundError:
+        print(f"{Fore.RED}ERROR: {kwargs_defaults_file} not found!{Fore.RESET}")
+        return {}
+
+
+def get_up_from_file(*args, user_prompt:str=None, up_file:str=None, **kwargs) -> str:
+    user_prompt = '' if user_prompt is None else user_prompt
+    if up_file is not None:
+        up_file = normpath(up_file, *args, **kwargs)
+        if not os.path.exists(up_file):
+            raise FileNotFoundError(f"{Fore.RED}File {up_file} does not exist!{Fore.RESET}")
+        with open(up_file, 'r') as f:
+            user_prompt += f"\n{f.read()}"
+    return {'user_prompt': user_prompt.strip()}

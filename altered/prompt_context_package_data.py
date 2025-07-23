@@ -4,7 +4,6 @@ prompt_context_package_data.py
 
 from colorama import Fore, Style
 
-import altered.settings as sts
 from altered.info_package_imports import PackageInfo
 from altered.info_files import Tree
 
@@ -45,11 +44,11 @@ class ContextPackageData:
             pg_requirements = self.load_from_pip(*args, **kwargs)
         return { 'pg_requirements': pg_requirements, 'req_format': req_format }
 
-    def load_from_pipenv(self, *args, **kwargs) -> dict:
+    def load_from_pipenv(self, *args, work_project_dir:str, **kwargs) -> dict:
         """
         Load installed packages using Pipenv.
         """
-        with open(os.path.join(sts.project_dir, 'Pipfile'), 'rb') as f:
+        with open(os.path.join(work_project_dir, 'Pipfile'), 'rb') as f:
             return f.read()
 
     def load_from_pip(self, *args, **kwargs) -> dict:
@@ -70,6 +69,7 @@ class ContextPackageData:
             return {}
 
     def mk_context(self, *args,     package_info:bool=False,
+                                    is_package:bool=False,
                                     pg_imports:bool=False, 
                                     pg_requirements:bool=False, 
                                     pg_tree:bool=False,
@@ -79,12 +79,16 @@ class ContextPackageData:
             print(f"{Fore.YELLOW}ContextPackageData.mk_context{Fore.RESET} {package_info = }")
         if not package_info: return {}
         # Note: there are additional flags to get various package_infos
-        self.context['package_info'] = {}
-        if pg_imports:
-            self.context['package_info'].update(self.get_pg_imports(*args, **kwargs))
-            if verbose:
-                print(f"{Fore.YELLOW}\tpg_imports: {Fore.RESET} {pg_imports}")
-        if pg_requirements:
+        self.context['package_info'] = {'is_package': is_package, }
+        if pg_imports and is_package:
+            try:
+                self.context['package_info'].update(self.get_pg_imports(*args, **kwargs))
+                if verbose:
+                    print(f"{Fore.YELLOW}\tpg_imports: {Fore.RESET} {pg_imports}")
+            except Exception as e:
+                print(f"{Fore.RED}Error getting package imports: {e}{Fore.RESET}")
+                self.context['package_info']['pg_imports'] = {'Imports': 'Not found'}
+        if pg_requirements and is_package:
             self.context['package_info'].update(self.get_requirements(*args, **kwargs))
             if verbose:
                 print(f"{Fore.YELLOW}\tpg_requirements: {Fore.RESET} {pg_requirements}")

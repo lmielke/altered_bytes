@@ -61,7 +61,8 @@ class Tree:
             self.matched_files.add(os.path.join(root, file))
 
     def mk_tree(self, *args, 
-                            project_dir:str=sts.project_dir, 
+                            project_dir:str=None,
+                            work_project_dir:str=None,
                             max_depth:int=2, 
                             file_match_regex:str=None,
                             work_file_name:str=None,
@@ -77,38 +78,45 @@ class Tree:
         Returns:
             str: A string representing the uncolorized directory tree.
         """
-        tree_structure = ""
+        project_dir = project_dir if project_dir else work_project_dir if work_project_dir else os.getcwd()
+        self.tree_structure = "root: " + project_dir + "\n"
+
         base_level = project_dir.count(os.sep)
         for root, dirs, files in os.walk(project_dir, topdown=True):
             level = root.count(os.sep) - base_level
             subdir = os.path.basename(root)
             indent_level = self.indent * level
 
-            # Directly append result from handle_ignoreds to the tree_structure
-            tree_structure += self.handle_ignoreds(subdir, dirs, indent_level)
+            # Directly append result from handle_ignoreds to the self.tree_structure
+            self.tree_structure += self.handle_ignoreds(subdir, dirs, indent_level)
             if dirs == []:  # If ignored, stop processing
                 continue
-
             if max_depth is not None and level >= max_depth:
-                tree_structure += f"{indent_level}|-- {subdir}/\n{indent_level}{self.disc_sym}\n"
+                self.tree_structure += f"{indent_level}|-- {subdir}/\n{indent_level}{self.disc_sym}\n"
                 dirs[:] = []  # Stop descending into deeper directories
                 continue
 
             # Add directory to the tree
-            tree_structure += f"{indent_level}|-- {subdir}/\n"
-            for file in files:
-                if work_file_name and file.split('.')[0] == work_file_name:
-                    tree_structure += ( 
-                                        f"{indent_level}{self.indent}|-- "
-                                        f"{Fore.BLUE}{file}{Fore.RESET}\n"
-                                        )
-                    self.find_match(root, file, work_file_name, *args, **kwargs)
-                else:
-                    tree_structure += f"{indent_level}{self.indent}|-- {file}\n"
-                if file_match_regex:
-                    self.find_match(root, file, file_match_regex, *args, **kwargs)
+            self.tree_structure += f"{indent_level}|-- {subdir}/\n"
+            self.get_files(files, root, indent_level, file_match_regex, work_file_name)
+        else:
+            self.tree_structure += f"{indent_level}|-- {subdir}/\n"
+            self.get_files(files, root, indent_level, file_match_regex, work_file_name)
         self.workfile_to_front(work_file_name, *args, **kwargs)
-        return tree_structure
+        return self.tree_structure
+
+    def get_files(self, files, root, indent_level, file_match_regex, work_file_name):
+        for file in files:
+            if work_file_name and file.split('.')[0] == work_file_name:
+                self.tree_structure += ( 
+                                    f"{indent_level}{self.indent}|-- "
+                                    f"{Fore.BLUE}{file}{Fore.RESET}\n"
+                                    )
+                self.find_match(root, file, work_file_name, *args, **kwargs)
+            else:
+                self.tree_structure += f"{indent_level}{self.indent}|-- {file}\n"
+            if file_match_regex:
+                self.find_match(root, file, file_match_regex, *args, **kwargs)
 
     def workfile_to_front(self, work_file_name: str, *args, **kwargs) -> None:
         """

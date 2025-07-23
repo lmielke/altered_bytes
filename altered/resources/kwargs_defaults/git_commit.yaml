@@ -10,9 +10,21 @@ selection: null
 deliverable_path: null
 to_clipboard: true
 alias: null
-user_prompt:
-    Based on the system info provided, write a git commit message for shown modifications!
+user_prompt: >
+    Based on the system info provided, suggest 3 different git commit messages, describing the 
+    modifications shown in the context! 
     Max length 150 characters.
+    Example
+    ```markdown
+      # Answer
+      ## Option 1
+      summary of changes made
+      ## Option 2
+      another summary of changes
+      ## Option 3
+      a third option describing the changes
+      ## ...
+      ```
 sys_info:
   - sys_info_ops
   - sys_info_usr

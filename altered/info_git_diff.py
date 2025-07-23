@@ -4,7 +4,7 @@ info_git_diff.py
 
 import subprocess
 import re, os
-
+from colorama import Fore, Style
 
 class GitDiffs:
     """
@@ -193,6 +193,8 @@ class GitDiffs:
         """
         raw_diff = self.extract_git_diff(*args, **kwargs)
         diff_changes = self.parse_git_diff(raw_diff, num_activities, *args, **kwargs)
+        if 'Not a git repository' in raw_diff:
+            diff_changes.append('Not a git repository')
         return diff_changes
 
 

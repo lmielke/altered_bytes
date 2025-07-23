@@ -48,7 +48,7 @@ def display_argument_info(*args, **kwargs):
     headers = ["Name", "Alias", "Required", "Type", "Default", "Help"]
     print(tabulate(argument_details_list, headers=headers, tablefmt="grid"))
 
-def check_environment_variables(*args, **kwargs):
+def check_env_vars(*args, **kwargs):
     print(f"\n{Fore.WHITE}Environment Variables:{Fore.RESET}")
     if os.getenv('altered_bytes'):
         print(f"{Fore.GREEN}$env:altered_bytes: {Fore.RESET}{os.getenv('altered_bytes')}")
@@ -57,6 +57,14 @@ def check_environment_variables(*args, **kwargs):
                 f"{Fore.RED}ERROR: altered_bytes env var not found."
                 f"$env:altered_bytes: {os.getenv('altered_bytes')}{Fore.RESET}"
                 f"Set altered_bytes env var to {sts.project_dir = }"
+                )
+    if os.environ.get('work_package_dir'):
+        print(f"{Fore.GREEN}$env:work_package_dir: {Fore.RESET}{os.environ.get('work_package_dir')}")
+    else:
+        print(  
+                f"{Fore.RED}api_info.check_env_vars ERROR: work_package_dir env var not found."
+                f"$env:work_package_dir: {os.getenv('work_package_dir')}{Fore.RESET}"
+                f"Provide a -w work_package_dir or set a environment variable!"
                 )
 
 def ping_altered_server(*args, **kwargs) -> str | None:
@@ -98,7 +106,7 @@ def call_commands(*args, **kwargs):
             f"""-wf api_prompt -rx "None" -up "Your question here!" """
             f"""-dl ".../{os.path.relpath(__file__, os.getcwd())}" -v 3 -al l3.2_0""")
     print(f"\n{Fore.YELLOW}EXAMPLES:{Fore.RESET}")
-    print(f"-{msg}\n-{msg.replace('thought', 'prompt')}")
+    print(f"-{msg}\n-{msg.replace('thought', 'prompt').replace('-al l3.2_0', '')}")
 
 def get_model_aliasse(*args, **kwargs):
     models = msts.config.aliasses.get('models')
@@ -134,7 +142,7 @@ def main(*args, **kwargs):
     """
     display_argument_info(*args, **kwargs)
     display_kwargs_defaults(*args, **kwargs)
-    check_environment_variables(*args, **kwargs)
+    check_env_vars(*args, **kwargs)
     call_commands(*args, **kwargs)
     get_model_aliasse(*args, **kwargs)
     print(f"{Fore.GREEN}{ping_altered_server()}{Fore.RESET}")

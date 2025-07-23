@@ -1,5 +1,8 @@
 ## Package Info
-The following section shows used Package information.
+{%-   if not context.package_info.is_package %}
+The selected folder contains no packgage information or it is not a package.
+{%-   else %}
+The following section shows information about the package in the cwd.
 
 {%   if context.package_info.digraph %}
 ### Package Import Structure starting at {{ context.package_info.work_file_name }}
@@ -13,7 +16,9 @@ The following section shows used Package information.
 {{ context.package_info.pg_requirements }}
 ```
 
-### Package File Structure
+{%   endif %}
+
+### Directory File Structure
 ```text
 {{ context.package_info.tree }}
 ```

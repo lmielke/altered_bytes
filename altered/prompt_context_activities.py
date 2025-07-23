@@ -44,13 +44,21 @@ class ContextActivities:
         if ps_hist and num_activities >= 1:
             self.load_ps_history(*args, **kwargs)
             data['ps_history'] = self.context['ps_history'][-num_activities*2:]
+        data.update(self.git_diffs(*args, git_diff=git_diff, num_activities=num_activities, **kwargs))
+        return {'user_info': data}
+        
+    def git_diffs(self, *args, git_diff:bool=False, num_activities:int=3, **kwargs):
+        data = {}
         if git_diff and num_activities >= 1:
             self.load_git_diffs(*args, **kwargs)
-            data['git_diffs'] = self.context['git_diffs'][-num_activities:]
-        if git_diff and num_activities >= 1:
-            self.load_git_status(*args, **kwargs)
-            data['git_status'] = self.context['git_status']
-        return {'user_info': data}
+            if 'Not a git repository' in self.context['git_diffs']:
+                data['no_git_repo'] = ['Not a git repository']
+            else:
+                data['git_diffs'] = self.context['git_diffs'][-num_activities:]
+                if git_diff and num_activities >= 1:
+                    self.load_git_status(*args, **kwargs)
+                    data['git_status'] = self.context['git_status']
+        return data
 
     def find_most_recent_act_log(self, *args, **kwargs):
         """

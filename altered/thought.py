@@ -13,6 +13,7 @@ from tabulate import tabulate as tb
 from colorama import Fore, Style
 
 import altered.settings as sts
+import altered.contracts as contracts
 from altered.model_connect import SingleModelConnect
 from altered.prompt import Prompt, Response
 from typing import List, Dict, Any
@@ -23,6 +24,7 @@ class Thought:
 
     def __init__(self, name:str, *args, **kwargs):
         # name of the chat can be used to locate/reference the saved chat
+        # print(f"{args = }, {kwargs = }")
         self.name = re.sub(r'\W+', '_', name.lower())
         self.assi = SingleModelConnect(*args, **kwargs)
         # prompt constructor for LLM interaction
@@ -33,6 +35,8 @@ class Thought:
 
     @sts.logs_timeit.timed("thought.Thought.think")
     def think(self, *args, **kwargs):
+        kwargs.update(contracts.get_kwargs_defaults(*args, **kwargs))
+        kwargs.update(contracts.get_up_from_file(*args, **kwargs))
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, **kwargs)
         kwargs['num_predict'] = self.p.I.context.get('num_predict', kwargs.get('num_predict'))

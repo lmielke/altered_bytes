@@ -10,6 +10,8 @@ import json, os, re, time, pyttsx3
 import altered.settings as sts
 import altered.hlp_printing as hlpp
 from altered.thought import Thought
+import altered.contracts as contracts
+from altered.hlp_directories import write_tempfile
 
 
 # After the existing imports at the top of the file
@@ -170,7 +172,11 @@ def main(*args, **kwargs):
     Main entry point for the thought API
     Returns the result of the thought function
     """
-    return thought(*args, **kwargs)
+    kwargs.update(contracts.get_kwargs_defaults(*args, **kwargs))
+    out = thought(*args, **kwargs)
+    # t = json.dumps(prompt(*args, **kwargs).data)
+    write_tempfile(*args, content=out, **kwargs)
+    return out
 
 
 if __name__ == "__main__":

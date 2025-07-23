@@ -24,6 +24,7 @@ import importlib, os
 import altered.settings as sts
 import altered.arguments as arguments
 import altered.contracts as contracts
+from altered.hlp_directories import set_workdir
 
 
 def runable(*args, api, **kwargs):
@@ -46,8 +47,11 @@ def main(*args, **kwargs):
     to runable from shell these arguments are passed in
     runs api if legidemit and prints outputs
     """
+    kwargs = arguments.mk_args()
+    # get workdir if provided
+    kwargs.update(set_workdir(*args, **kwargs))
     # kwargs are vakidated against enforced contract
-    kwargs = contracts.checks(*args, **arguments.mk_args())
+    kwargs = contracts.checks(*args, **kwargs)
     # the imported api runable package is executed
     if kwargs.get("api") == "help":
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "

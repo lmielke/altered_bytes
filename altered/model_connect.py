@@ -330,7 +330,7 @@ class RmConnect:
             $response = Invoke-RestMethod -Method Post -Uri $url -Body $context -ContentType $ct
             return $response[0].responses.response
         """
-        print(f"{Fore.YELLOW}\nSending request to OllamaConnect module {url = }{Fore.RESET}")
+        # print(f"{Fore.YELLOW}\nSending request to OllamaConnect module {url = }{Fore.RESET}")
         return OllamaConnect(url=url, **kwargs)(ctx=ctx)
 
     # ───────────────────────── helpers ─────────────────────────

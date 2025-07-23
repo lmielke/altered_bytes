@@ -42,22 +42,22 @@ class PackageInfo:
         """
         Handle the main file name to ensure it ends with '.py'.
         """
-        work_file_name = work_file_name if work_file_name is not None else sts.package_name
+        work_file_name = work_file_name if work_file_name is not None else self.package_name
         if not work_file_name.endswith('.py') and not '.' in work_file_name:
             work_file_name += '.py'
-        return work_file_name
+        if os.path.exists(work_file_name):
+            return work_file_name
+        elif os.path.exists('__init__.py'):
+            return '__init__.py'
+        else:
+            return None
 
     def find_root_dir(self, start_dir:str=None, *args, **kwargs):
         """
         Determine the root directory of a Python project by locating __main__.py.
         """
-        start_dir = start_dir if start_dir is not None else os.getcwd()
-        # we log start_dir using open
-        if not sts.package_name in start_dir and sts.package_name not in os.listdir(start_dir):
-            raise Exception(
-                                f"{Fore.RED}package_name '{sts.package_name}' "
-                                f"not in start_dir {start_dir}{Style.RESET_ALL}"
-                                )
+        wpgd = os.environ.get('work_package_dir')
+        start_dir = start_dir if start_dir is not None else wpgd if wpgd else os.getcwd()
         for root, dirs, files in os.walk(start_dir):
             dirs[:] = [d for d in dirs if d not in ignore_dirs]
             if '__main__.py' in files:

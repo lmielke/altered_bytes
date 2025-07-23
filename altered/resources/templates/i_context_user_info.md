@@ -1,5 +1,5 @@
 ## User and System Activities
-The following shows some stats about recent user activities and their intensity.
+Below shows rudimentary statistics about recent user activities and duration.
 {%- if context.user_info.user_act %}
 {%- for activity in context.user_info.user_act %}
 ### Activity {{ loop.index }}
@@ -25,6 +25,14 @@ The following shows the recent {{ context.user_info.ps_history|length }} Powersh
 {%- endfor %}
 {% endif %}
 
+
+## Git Information
+{%- if context.user_info.no_git_repo %}
+{{ context.user_info.no_git_repo[0] }}
+{% else %}
+The following section shows the recent {{ context.user_info.git_diffs|length }} `git diff` code changes, listed as txt files, sorted from recent to oldest.
+{% endif %}
+
 {%- if context.user_info.git_status %}
 ## Git Status
 - **Modified Files:**
@@ -41,14 +49,10 @@ The following shows the recent {{ context.user_info.ps_history|length }} Powersh
   {%- for file in context.user_info.git_status.deleted %}
   - {{ file }}
   {%- endfor %}
-{%- else %}
-## Git Status
-No git status found.
 {%- endif %}
 
-## Git Diffs Log
-The following section shows the recent {{ context.user_info.git_diffs|length }} `git diff` code changes, listed as txt files, sorted from recent to oldest.
 {% if context.user_info.git_diffs %}
+## Git Diffs
 {% for git_diff in context.user_info.git_diffs %}
 ### Change {{ loop.index }}
 - **File Path:** {{ git_diff.file_path }}
@@ -58,6 +62,4 @@ The following section shows the recent {{ context.user_info.git_diffs|length }} 
 {{ git_diff.content }}
 ```
 {% endfor %}
-{% else %}
-No git diffs found.
 {% endif %}

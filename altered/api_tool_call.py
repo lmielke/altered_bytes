@@ -32,7 +32,7 @@ def main(*args, application=None, **kwargs):
     Main function to handle tool calls.
     This function is a wrapper around the `tool_call` function.
     """
-    print(f"{Fore.YELLOW}Getting AI thought\n{kwargs =}{Fore.RESET}")
+    # print(f"{Fore.YELLOW}Getting AI thought\n{kwargs =}{Fore.RESET}")
     result = thought(*args, application='tool_call', **kwargs)
     return tool_call(result, *args, application=application, **kwargs)
 

@@ -78,7 +78,7 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         default=[],
         # Shorter help text
-        help="Host package info options (e.g., pg_imports)."
+        help="Package info options (pg_requirements, pg_imports, pg_tree)."
     )
 
     parser.add_argument(
@@ -97,11 +97,22 @@ def get_parser() -> argparse.ArgumentParser:
         help="Current workfile (root for package import graph)."
     )
     parser.add_argument(
+        "-wd", "--work_dir",
+        type=str,
+        # Shorter help text
+        help="Current work_dir."
+    )
+    parser.add_argument(
         "-up", "--user_prompt",
         type=str,
         help="User question or problem to solve." # Already short
     )
-
+    parser.add_argument(
+        "-uf", "--up_file",
+        type=str,
+        help="User question as file path." # Already short
+    )
+    
     parser.add_argument(
         "-dl", "--deliverable_path",
         type=str,
