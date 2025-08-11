@@ -15,33 +15,29 @@ class Deliverable:
         self.deliverable, self.selection = '', ''
         self.context = {}
 
-    def get_context_info(self, *args,   deliverable_path:str=None, 
-                                        selection:str=None, **kwargs,
+    def get_context_info(self, *args, deliverable_path:str=None, **kwargs, 
         ) -> dict:
         """
         Get the content of the deliverable file. This can be code or any kind of text.
         """
-        if deliverable_path is not None:
-            with open(deliverable_path, 'r', encoding="utf-8") as f:
-                self.deliverable = f.read()
-        if selection is not None:
-            self.selection += "Note: "
-            if selection in self.deliverable:
-                self.selection += (f"This section was highlighted by the user "
-                                    f"and points to above deliverable. \n\n")
-                selection = f"```\n\n{selection}\n\n```"
-            else:
-                pass
-            self.selection += selection
+        if deliverable_path is None: return
+        with open(deliverable_path, 'r', encoding="utf-8") as f:
+            self.deliverable = f.read()
+        # if selection is not None:
+        #     if selection in self.deliverable:
+        #         selection = f"```\n\n{selection}\n\n```"
+        #     else:
+        #         pass
+        #     self.selection += selection
 
-    def mk_context(self, *args, deliverable_path:str=None, **kwargs):
+    def mk_context(self, *args, selection:str=None, **kwargs):
         """
         This context dict contains variables to be rendered in a jinja template.
         """
-        if deliverable_path is None: return {}
-        self.get_context_info(*args, deliverable_path=deliverable_path, **kwargs)
+        self.get_context_info(*args, **kwargs)
         if self.deliverable:
             self.context['content'] = self.deliverable
-            self.context['selection'] = self.selection
+        if selection:
+            self.context['selection'] = f"```\n{selection}\n```"
         return self.context
 

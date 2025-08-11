@@ -18,10 +18,12 @@ The following section shows information about the package in the cwd.
 
 {%   endif %}
 
+{% if context.package_info.tree %}
 ### Directory File Structure
 ```text
 {{ context.package_info.tree }}
 ```
+{%   endif %}
 
 {% if context.package_info.selected_files %}
 ### Top {{ context.package_info.selected_files|length }} Selected Package Files

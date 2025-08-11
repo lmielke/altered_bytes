@@ -30,6 +30,7 @@ pystray = "*"
 fastapi = "*"
 uvicorn = "*"
 psutil = "*"
+dotenv = "*"
 
 [dev-packages]
 black = "*"

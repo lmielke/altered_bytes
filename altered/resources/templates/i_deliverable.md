@@ -12,7 +12,10 @@ Below you find the latest version __Deliverable__  or Object of Interest of this
 ```
 
 {% if deliverable.selection %}
-## Selection: 
+## Selections:
+The following parts of the deliverable (mouse selection) where highlighted by the user.
+These contain important facts to remember.
+
 {{ deliverable.selection }}
 {% endif %}
 

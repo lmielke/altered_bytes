@@ -1,8 +1,11 @@
-## System Information
+## User System Information
 The following section shows performance relevant System runtime Information.
 It can be used to identify potential bottlenecks and to optimize the performance of the system.
 ### Operating System
 **OS**: {{ context.sys_info.os }}
+
+### User
+**Username**: {{ context.sys_info.username }}
 
 ### CPU
 **CPU Name**: {{ context.sys_info.cpu_type.Name }}
@@ -22,9 +25,6 @@ It can be used to identify potential bottlenecks and to optimize the performance
 ### Network
 **Hostname**: {{ context.sys_info.hostname }}
 **IP Address**: {{ context.sys_info.ip_address }}
-
-### User
-**Username**: {{ context.sys_info.username }}
 
 ### PowerShell Version Information
 **PS Version**: {{ context.sys_info.psversiontable.PSVersion }}

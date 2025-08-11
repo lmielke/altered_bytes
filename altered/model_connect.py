@@ -192,7 +192,6 @@ class ModelConnect:
             self.m_params = msts.config.get_model(*args, **kwargs)
             self.print_connect_params(*args, **kwargs)
         except Exception as e:
-            print(f"{Fore.RED}ModelConnect.post prep_params Error!\n{e}{Fore.RESET}")
             raise
         try:
             response = RmConnect()( *args,
@@ -204,8 +203,8 @@ class ModelConnect:
             response['model'] = self.m_params['model_file']['name']
             response['server'] = self.m_params.get('server')
         except Exception as e:
-            print(f"{Fore.RED}ModelConnect.post RmConnect Error!\n{e}{Fore.RESET}")
-            raise
+            print(f"\n{Fore.RED}ModelConnect.post RmConnect raising Error!\n{e}{Fore.RESET}")
+            raise Exception(e)
         try:
             self.validate_response(response, *args, **kwargs)
         except Exception as e:
@@ -214,7 +213,6 @@ class ModelConnect:
         try:
             self.stats(response, *args, model=self.m_params['model_file']['name'], **kwargs)
         except Exception as e:
-            print(f"{Fore.RED}ModelConnect.post stats Error!\n{e}{Fore.RESET}")
             raise
         return response
 

@@ -62,7 +62,6 @@ class Tree:
 
     def mk_tree(self, *args, 
                             project_dir:str=None,
-                            work_project_dir:str=None,
                             max_depth:int=2, 
                             file_match_regex:str=None,
                             work_file_name:str=None,
@@ -78,7 +77,7 @@ class Tree:
         Returns:
             str: A string representing the uncolorized directory tree.
         """
-        project_dir = project_dir if project_dir else work_project_dir if work_project_dir else os.getcwd()
+        project_dir = project_dir if project_dir is not None else os.getcwd()
         self.tree_structure = "root: " + project_dir + "\n"
 
         base_level = project_dir.count(os.sep)

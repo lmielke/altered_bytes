@@ -3,7 +3,7 @@ api_thought.py
 """
 
 from colorama import Fore, Style, Back
-from datetime import datetime
+from datetime import datetime as dt
 import pyperclip as pc
 import json, os, re, time, pyttsx3
 
@@ -12,7 +12,6 @@ import altered.hlp_printing as hlpp
 from altered.thought import Thought
 import altered.contracts as contracts
 from altered.hlp_directories import write_tempfile
-
 
 # After the existing imports at the top of the file
 try:
@@ -30,6 +29,8 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     try:
         thought = Thought(api, *args, verbose=verbose, **kwargs)
         play_sound("PROMPT")
+        with open(os.path.join(sts.logs_dir, 'server', 'api_thought_kwargs.log'), 'a') as f:
+            f.write(f"\n\n{re.sub(r"([: .])", r"-" , str(dt.now()))}: \n{kwargs = }")
         response = thought.think(*args, verbose=verbose, **kwargs)
         if response is None:
             msg = "ERROR: api_thought.thought: Response is None!"
@@ -43,9 +44,7 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
             return msg
         response_text = response.get('response', '').strip()
         code_blocks = copy_response(response_text, *args, **kwargs)
-        log_path = os.path.join(
-            sts.logs_dir, 'prompts', f"{sts.time_stamp()}_response.md"
-        )
+        log_path = os.path.join(sts.logs_dir, 'prompts', f"{sts.time_stamp()}_response.md" )
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         log_response(response_text, log_path, *args, **kwargs)
         if not code_blocks:
@@ -167,12 +166,12 @@ def log_response(response:str, log_path:str, *args, **kwargs):
 def open_log_file(log_path:str, *args, **kwargs):
     os.system(f"start notepad {log_path}")
 
-def main(*args, **kwargs):
+def main(*args, **kwargs) -> str:
     """
     Main entry point for the thought API
     Returns the result of the thought function
     """
-    kwargs.update(contracts.get_kwargs_defaults(*args, **kwargs))
+    kwargs.update(contracts.checks(*args, **kwargs))
     out = thought(*args, **kwargs)
     # t = json.dumps(prompt(*args, **kwargs).data)
     write_tempfile(*args, content=out, **kwargs)

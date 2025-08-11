@@ -31,7 +31,7 @@ class ContextSysInfo:
             return {}
         self.context = {self.trigger: self.get_context_info(*args, **kwargs), }
         if sys_info_usr:
-            self.context[self.trigger]['sys_info_ops'] = True
-        if sys_info_ops:
             self.context[self.trigger]['sys_info_usr'] = True
+        if sys_info_ops:
+            self.context[self.trigger]['sys_info_ops'] = True
         return self.context

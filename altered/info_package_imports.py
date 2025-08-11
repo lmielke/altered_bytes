@@ -52,12 +52,12 @@ class PackageInfo:
         else:
             return None
 
-    def find_root_dir(self, start_dir:str=None, *args, **kwargs):
+    def find_root_dir(self, start_dir:str=None, *args, work_dir:str, **kwargs):
         """
         Determine the root directory of a Python project by locating __main__.py.
         """
-        wpgd = os.environ.get('work_package_dir')
-        start_dir = start_dir if start_dir is not None else wpgd if wpgd else os.getcwd()
+        start_dir = (start_dir if start_dir is not None else 
+                        work_dir if work_dir else os.getcwd())
         for root, dirs, files in os.walk(start_dir):
             dirs[:] = [d for d in dirs if d not in ignore_dirs]
             if '__main__.py' in files:

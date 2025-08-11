@@ -51,7 +51,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-al", "--alias",
         type=str,
-        default='l3.2_1',
+        default=None,
         # Shorter help text
         help="Model & Server alias (e.g., l3.2_1). Default: l3.2_1."
     )
@@ -69,7 +69,7 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         default=[],
         # Shorter help text
-        help="Host system technical info options (e.g., sys_info_ops)."
+        help="Host system technical info options (e.g., sys_info_usr)."
     )
 
     parser.add_argument(
@@ -182,25 +182,4 @@ def mk_args() -> dict:
               YAML values will overwrite CLI/code defaults.
               Will "fail fast" if YAML is missing or faulty.
     """
-    kwargs = get_parser().parse_args().__dict__
-    if kwargs.get('kwargs_defaults'): 
-        kwargs = update_kwargs(kwargs, kwargs_defaults=kwargs['kwargs_defaults'])
-    return kwargs
-
-def update_kwargs(kwargs: dict, kwargs_defaults: str) -> dict:
-    """
-    Updates kwargs dictionary with data from a YAML file.
-    YAML values overwrite existing keys in kwargs.
-    Raises FileNotFoundError or YAMLError if file is missing or syntax is bad.
-    Raises ValueError if loaded YAML content is not a truthy dictionary.
-    """
-    file_path = os.path.join(sts.kwargs_defaults_dir, f"{kwargs_defaults}.yaml")
-    with open(file_path, 'r') as file:
-        loaded = yaml.safe_load(file)
-        if loaded and isinstance(loaded, dict): 
-            kwargs.update(loaded)
-        else:
-            raise ValueError(
-                f"YAML content in '{file_path}' is invalid or not a dictionary."
-            )
-    return kwargs
+    return get_parser().parse_args().__dict__

@@ -67,7 +67,7 @@ class Prompt:
         ):
         kwargs.update(self.get_template(*args, **kwargs))
         context = _cont if _cont is not None else self.context
-        prompt = self.RD.render(*args, context=context, **kwargs, )
+        prompt = self.RD.render(*args, context=context, verbose=verbose, **kwargs, )
         if verbose >= 1:
             print(f"\n{Fore.CYAN}Prompt.render_prompt.prompt:{Fore.RESET} {verbose = } >= 1")
             hlpp.pretty_prompt(prompt, *args, verbose=verbose, **kwargs)

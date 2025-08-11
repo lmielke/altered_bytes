@@ -44,11 +44,11 @@ class ContextPackageData:
             pg_requirements = self.load_from_pip(*args, **kwargs)
         return { 'pg_requirements': pg_requirements, 'req_format': req_format }
 
-    def load_from_pipenv(self, *args, work_project_dir:str, **kwargs) -> dict:
+    def load_from_pipenv(self, *args, project_dir:str, **kwargs) -> dict:
         """
         Load installed packages using Pipenv.
         """
-        with open(os.path.join(work_project_dir, 'Pipfile'), 'rb') as f:
+        with open(os.path.join(project_dir, 'Pipfile'), 'rb') as f:
             return f.read()
 
     def load_from_pip(self, *args, **kwargs) -> dict:

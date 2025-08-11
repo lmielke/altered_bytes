@@ -30,13 +30,13 @@ class Render:
         self.context = self._load_context(*args, context=context, **kwargs)
         template = self.env.get_template(template_name)
         context = context if context else self.context
-        if verbose >= 3: hlpp.dict_to_table('Render.render.context', context)
+        if verbose >= 3:
+            hlpp.dict_to_table('Render.render.context', context, color=Fore.MAGENTA)
         # we sort the keys to make sure the fields are in the correct order
         sorted = {k: context.get(k) for k in self.fields}
         self.document = template.render(sorted)
         self.document = Render.render_from_string(self.document, sorted, *args, **kwargs)
         self.document = Render.correct_ansi_codes(self.document, *args, **kwargs)
-        from colorama import Fore, Style        
         return self.document
 
     def save_rendered(self, *args, template_name:str, output_file:str=None, **kwargs):

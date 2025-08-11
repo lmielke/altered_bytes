@@ -58,14 +58,6 @@ def check_env_vars(*args, **kwargs):
                 f"$env:altered_bytes: {os.getenv('altered_bytes')}{Fore.RESET}"
                 f"Set altered_bytes env var to {sts.project_dir = }"
                 )
-    if os.environ.get('work_package_dir'):
-        print(f"{Fore.GREEN}$env:work_package_dir: {Fore.RESET}{os.environ.get('work_package_dir')}")
-    else:
-        print(  
-                f"{Fore.RED}api_info.check_env_vars ERROR: work_package_dir env var not found."
-                f"$env:work_package_dir: {os.getenv('work_package_dir')}{Fore.RESET}"
-                f"Provide a -w work_package_dir or set a environment variable!"
-                )
 
 def ping_altered_server(*args, **kwargs) -> str | None:
     """
@@ -75,7 +67,7 @@ def ping_altered_server(*args, **kwargs) -> str | None:
         str: The server's response if successful.
         None: If the server is unresponsive or an error occurs.
     """
-    address = 'localhost:5555/ping'
+    address = 'localhost:9005/ping'
     try:
         result = subprocess.run(['curl', address], 
                                     timeout=3, 
@@ -83,7 +75,7 @@ def ping_altered_server(*args, **kwargs) -> str | None:
                                     text=True
                     )
         if result.returncode == 0:
-            return result.stdout.strip()
+            return f"API Server ping response: {result.stdout.strip()}"
         else:
             print(
                 f"{Fore.RED}Error pinging server:{Fore.RESET} "
@@ -103,8 +95,8 @@ def call_commands(*args, **kwargs):
     Prints alter call commands as part of info
     """
     msg = ( f"""alter thought -si sys_info_ops sys_info_usr -pi pg_requirements -na 3 """
-            f"""-wf api_prompt -rx "None" -up "Your question here!" """
-            f"""-dl ".../{os.path.relpath(__file__, os.getcwd())}" -v 3 -al l3.2_0""")
+            f"""-wf api_prompt -rx "None" -up "Test: Why is the sky blue?" """
+            f"""-dl "{os.path.relpath(__file__, os.getcwd())}" -v 3 -al l3.2_0""")
     print(f"\n{Fore.YELLOW}EXAMPLES:{Fore.RESET}")
     print(f"-{msg}\n-{msg.replace('thought', 'prompt').replace('-al l3.2_0', '')}")
 

@@ -1,0 +1,25 @@
+{
+  "apps": [
+    {
+      "name": "altered",
+      "script": "C:\\Users\\lars\\.virtualenvs\\altered_bytes-uZ3fI-DB\\Scripts\\pythonw.exe",
+      "args": [
+        "-m",
+        "altered",
+        "api_server",
+        "-v",
+        "2"
+      ],
+      "cwd": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes",
+      "env": {
+        "PYTHONPATH": "C:\\Users\\lars\\python_venvs\\packages\\altered_bytes",
+        "PIPENV_IGNORE_VIRTUALENVS": 1,
+        "pg_alias": "alter",
+        "appName": "altered",
+        "test_color": "GREEN",
+        "port": 9005
+      },
+      "max_restarts": 2
+    }
+  ]
+}

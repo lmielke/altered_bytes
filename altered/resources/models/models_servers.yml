@@ -12,6 +12,7 @@ aliasses:
     ds: deepseek-r1:32b
     gm: gemma3:27b
     qwq: qwq:32b
+    oss: gpt-oss:120b
     m8: mixtral:8x22b
     q2b: qwen2:72b
     nemo: nemotron
@@ -20,6 +21,16 @@ aliasses:
     '1': while-ai_1
     oai: openAI
 models:
+  gpt-oss:120b:
+    blob_id: 8eeb52dfb3bb
+    context_length: 131072
+    embedding_length: 3072
+    general.architecture: llama
+    host: _ollama
+    general.file_type: Q4_0
+    last_update: 8 days ago
+    name: gpt-oss:120b
+    new_update_available: false
   dolphin-llama3:
     blob_id: ea025c107c1c
     context_length: 8192
@@ -201,16 +212,16 @@ defaults:
   # defaults kick in if no parameter was supplied
   # default ollama server that comes with ollama
   generate:
-    model: llama3.2:3b
+    model: qwq:32b
     server: while-ai_0
   # altered_bytes default server for generate responses
   get_generates:
-    model: llama3.2:3b
+    model: qwq:32b
     server: while-ai_0
   # altered_bytes default server for embeddings
   get_embeddings:
-    model: llama3.1
-    server: while-ai_1
+    model: qwq:32b
+    server: while-ai_0
   service_endpoint: get_generates
   keep_alive: 2000
   port: 11434
@@ -221,8 +232,8 @@ services:
 overwrites:
   # overwrites will take precedence over defaults and parameters
   get_embeddings:
-    model: llama3.1
-    server: while-ai_1
+    model: qwq:32b
+    server: while-ai_0
 params:
   ollama_host: http://localhost:11434
   timeout: 120

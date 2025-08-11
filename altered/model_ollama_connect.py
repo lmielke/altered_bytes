@@ -11,7 +11,8 @@ class OllamaConnect:
     """
 
     def __init__(self, *, url: str, timeout: int = 120, **__) -> None:
-        self.client = Client(host=url.split('/api', 1)[0], timeout=timeout)
+        self.url = url
+        self.client = Client(host=self.url.split('/api', 1)[0], timeout=timeout)
 
     # ─── public entry ──────────────────────────────────────────────────────
     def __call__(self, *, ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -51,13 +52,18 @@ class OllamaConnect:
                                            for p in ctx.get("prompts", [])]
         tc_flag_none = ctx.get("tool_choice") == "none"
         tools = None if tc_flag_none else ctx.get("tools")
+        msg = {}
         try:
             msg = self.client.chat(model=ctx["model"], messages=messages,
                                tools=tools,
                                keep_alive=ctx.get("keep_alive", 200),
                                stream=False)["message"]
         except Exception as e:
-            print(f"{Fore.RED}_chat response: \n{e}{Fore.RESET}")
+            msg['content'] = (
+                                f"\n{Fore.RED}ERROR: model_ollama_connect._chat: "
+                                f"\n{e}\n{self.url = }, {ctx['model'] =}{Fore.RESET}"
+                                )
+            print(msg['content'])
         tc = self._norm_tool((msg.get("tool_calls") or [None])[0])
         content = msg.get("content") or json.dumps({"tool_call": tc} )
         return {"responses": [{"response": content, "tool_call": tc}]}

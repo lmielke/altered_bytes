@@ -24,7 +24,8 @@ import importlib, os
 import altered.settings as sts
 import altered.arguments as arguments
 import altered.contracts as contracts
-from altered.hlp_directories import set_workdir
+from datetime import datetime as dt
+import re
 
 
 def runable(*args, api, **kwargs):
@@ -36,8 +37,9 @@ def runable(*args, api, **kwargs):
         api = f"api_{api}"
     if not os.path.exists(os.path.join(sts.package_dir, f"{api}.py")):
         raise FileNotFoundError(
-                                    f"{Fore.RED}api {api} not found in{Fore.RESET} "
-                                    f"{sts.package_dir}"
+                                    f"{Fore.RED}api{Fore.RESET} "
+                                    f"{Fore.YELLOW}'{api}'{Fore.RESET} "
+                                    f"{Fore.RED}not found in{Fore.RESET} {sts.package_dir}"
                                 )
     return importlib.import_module(f"altered.{api}")
 
@@ -48,8 +50,6 @@ def main(*args, **kwargs):
     runs api if legidemit and prints outputs
     """
     kwargs = arguments.mk_args()
-    # get workdir if provided
-    kwargs.update(set_workdir(*args, **kwargs))
     # kwargs are vakidated against enforced contract
     kwargs = contracts.checks(*args, **kwargs)
     # the imported api runable package is executed
@@ -57,9 +57,7 @@ def main(*args, **kwargs):
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "
                 f"For parameter and package info, run: 'alter info'")
     else:
-        out = runable(*args, **kwargs).main(*args, **kwargs)
-        return out
-
+        return runable(*args, **kwargs).main(*args, **kwargs)
 
 if __name__ == "__main__":
     main()

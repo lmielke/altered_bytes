@@ -12,7 +12,7 @@ to_clipboard: true
 alias: null
 user_prompt: >
     Based on the system info provided, suggest 3 different git commit messages, describing the 
-    modifications shown in the context! 
+    modifications shown in the context! If there is no changes, give the user a hint.
     Max length 150 characters.
     Example
     ```markdown

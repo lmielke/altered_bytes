@@ -15,6 +15,7 @@ from altered.info_git_diff import GitDiffs
 class ContextActivities:
 
     template_name = 'i_context_user_info.md'
+    log_dir = os.path.expanduser('~/.monitoring')
     log_name = 'activity_log'
     trigger = 'user_act'
 
@@ -64,10 +65,10 @@ class ContextActivities:
         """
         Search the logs directory for the most recent log file based on the timestamp in the filename.
         """
-        log_pattern = os.path.join(sts.logs_dir, 'activities', f'*_{self.log_name}.json')
+        log_pattern = os.path.join(self.log_dir, f'*_{self.log_name}.json')
         log_files = glob.glob(log_pattern)
         if not log_files:
-            raise FileNotFoundError(f"No log files found in {sts.logs_dir}")
+            raise FileNotFoundError(f"No log files found in {self.log_dir}")
         # Extract the timestamp from each filename and find the most recent
         log_files.sort()
         # Return the path to the most recent log file
