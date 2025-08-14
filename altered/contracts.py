@@ -13,6 +13,7 @@ from altered.hlp_directories import set_workdir
 def checks(*args, verbose:int=0, **kwargs):
     kwargs['verbose'] = verbose
     kwargs.update(get_kwargs_defaults(*args, **kwargs))
+    kwargs.update(read_tempfile(*args, **kwargs))
     kwargs = clean_kwargs(*args, **kwargs)
     kwargs = prep_sys_infos(*args, **kwargs)
     kwargs = prep_user_info(*args, **kwargs)
@@ -24,6 +25,31 @@ def checks(*args, verbose:int=0, **kwargs):
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
     return kwargs
+
+def write_tempfile(*args, api: str, content: str, up_file: str = None, **kwargs):
+    """
+    Writes the generated content JSON back to the original up_file, if provided.
+    """
+    if not up_file:
+        return  # Skip if no output path is specified
+    up_file = normpath(up_file, *args, **kwargs)
+    out_str = f"\n{api}_response:\n{content.strip()}\n"
+    try:
+        with open(up_file, 'a', encoding='utf-8') as f:
+            f.write(out_str)
+    except Exception as e:
+        print(f"{Fore.RED}Failed to write content to file {up_file}: {e}{Fore.RESET}")
+
+def read_tempfile(*args, user_prompt:str='', up_file:str=None, **kwargs) -> str:
+    # user_promt might come as None from arguments
+    user_prompt = '' if user_prompt is None else user_prompt
+    if up_file is not None:
+        up_file = normpath(up_file, *args, **kwargs)
+        if not os.path.exists(up_file):
+            raise FileNotFoundError(f"{Fore.RED}temp file {up_file} not found!{Fore.RESET}")
+        with open(up_file, 'r', encoding='utf-8', errors='replace') as f:
+            user_prompt = f"{f.read()}\n" + user_prompt
+    return {'user_prompt': user_prompt.strip()}
 
 def get_model_alias(*args, alias:str=None, **kwargs):
     if alias is None:
@@ -134,7 +160,7 @@ def check_req_kwargs(*args, api:str, **kwargs):
         print(f"{Fore.RED}ERROR: {ve}{Style.RESET_ALL}")
         raise
 
-def get_kwargs_defaults(*args, kwargs_defaults:str=None, **kwargs):
+def get_kwargs_defaults(*args, kwargs_defaults:str=None, verbose:int=0, **kwargs):
     """
     Uses the kwargs_defaults string to return a dictionary of default values
     """
@@ -147,22 +173,12 @@ def get_kwargs_defaults(*args, kwargs_defaults:str=None, **kwargs):
             for k, vs in loaded.items():
                 if any({w in k for w in {'path', 'dir', 'file'}}):
                     loaded[k] = normpath(vs, *args, **kwargs)
-            return loaded
+        if loaded.get('verbose') < verbose:
+            loaded['verbose'] = verbose
+        return loaded
     except FileNotFoundError:
         print(f"{Fore.RED}ERROR: {kwargs_defaults_file} not found!{Fore.RESET}")
         return {}
-
-
-def get_up_from_file(*args, user_prompt:str=None, up_file:str=None, **kwargs) -> str:
-    user_prompt = '' if user_prompt is None else user_prompt
-    if up_file is not None:
-        up_file = normpath(up_file, *args, **kwargs)
-        if not os.path.exists(up_file):
-            raise FileNotFoundError(f"{Fore.RED}File {up_file} does not exist!{Fore.RESET}")
-        with open(up_file, 'r') as f:
-            user_prompt += f"\n{f.read()}"
-    return {'user_prompt': user_prompt.strip()}
-
 
 def check_env_vars(*args, verbose:int=0, **kwargs):
     """

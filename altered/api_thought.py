@@ -5,20 +5,13 @@ api_thought.py
 from colorama import Fore, Style, Back
 from datetime import datetime as dt
 import pyperclip as pc
-import json, os, re, time, pyttsx3
+import json, os, re, pyttsx3
 
 import altered.settings as sts
 import altered.hlp_printing as hlpp
 from altered.thought import Thought
 import altered.contracts as contracts
-from altered.hlp_directories import write_tempfile
 
-# After the existing imports at the top of the file
-try:
-    import winsound
-    SOUND_AVAILABLE = True
-except ImportError:
-    SOUND_AVAILABLE = False
 
 @sts.logs_timeit.timed("api_thought.thought")
 def thought(*args, api: str, verbose: int, application:str='powershell', **kwargs):
@@ -27,30 +20,24 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     """
     application = 'powershell' if application is None else application.lower()
     try:
+        # with open('C:/temp/api_thought.log', 'a') as l: 
+        #     l.write(f"thought0:\n\n{re.sub(r'([: .])', '-', str(dt.now()))}: \n{args = }\n{kwargs = }")
         thought = Thought(api, *args, verbose=verbose, **kwargs)
-        play_sound("PROMPT")
-        with open(os.path.join(sts.logs_dir, 'server', 'api_thought_kwargs.log'), 'a') as f:
-            f.write(f"\n\n{re.sub(r"([: .])", r"-" , str(dt.now()))}: \n{kwargs = }")
         response = thought.think(*args, verbose=verbose, **kwargs)
+        hlpp.play_sound('RESPONSE2')
         if response is None:
             msg = "ERROR: api_thought.thought: Response is None!"
             print(f"{Fore.RED}{msg}{Fore.RESET}")
-            play_sound("ERROR")
             return msg
         elif not response.get('response'):
             msg = "ERROR: api_thought.thought: No model response in response dict!"
             print(f"{Fore.RED}{msg}{Fore.RESET}")
-            play_sound("ERROR")
             return msg
         response_text = response.get('response', '').strip()
         code_blocks = copy_response(response_text, *args, **kwargs)
         log_path = os.path.join(sts.logs_dir, 'prompts', f"{sts.time_stamp()}_response.md" )
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         log_response(response_text, log_path, *args, **kwargs)
-        if not code_blocks:
-            play_sound("RESPONSE")
-        else:
-            play_sound("HAPPY")
         output_json = json.dumps(
                                     {
                                         'response': response.get('response'),
@@ -63,7 +50,6 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     except Exception as e:
         msg = f"ERROR: altered.api_thought.thought: {e}"
         print(f"{Fore.RED}{msg}{Fore.RESET}")
-        play_sound("ERROR")
         return msg
 
 def copy_response(response: str, *args, to_clipboard: bool = False, **kwargs):
@@ -123,30 +109,6 @@ def copy_response(response: str, *args, to_clipboard: bool = False, **kwargs):
         pc.copy('\n'.join(code_blocks))
     return code_blocks
 
-# After other functions and before main(), define play_sound
-def play_sound(status: str):
-    """
-    Plays a short acoustic signal based on the given status.
-    Args:
-        status: (str) One of ["LOADED", "START", "STOP"].
-    """
-    if SOUND_AVAILABLE:
-        if status == "PROMPT":
-            winsound.Beep(600, 150)   # Lower pitch
-            winsound.Beep(1000, 150)  # Higher pitch
-        elif status == "RESPONSE":
-            winsound.Beep(1000, 150)  # Higher pitch
-            winsound.Beep(800, 150)   # Lower pitch
-            winsound.Beep(600, 150)   # Lower pitch
-        elif status == "HAPPY":
-            winsound.Beep(1000, 100)  # Higher pitch
-            winsound.Beep(1200, 100)  # Higher pitch
-            winsound.Beep(1600, 100)  # Higher pitch
-            time.sleep(.1)
-        elif status == "ERROR":
-            winsound.Beep(200, 150)
-            winsound.Beep(100, 550)
-
 def speak_response(response: str, code_blocks, *args, **kwargs):
     spoken = response
     for code_match in code_blocks:
@@ -172,10 +134,12 @@ def main(*args, **kwargs) -> str:
     Returns the result of the thought function
     """
     kwargs.update(contracts.checks(*args, **kwargs))
-    out = thought(*args, **kwargs)
+    with open(os.path.join(sts.logs_dir, 'server', 'api_thought_kwargs.log'), 'a') as f:
+        f.write(f"\n\n{re.sub(r"([: .])", r"-" , str(dt.now()))}: \n{kwargs = }")
+    r = thought(*args, **kwargs)
     # t = json.dumps(prompt(*args, **kwargs).data)
-    write_tempfile(*args, content=out, **kwargs)
-    return out
+    contracts.write_tempfile(*args, content=r, **kwargs)
+    return r
 
 
 if __name__ == "__main__":

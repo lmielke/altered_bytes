@@ -2,16 +2,15 @@ from typing import Any, Dict
 from colorama import Fore, Style, Back
 from tabulate import tabulate as tb
 import numpy as np
-import re, time
+import re
 
 class PromptStats:
 
     # Token length divisor describes the ratio tokens to characters (default is 3)
     tkd = 3
     sub_total_prefix = "Sub-Total: "
-    sample_len = 100
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, verbose:int=0, **kwargs) -> None:
         """
         Initializes the class and variables for length tracking.
 
@@ -21,6 +20,7 @@ class PromptStats:
         self.lc = [Fore.BLUE, Fore.CYAN, Fore.MAGENTA]
         self.backs = [Back.BLUE, Back.CYAN, Back.MAGENTA]
         self.total_color, self.llc = Fore.YELLOW, Fore.WHITE
+        self.sample_len = 100 + 100 * max(0, verbose - 2 )
 
     def __call__(self, up_to: int, *args, **kwargs) -> str:
         """

@@ -5,7 +5,7 @@ use like:
 """
 import altered.logs_timeit as logs_timeit
 from altered.logs_events import init_event_logger, logprint
-import os, re, sys, time, yaml
+import os, re, sys, yaml
 from datetime import datetime as dt
 
 

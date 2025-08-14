@@ -5,10 +5,8 @@ Example: python -m altered.info_package_imports test_prompt_context_activities.p
 """
 
 
-import ast
-import os
-import graphviz
-import argparse
+import ast, os, re, graphviz, argparse
+from datetime import datetime as dt
 import altered.settings as sts
 from colorama import Fore, Style
 
@@ -52,7 +50,7 @@ class PackageInfo:
         else:
             return None
 
-    def find_root_dir(self, start_dir:str=None, *args, work_dir:str, **kwargs):
+    def find_root_dir(self, start_dir:str=None, *args, work_dir:str=None, **kwargs):
         """
         Determine the root directory of a Python project by locating __main__.py.
         """

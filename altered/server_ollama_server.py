@@ -5,7 +5,6 @@ Calls the Ollama server with timeout handling. Retries in case of a timeout.
 
 import subprocess
 import threading
-import time
 from ollama import Client
 from colorama import Fore, Style
 

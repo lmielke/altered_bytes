@@ -1,11 +1,19 @@
 """
 hlp_printing.py
 """
-import re
+import re, time
 from colorama import Fore, Back, Style
 import altered.settings as sts
 from textwrap import wrap as tw
 from tabulate import tabulate as tb
+
+
+# After the existing imports at the top of the file
+try:
+    import winsound
+    SOUND_AVAILABLE = True
+except ImportError:
+    SOUND_AVAILABLE = False
 
 def wrap_text(text:str, *args, max_chars:int=sts.table_max_chars, **kwargs):
     max_chars = normalize_max_chars(max_chars, text, *args, **kwargs)
@@ -167,3 +175,39 @@ def pretty_print_df(df, *args, color:object=Fore.MAGENTA, sum_color:object=None,
             print(f"{line}")
         else:
             print(line)
+
+# After other functions and before main(), define play_sound
+def play_sound(status: str):
+    """
+    Plays a short acoustic signal based on the given status.
+    Args:
+        status: (str) One of ["LOADED", "START", "STOP"].
+    """
+    if SOUND_AVAILABLE:
+        if status == "PROMPT":
+            winsound.Beep(600, 150)   # Lower pitch
+            winsound.Beep(1000, 150)  # Higher pitch
+        if status == "PROMPT0":
+            winsound.Beep(600, 150)   # Lower pitch
+        if status == "PROMPT1":
+            winsound.Beep(1000, 150)  # Higher pitch
+        if status == "PROMPT2":
+            winsound.Beep(1300, 150)  # Higher pitch
+        elif status == "RESPONSE":
+            winsound.Beep(1000, 150)  # Higher pitch
+            winsound.Beep(800, 150)   # Lower pitch
+            winsound.Beep(600, 150)   # Lower pitch
+        elif status == "RESPONSE0":
+            winsound.Beep(1000, 100)  # Higher pitch
+        elif status == "RESPONSE1":
+            winsound.Beep(1200, 100)  # Higher pitch
+        elif status == "RESPONSE2":
+            winsound.Beep(1600, 100)  # Higher pitch
+        elif status == "HAPPY":
+            winsound.Beep(1400, 100)  # Higher pitch
+            winsound.Beep(1600, 100)  # Higher pitch
+            winsound.Beep(2000, 100)  # Higher pitch
+            time.sleep(.1)
+        elif status == "ERROR":
+            winsound.Beep(200, 150)
+            winsound.Beep(100, 550)

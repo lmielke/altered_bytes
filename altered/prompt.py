@@ -2,7 +2,7 @@
 prompt.py
 
 """
-import os, time, yaml
+import os, yaml
 from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
@@ -35,6 +35,7 @@ class Prompt:
 
     @sts.logs_timeit.timed("prompt.Prompt.__call__")
     def __call__(self, *args, **kwargs):
+        hlpp.play_sound('PROMPT0')
         self.get_context(*args, **kwargs)
         self.get_deliverable(*args, **kwargs)
         self.get_user_prompt(*args, **kwargs)
@@ -42,6 +43,7 @@ class Prompt:
         self.mk_prompt(*args, **kwargs)
         self.mk_prompt_summary(*args, **kwargs)
         self.data = self.render_prompt(*args, **kwargs)
+        hlpp.play_sound('PROMPT1')
         return self
 
     def mk_prompt(self, *args, verbose:int=0, **kwargs):
@@ -68,7 +70,7 @@ class Prompt:
         kwargs.update(self.get_template(*args, **kwargs))
         context = _cont if _cont is not None else self.context
         prompt = self.RD.render(*args, context=context, verbose=verbose, **kwargs, )
-        if verbose >= 1:
+        if verbose >= 3:
             print(f"\n{Fore.CYAN}Prompt.render_prompt.prompt:{Fore.RESET} {verbose = } >= 1")
             hlpp.pretty_prompt(prompt, *args, verbose=verbose, **kwargs)
         return prompt
@@ -158,7 +160,7 @@ class Response:
     def params_to_table(self, checks_ok, *args, verbose:int=0, **kwargs):
         kwargs['checks'] = checks_ok
         kwargs.update(self.V.validations)
-        if verbose:
+        if verbose >= 2:
             print(hlpp.dict_to_table('Response.params_to_table.kwargs', kwargs, *args, **kwargs))
 
     def extract(self, r:dict, *args, repeats:int=sts.repeats, **kwargs) -> dict:

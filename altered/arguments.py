@@ -154,7 +154,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=0,
         nargs="?", 
         const=1,   
-        choices=[0, 1, 2, 3],
+        choices=[0, 1, 2, 3, 4, 5, 6],
         # Shorter help text
         help="Verbosity level (0-3). 0=silent, 3=detailed."
     )

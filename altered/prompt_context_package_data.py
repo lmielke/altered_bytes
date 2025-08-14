@@ -3,11 +3,12 @@ prompt_context_package_data.py
 """
 
 from colorama import Fore, Style
+from datetime import datetime as dt
 
 from altered.info_package_imports import PackageInfo
 from altered.info_files import Tree
 
-import os, subprocess, tomllib
+import os, re, subprocess, tomllib
 
 
 class ContextPackageData:

@@ -1,9 +1,9 @@
 # models.clients.yml
 while-ai-2:
   psversiontable:
-    PSVersion: 7.2.23
+    PSVersion: 7.5.2
     PSEdition: Core
-    GitCommitId: 7.2.23
+    GitCommitId: 7.5.2
     OS: Microsoft Windows 10.0.19045
     Platform: Win32NT
     PSCompatibleVersions: {1.0, 2.0, 3.0, 4.0}

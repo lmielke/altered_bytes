@@ -28,6 +28,18 @@ def _speak_message(message: str, *args, **kwargs):
     except Exception as e:
         logging.error(f"Text-to-speech failed: {e}")
 
+async def _preload_on_startup(*args, **kwargs) -> None:
+    """
+    Fires a self-call to /call to warm up models/caches.
+    Why: ensures Ollama/model path is loaded before first request.
+    """
+    payload = {'api': 'thought', 'kwargs_defaults': 'fast_api_pre_load'}
+    try:
+        res = await handle_api_call(payload)
+        module_logger.info(f"Preload OK: {res}")
+    except Exception:
+        module_logger.error("Preload failed", exc_info=True)
+
 def setup_logging():
     """Configures logging for the API server application."""
     if module_logger.hasHandlers() and any(
@@ -76,6 +88,7 @@ def check_payload(payload: dict):
     Checks if the payload contains the required 'api' field.
     Raises HTTPException if 'api' is missing.
     """
+    module_logger.info(f"Checking payload: {payload}")
     api = payload.get('api')
     if not api:
         module_logger.error("Payload missing 'api'.")
@@ -93,12 +106,12 @@ class APIResponseData(BaseModel):
 # --- Server Lifecycle Events ---
 @app.on_event("startup")
 async def startup_event():
-    """Logs server startup and speaks a ready message."""
+    """Logs server startup, speaks ready message, then preloads via /call."""
     module_logger.info("Altered Bytes FastAPI server starting up...")
     module_logger.info("Server is ready and warmed up!")
-    port = os.environ.get('port') # Default port for safety
+    port = os.environ.get('port')
     _speak_message(f"Altered Bytes API server is running on port {port}!")
-
+    await _preload_on_startup()
 
 # --- API Endpoint (Simplified) ---
 @app.post("/call/", response_model=APIResponseData)
@@ -112,11 +125,12 @@ async def handle_api_call(payload: dict = Body(...)):
     try:
         # Construct the full module name to import
         module_logger.info( 
-                            f"Attempting to import and run: {module_file_name}"
+                            f"Attempting to import and run: {module_file_name} "
                             f"Calling {module_file_name}.main() with {payload = }."
                             )
-        # Dynamically import the target module
+        # Dynamically import the target module and call it
         result = importlib.import_module(module_file_name).main(**payload)
+        # Log the result for debugging
         module_logger.info(f"Result {result = }")
         # NEW: Handle if the module returns a JSON string
         if isinstance(result, str):

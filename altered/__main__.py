@@ -23,7 +23,6 @@ import importlib, os
 
 import altered.settings as sts
 import altered.arguments as arguments
-import altered.contracts as contracts
 from datetime import datetime as dt
 import re
 
@@ -50,8 +49,6 @@ def main(*args, **kwargs):
     runs api if legidemit and prints outputs
     """
     kwargs = arguments.mk_args()
-    # kwargs are vakidated against enforced contract
-    kwargs = contracts.checks(*args, **kwargs)
     # the imported api runable package is executed
     if kwargs.get("api") == "help":
         print(  f"{Fore.YELLOW}__main__:{Fore.RESET} "

@@ -1,0 +1,4 @@
+verbose: 0
+alias: null
+tool_choice: none
+user_prompt: "This is a automated connection test. Ping! Ignore all prior context, dont think, give a fast answer: Pong!"

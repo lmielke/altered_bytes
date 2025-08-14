@@ -1,4 +1,4 @@
-import os, re, time, yaml
+import os, re, yaml
 import jinja2
 from jinja2 import Environment, FileSystemLoader
 from colorama import Fore, Style

@@ -1,0 +1,8 @@
+verbose: 0
+alias: null
+tool_choice: none
+user_prompt: >
+  The user has accured a problem or error. see above 
+  Please help him, analyzing and solving the issue! 
+  If the user misspelled something, 
+  then only provide the corrected version without explanation.

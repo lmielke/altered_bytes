@@ -11,6 +11,7 @@ import altered.settings as sts
 from openai import OpenAI
 from colorama import Fore, Style, Back
 
+
 from altered.model_ollama_connect import OllamaConnect
 from altered.prompt_function_calling import Function
 
@@ -27,7 +28,7 @@ class ConParams:
     temperature:        Optional[float] = None
     num_ctx:            Optional[int] = None
     num_predict:        Optional[int] = None
-    keep_alive:         Optional[int] = 200
+    keep_alive:         Optional[int] = 1000
     service_endpoint:   Optional[str] = None
     stream:             Optional[bool] = False
     # helper parameters
@@ -160,7 +161,7 @@ class ConParams:
         # already a dict → pass through
         return tool_choice
 
-    def add_tools(self, *args, tool_choice: str | dict = "auto", **kwargs) -> None:
+    def add_tools(self, *args, tool_choice: str | dict = 'none', **kwargs) -> None:
         """
         Attach one tool definition to the current request context.
         """
@@ -212,8 +213,11 @@ class ModelConnect:
             raise
         try:
             self.stats(response, *args, model=self.m_params['model_file']['name'], **kwargs)
+
         except Exception as e:
+            hlpp.play_sound("ERROR")
             raise
+        hlpp.play_sound("RESPONSE1")
         return response
 
     def validate_response(self, r_dict: dict, *args, verbose: int = 0, **kwargs) -> bool:
@@ -251,7 +255,9 @@ class RmConnect:
         ctx = self.mk_context(*args, model=name, **kwargs)
         self.print_calling_params(func, *args, ctx=ctx, **kwargs)
         # Call the appropriate model function.
+        hlpp.play_sound("PROMPT2")
         response = getattr(self, func)(*args, ctx=ctx, **kwargs)
+        hlpp.play_sound("RESPONSE0")
         return response
 
     def mk_context(self, messages, *args, model:str, verbose:int=0, **kwargs) -> None:
@@ -271,17 +277,18 @@ class RmConnect:
             print(f"{Fore.RED}RmConnect.mk_context Error!\n{e}{Fore.RESET}")
             raise
 
-    def print_calling_params(self, func, *args, url:str, ctx:dict, verbose:int=0, **kwargs):
+    def print_calling_params(self, func, prompts, *args, url:str, ctx:dict, verbose:int=0, **kwargs):
         """
         Prints parameters and context for debugging purposes.
         """
-        if 0 < verbose < 2:
+        if verbose >= 1:
             print(f"{Fore.MAGENTA}RmConnect.post {func}, {url = }: {Fore.RESET}\n"
-                  f"\tmodel={ctx['model']},  "
-                  f"repeats={ctx.get('repeats', 'N/A')}, "
-                  f"num_prompts={len(ctx.get('prompts', []))} "
-                  f"num_predict={ctx.get('options')}, "
+                  f"\tmodel={ctx['model']},\n"
+                  f"\tnum characters={len(prompts[0])},\n"
+                  f"\tnum_prompts={len(ctx.get('prompts', []))}\n"
+                  f"\tnum_predict={ctx.get('options')},\n"
                   )
+            print(f"{Fore.MAGENTA}{prompts[0]}{Fore.RESET}")
         elif verbose >= 2:
             hlpp.unroll_print_dict(ctx, 'context', *args, **kwargs)
 

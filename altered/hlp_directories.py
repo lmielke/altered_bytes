@@ -43,20 +43,6 @@ def normalize_path(path:str, *args, **kwargs) -> str:
         return os.path.normpath(n_path)
     return path
 
-def write_tempfile(*args, api: str, content: str, up_file: str = None, **kwargs):
-    """
-    Writes the generated content JSON back to the original up_file, if provided.
-    """
-    if not up_file:
-        return  # Skip if no output path is specified
-    up_file = normalize_path(up_file, *args, **kwargs)
-    out_str = f"\n{api}_response:\n{content.strip()}\n"
-    try:
-        with open(up_file, 'a', encoding='utf-8') as f:
-            f.write(out_str)
-    except Exception as e:
-        print(f"{Fore.RED}Failed to write content to file {up_file}: {e}{Fore.RESET}")
-
 def set_workdir(*args, work_dir:str=None, **kwargs):
     """
     Sets work_dir and project_dir based on provided or current work_dir.

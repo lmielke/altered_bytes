@@ -32,7 +32,7 @@ class OllamaConnect:
 
     # ─── endpoints ────────────────────────────────────────────────────────
     def _generate(self, ctx: Dict[str, Any]) -> Dict[str, Any]:
-        # print(f"\n\n\n{Fore.RED}_generate with model:{Fore.RESET} \n{ctx}")
+        print(f"\n\n\n{Fore.YELLOW}_generate with model:{Fore.RESET} \n{ctx}")
         rpt = ctx.get("repeats", {}).get("num", 1)
         outs = [self._once_generate(ctx) for _ in range(rpt)]
         return {"responses": outs, "num_results": len(outs)}
@@ -42,7 +42,7 @@ class OllamaConnect:
         g = self.client.generate(model=ctx["model"],
                                  prompt="".join(ctx["prompts"]),
                                  options=ctx.get("options", {}),
-                                 keep_alive=ctx.get("keep_alive", 200),
+                                 keep_alive=ctx.get("keep_alive", 1000),
                                  stream=False)
         return {"response": g["response"], "tool_call": None}
 
@@ -56,12 +56,12 @@ class OllamaConnect:
         try:
             msg = self.client.chat(model=ctx["model"], messages=messages,
                                tools=tools,
-                               keep_alive=ctx.get("keep_alive", 200),
+                               keep_alive=ctx.get("keep_alive", 1000),
                                stream=False)["message"]
         except Exception as e:
             msg['content'] = (
                                 f"\n{Fore.RED}ERROR: model_ollama_connect._chat: "
-                                f"\n{e}\n{self.url = }, {ctx['model'] =}{Fore.RESET}"
+                                f"\n{e =}\n{self.url = }, {ctx['model'] =}{Fore.RESET}"
                                 )
             print(msg['content'])
         tc = self._norm_tool((msg.get("tool_calls") or [None])[0])
