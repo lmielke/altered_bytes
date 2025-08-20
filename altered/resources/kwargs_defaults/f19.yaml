@@ -1,0 +1,20 @@
+verbose: 3
+# fmt: text
+user_prompt: Read this document carefully! The question to answer is at the end of this document.
+application: null
+num_activities: 3
+work_file_name: null
+user_info:
+  - user_act
+  - ps_hist
+selection: null
+deliverable_path: null
+to_clipboard: true
+alias: null
+sys_info:
+  - sys_info_ops
+  - sys_info_usr
+package_info:
+  - pg_requirements
+  - pg_imports
+  - pg_tree

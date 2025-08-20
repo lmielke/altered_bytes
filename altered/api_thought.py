@@ -134,8 +134,8 @@ def main(*args, **kwargs) -> str:
     Returns the result of the thought function
     """
     kwargs.update(contracts.checks(*args, **kwargs))
-    with open(os.path.join(sts.logs_dir, 'server', 'api_thought_kwargs.log'), 'a') as f:
-        f.write(f"\n\n{re.sub(r"([: .])", r"-" , str(dt.now()))}: \n{kwargs = }")
+    # with open(os.path.join(sts.logs_dir, 'server', 'api_thought_kwargs.log'), 'a') as f:
+    #     f.write(f"\n\n{re.sub(r"([: .])", r"-" , str(dt.now()))}: \n{kwargs = }")
     r = thought(*args, **kwargs)
     # t = json.dumps(prompt(*args, **kwargs).data)
     contracts.write_tempfile(*args, content=r, **kwargs)

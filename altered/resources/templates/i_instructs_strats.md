@@ -20,7 +20,11 @@
 {% endif%}
 
 ## Response Layout and Format:
-{%- include "i_instructs_io.md" ignore missing %}
+{%- if instructs.io %}
+{% include "i_instructs_io.md" ignore missing %}
+{%- else %}
+{% include "i_io_default_fmt.md" ignore missing %}
+{% endif%}
 
 ## Your Task
 {{ instructs.strats.your_task }}

@@ -34,6 +34,7 @@ class Instructions:
         self.context = {
                     'strats': strat_context, 
                     'io': strat_io,
+                    'fmt': self.fmt,
                 }
         # if time revise how num_predict is derrived (check kwargs['num_predict'])
         self.context['num_predict'] = max(  

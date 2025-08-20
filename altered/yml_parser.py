@@ -173,7 +173,7 @@ class YmlParser:
             return self.fields_text[1:]
         elif fmt == 'json':
             return self._field_info_json()
-        elif fmt == 'markdown':
+        elif fmt in {'markdown', 'text', 'html',}:
             return self._field_info_markdown()
         else:
             raise ValueError("Unsupported format. Use 'tbl', 'yaml', 'json', or 'markdown'.")

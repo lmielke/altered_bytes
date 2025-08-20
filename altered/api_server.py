@@ -1,3 +1,5 @@
+# api_server.py
+# for logging set module_logger.setLevel(logging.INFO) to DEBUG
 import uvicorn
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel
@@ -36,7 +38,7 @@ async def _preload_on_startup(*args, **kwargs) -> None:
     payload = {'api': 'thought', 'kwargs_defaults': 'fast_api_pre_load'}
     try:
         res = await handle_api_call(payload)
-        module_logger.info(f"Preload OK: {res}")
+        module_logger.debug(f"Preload OK: {res}")
     except Exception:
         module_logger.error("Preload failed", exc_info=True)
 
@@ -58,7 +60,7 @@ def setup_logging():
                                     )
         )
         module_logger.addHandler(file_handler)
-        module_logger.info(f"Application logging setup complete. Logging to: {log_file}" )
+        module_logger.debug(f"Application logging setup complete. Logging to: {log_file}" )
     except Exception as e:
         logging.basicConfig(
             level=logging.ERROR,
@@ -88,7 +90,7 @@ def check_payload(payload: dict):
     Checks if the payload contains the required 'api' field.
     Raises HTTPException if 'api' is missing.
     """
-    module_logger.info(f"Checking payload: {payload}")
+    module_logger.debug(f"Checking payload: {payload}")
     api = payload.get('api')
     if not api:
         module_logger.error("Payload missing 'api'.")
@@ -107,8 +109,8 @@ class APIResponseData(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Logs server startup, speaks ready message, then preloads via /call."""
-    module_logger.info("Altered Bytes FastAPI server starting up...")
-    module_logger.info("Server is ready and warmed up!")
+    module_logger.debug("Altered Bytes FastAPI server starting up...")
+    module_logger.debug("Server is ready and warmed up!")
     port = os.environ.get('port')
     _speak_message(f"Altered Bytes API server is running on port {port}!")
     await _preload_on_startup()
@@ -120,18 +122,18 @@ async def handle_api_call(payload: dict = Body(...)):
     Receives a request, dynamically imports the specified API module,
     and executes its main function with the request payload.
     """
-    module_logger.info(f"Received API call with payload: {payload}")
+    module_logger.debug(f"Received API call with payload: {payload}")
     module_file_name = check_payload(payload)
     try:
         # Construct the full module name to import
-        module_logger.info( 
+        module_logger.debug( 
                             f"Attempting to import and run: {module_file_name} "
                             f"Calling {module_file_name}.main() with {payload = }."
                             )
         # Dynamically import the target module and call it
         result = importlib.import_module(module_file_name).main(**payload)
         # Log the result for debugging
-        module_logger.info(f"Result {result = }")
+        module_logger.debug(f"Result {result = }")
         # NEW: Handle if the module returns a JSON string
         if isinstance(result, str):
             try:
@@ -148,25 +150,25 @@ async def handle_api_call(payload: dict = Body(...)):
             # If not a dict or valid JSON string, wrap the result.
             return APIResponseData(response=result, log_path=None)
     except ImportError:
-        msg = f"API module not found for '{api_name}'."
+        msg = f"API module not found for '{module_file_name =}'."
         module_logger.error(msg, exc_info=True)
         raise HTTPException(status_code=404, detail=msg)
     except Exception as e:
         msg = (
-            f"An unexpected error occurred while processing API '{api_name}': "
+            f"An unexpected error occurred while processing API '{module_file_name =}': "
             f"{type(e).__name__} - {e}"
         )
         module_logger.error(msg, exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"Internal Server Error for API '{api_name}'. Check logs."
+            detail=f"Internal Server Error for API '{module_file_name =}'. Check logs."
         )
 
 
 @app.get("/ping")
 async def ping() -> dict:
     """Simple health-check endpoint."""
-    module_logger.info("Ping received")
+    module_logger.debug("Ping received")
     return {"status": "pong"}
 
 # --- Server Execution ---
@@ -174,14 +176,14 @@ def main(*args, **kwargs):
     """
     Entry point for starting the FastAPI server when called via 'alter server'.
     """
-    module_logger.info("Attempting to start Altered Bytes API server via main()...")
+    module_logger.debug("Attempting to start Altered Bytes API server via main()...")
 
     port = int(os.environ.get("port"))
     host = os.environ.get("ALTERED_BYTES_HOST", "127.0.0.1")
 
     app_import_string = "altered.api_server:app"
 
-    module_logger.info(
+    module_logger.debug(
         f"Starting Uvicorn server for '{app_import_string}' on "
         f"http://{host}:{port}"
     )

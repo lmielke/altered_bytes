@@ -1,12 +1,14 @@
 # contracts.py
-import altered.settings as sts
-import importlib, os, sys, yaml
-import altered.arguments as arguments
+import importlib, os, re, sys, yaml
+from datetime import datetime as dt
 from colorama import Fore, Style
-import altered.hlp_printing as hlpp
-from altered.hlp_directories import normalize_path as normpath
 from dotenv import load_dotenv
 import pyttsx3
+
+import altered.settings as sts
+import altered.arguments as arguments
+import altered.hlp_printing as hlpp
+from altered.hlp_directories import normalize_path as normpath
 from altered.hlp_directories import set_workdir
 
 
@@ -30,6 +32,8 @@ def write_tempfile(*args, api: str, content: str, up_file: str = None, **kwargs)
     """
     Writes the generated content JSON back to the original up_file, if provided.
     """
+    # with open("C:/Users/lars/python_venvs/write_tempfile.log", 'w', encoding='utf-8') as f:
+    #     f.write(f"api: {api}\ncontent: {content}\n{up_file = }")
     if not up_file:
         return  # Skip if no output path is specified
     up_file = normpath(up_file, *args, **kwargs)
