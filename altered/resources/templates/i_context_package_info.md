@@ -3,6 +3,9 @@
 The selected folder contains no packgage information or it is not a package.
 {%-   else %}
 The following section shows information about the package in the cwd.
+- Project Name: `{{ context.package_info.pr_name }}`
+- Package Name: `{{ context.package_info.pg_name }}`
+- Project Dir: `{{ context.package_info.project_dir }}`
 
 {%   if context.package_info.digraph %}
 ### Package Import Structure starting at {{ context.package_info.work_file_name }}

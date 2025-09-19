@@ -15,6 +15,7 @@ class ContextPackageData:
 
     template_name = 'i_context_package_info.md'
     trigger = 'package_info'
+    pg_keys = {'pg_name', 'pr_name', 'work_dir', 'project_dir', }
 
     def __init__(self, *args, **kwargs):
         self.context = {}
@@ -80,7 +81,8 @@ class ContextPackageData:
             print(f"{Fore.YELLOW}ContextPackageData.mk_context{Fore.RESET} {package_info = }")
         if not package_info: return {}
         # Note: there are additional flags to get various package_infos
-        self.context['package_info'] = {'is_package': is_package, }
+        self.context['package_info'] = {k: v for k, v in kwargs.items() if k in self.pg_keys}
+        self.context['package_info']['is_package'] = is_package
         if pg_imports and is_package:
             try:
                 self.context['package_info'].update(self.get_pg_imports(*args, **kwargs))
@@ -94,7 +96,7 @@ class ContextPackageData:
             if verbose:
                 print(f"{Fore.YELLOW}\tpg_requirements: {Fore.RESET} {pg_requirements}")
         if pg_tree:
-            self.context['package_info'].update(self.tree(*args, **kwargs))
+            self.context['package_info'].update(self.tree(*args, verbose=verbose, **kwargs))
             if verbose:
                 print(f"{Fore.YELLOW}\tpg_tree: {Fore.RESET} {pg_tree}")
         return self.context

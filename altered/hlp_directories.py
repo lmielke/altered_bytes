@@ -1,6 +1,7 @@
-import os, yaml
+import os, time, yaml
 import altered.settings as sts
 from colorama import Fore, Style
+from contextlib import contextmanager
 
 def cleanup_data_dir(data_dir:str, max_files:int=sts.max_files, exts:set=None, *args, 
     verbose:int=0, **kwargs, ) -> None:
@@ -67,10 +68,56 @@ def set_workdir(*args, work_dir:str=None, **kwargs):
             if os.path.isdir(candidate) and package_key_file in os.listdir(candidate):
                 package_dir = candidate
                 is_package = True
-
+    # we also derrive the project name (pr_name) and package_name (pg_name)
+    pr_name = os.path.basename(project_dir) if is_package and project_dir else None
+    pg_name = os.path.basename(package_dir) if is_package and package_dir else None
     return {
+            'pr_name': pr_name,
+            'pg_name': pg_name,
             'work_dir': work_dir, 
             'project_dir': project_dir, 
             'package_dir': package_dir, 
             'is_package': is_package,
             }
+
+def manage_log_files(log_dir:str, age_days:int=15, log_max:int=20, *args, **kwargs) -> int:
+    """
+    Removes log files in the specified directory that are older than the specified age.
+    """
+    cutoff = time.time() - (age_days * 86400)  # 86400 seconds in a day
+    if not os.path.isdir(log_dir):
+        print(f"{Fore.RED}Log directory {log_dir} does not exist.{Style.RESET_ALL}")
+        return 0
+    log_files = os.listdir(log_dir)
+    to_remove, removed_files = len(log_files) - log_max, 0
+    for i, filename in enumerate(log_files):
+        file_path = os.path.join(log_dir, filename)
+        if os.path.isfile(file_path):
+            file_mtime = os.path.getmtime(file_path)
+            if file_mtime < cutoff or i < to_remove:
+                try:
+                    os.remove(file_path)
+                    removed_files += 1
+                    print(f"{Fore.GREEN}Removed old log file: {file_path}{Style.RESET_ALL}")
+                except Exception as e:
+                    print(f"{Fore.RED}Error removing file {file_path}: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}Total old log files removed: {removed_files}{Style.RESET_ALL}")
+    return removed_files
+
+@contextmanager
+def temp_chdir(target_dir: str) -> None:
+    """
+    Context manager for temporarily changing the current working directory.
+
+    Parameters:
+    target_dir (str): The target directory to change to.
+
+    Yields:
+    None
+    """
+    original_dir = os.getcwd()
+    try:
+        os.chdir(target_dir)
+        yield
+    finally:
+        os.chdir(original_dir)

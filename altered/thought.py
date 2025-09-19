@@ -32,26 +32,21 @@ class Thought:
         # prompt constructor for LLM interaction
         self.prompt = Prompt(name, *args, **kwargs)
         self.response, self.last_response = Response(name, *args, **kwargs), None
-        self.get_log_path = lambda: os.path.join(
-                                sts.logs_dir, 'prompts',
-                                f"{re.sub(r"([: .])", r"-" , str(dt.now()))}_{self.name}.md"
-                                )
 
     @sts.logs_timeit.timed("thought.Thought.think")
     def think(self, *args, **kwargs):
         # we call the prompt with history since all other context is handled by prompt
         self.p = self.prompt(*args, **kwargs)
-        self.log_path = self.get_log_path()
         kwargs['num_predict'] = self.p.I.context.get('num_predict', kwargs.get('num_predict'))
         for self.p_cnt in range(1, 3):
             # post calls the model and response handles post model cleanup
             self.r = self.response(self.post(*args, **kwargs), *args, **kwargs)
             if self.r:
                 self.last_response = self.r.get('content')
-                self.log_prompts([self.last_response], 'Response', *args, **kwargs)
+                self.prompt.log_prompts([self.last_response], 'Response', self.p_cnt, *args, **kwargs)
                 break
             else:
-                self.log_prompts(['Thought.think: No response.'], 'Response', *args, **kwargs)
+                self.prompt.log_prompts(['Thought.think: No response.'], 'Response', self.p_cnt, *args, **kwargs)
         else:
             print(  f"{Fore.RED}Thought.think ERROR: {self.p_cnt}{Fore.RESET} "
                     f"No valid response received!")
@@ -83,23 +78,9 @@ class Thought:
         if self.p_cnt >= 2:
             pr = self.modify_prompt(*args, **kwargs)
         final_prompts = [pr if self.p_cnt >= 2 else self.p.data]
-        self.log_prompts(final_prompts, 'Prompt', *args, **kwargs)
+        self.prompt.log_prompts(final_prompts, 'Prompt', self.p_cnt, *args, **kwargs)
         # print(f"{Fore.YELLOW}Thought.post: {Fore.RESET}{final_prompts}\n\n{server_params}")
         return self.assi.post(final_prompts, *args, **server_params)
-
-    def log_prompts(self, final_prompts:list[str], content_type:str, *args, alias:str=None, 
-        verbose:int=0, **kwargs) -> None:
-        """Writes a list of strings to a log file."""
-        if verbose > 2:
-            print(f"{Fore.YELLOW}logging prompt:{Fore.RESET} {self.log_path}")
-        _kwargs = kwargs.copy()
-        _kwargs.update({'verbose': verbose, 'alias': alias})
-        _kwargs_str = ', '.join([f"{k}={v}" for k, v in _kwargs.items()])
-        with open(self.log_path, 'a', encoding="utf-8") as file:
-            file.write(f"tought.Thought: \n{_kwargs_str = }\n\n")
-            for i, prompt in enumerate(final_prompts, start=1):
-                header = f"# {content_type} {self.p_cnt}_{i} from {alias or ''}"
-                file.write(f"{header}\n{prompt}\n\n")
 
     def modify_prompt(self, *args, verbose:int=0, **kwargs):
         """

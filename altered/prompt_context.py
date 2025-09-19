@@ -11,8 +11,8 @@ from colorama import Fore, Style
 
 class Context:
 
-    def __init__(self, name:str, context:str={}, *args, **kwargs):
-        self.context = context
+    def __init__(self, name:str, *args, **kwargs):
+        self.context = {}
         self.web_search = ContextSearch(*args, name=name, **kwargs)
         self.user_infos = ContextActivities(*args, **kwargs)
         self.os_sys_info = ContextSysInfo(*args, **kwargs)

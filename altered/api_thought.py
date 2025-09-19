@@ -22,7 +22,7 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     try:
         # with open('C:/temp/api_thought.log', 'a') as l: 
         #     l.write(f"thought0:\n\n{re.sub(r'([: .])', '-', str(dt.now()))}: \n{args = }\n{kwargs = }")
-        thought = Thought(api, *args, verbose=verbose, **kwargs)
+        thought = Thought(api, *args, verbose=verbose, api=api, **kwargs)
         response = thought.think(*args, verbose=verbose, **kwargs)
         hlpp.play_sound('RESPONSE2')
         if response is None:

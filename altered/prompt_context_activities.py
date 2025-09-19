@@ -10,6 +10,7 @@ from colorama import Fore, Style
 from collections import OrderedDict
 
 import altered.settings as sts
+from altered.hlp_directories import temp_chdir
 from altered.info_git_diff import GitDiffs
 
 class ContextActivities:
@@ -31,7 +32,8 @@ class ContextActivities:
     def __call__(self, *args, **kwargs):
         return self.get_all_infos(*args, **kwargs)
 
-    def get_all_infos(self, *args,  git_diff:bool=False, 
+    def get_all_infos(self, *args,  work_dir:str,
+                                    git_diff:bool=False, 
                                     user_act:bool=False, 
                                     ps_hist:bool=False,
                                     num_activities:int=1,
@@ -45,7 +47,8 @@ class ContextActivities:
         if ps_hist and num_activities >= 1:
             self.load_ps_history(*args, **kwargs)
             data['ps_history'] = self.context['ps_history'][-num_activities*2:]
-        data.update(self.git_diffs(*args, git_diff=git_diff, num_activities=num_activities, **kwargs))
+        with temp_chdir(work_dir):
+            data.update(self.git_diffs(*args, git_diff=git_diff, num_activities=num_activities, **kwargs))
         return {'user_info': data}
         
     def git_diffs(self, *args, git_diff:bool=False, num_activities:int=3, **kwargs):

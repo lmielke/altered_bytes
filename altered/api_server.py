@@ -6,10 +6,10 @@ from pydantic import BaseModel
 import importlib, json, logging, os, pyttsx3, sys
 from pathlib import Path
 from colorama import Fore, Style
-
 # --- Pre-load your altered_bytes package components ---
 # These are assumed to be in the python path
 import altered.settings as sts
+from altered.hlp_directories import manage_log_files
 
 # Create a logger instance for this module
 module_logger = logging.getLogger(__name__)
@@ -112,8 +112,9 @@ async def startup_event():
     module_logger.debug("Altered Bytes FastAPI server starting up...")
     module_logger.debug("Server is ready and warmed up!")
     port = os.environ.get('port')
+    manage_log_files(sts.prompt_logs_dir, age_days=7)
     _speak_message(f"Altered Bytes API server is running on port {port}!")
-    await _preload_on_startup()
+    # await _preload_on_startup()
 
 # --- API Endpoint (Simplified) ---
 @app.post("/call/", response_model=APIResponseData)

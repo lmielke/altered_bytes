@@ -44,6 +44,8 @@ class Prompt:
         self.mk_prompt_summary(*args, **kwargs)
         self.data = self.render_prompt(*args, **kwargs)
         hlpp.play_sound('PROMPT1')
+        if __name__.split('.')[-1] == self.name:
+            self.log_prompts([self.data], self.name.capitalize(), 0, *args, **kwargs)
         return self
 
     def mk_prompt(self, *args, verbose:int=0, **kwargs):
@@ -138,7 +140,21 @@ class Prompt:
         elif not self.deliverable.get('content') and not self.up.get('user_prompt'):
             raise ValueError(f"{Fore.RED}ERROR:{Fore.RESET} No inputs found")
 
-
+    def log_prompts(self, final_prompts:list[str], content_type:str, p_cnt:int, *args, alias:str=None, 
+        verbose:int=0, **kwargs) -> None:
+        """Writes a list of strings to a log file."""
+        log_path = sts.get_prompt_log_path(self.name)
+        if verbose > 2:
+            print(f"{Fore.YELLOW}logging prompt:{Fore.RESET} {log_path}")
+            print(f"{self.name = }, {__name__.split('.')[-1] == self.name }")
+        _kwargs = kwargs.copy()
+        _kwargs.update({'verbose': verbose, 'alias': alias})
+        _kwargs_str = ', '.join([f"{k}={v}" for k, v in _kwargs.items()])
+        with open(log_path, 'a', encoding="utf-8") as file:
+            file.write(f"tought.Thought: \n{_kwargs_str = }\n\n")
+            for i, prompt in enumerate(final_prompts, start=1):
+                header = f"# {content_type} {p_cnt}_{i} from {alias or ''}"
+                file.write(f"{header}\n{prompt}\n\n")
 
 class Response:
 
