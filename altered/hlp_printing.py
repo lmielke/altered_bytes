@@ -1,7 +1,8 @@
 """
 hlp_printing.py
 """
-import re, time
+import os, re, time
+from datetime import datetime as dt
 from colorama import Fore, Back, Style
 import altered.settings as sts
 from textwrap import wrap as tw
@@ -22,9 +23,7 @@ def wrap_text(text:str, *args, max_chars:int=sts.table_max_chars, **kwargs):
         for line in text.split('\n'):
             if len(line) > max_chars:
                 line = '\n'.join(tw(line, max_chars))
-            wrapped += f"\n{line}"
-        if len(wrapped)>=300:
-            print(wrapped)
+            wrapped += f"\n{line}"               
         return wrapped.strip()
     return text
 

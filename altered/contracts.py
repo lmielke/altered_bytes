@@ -9,7 +9,8 @@ import altered.settings as sts
 import altered.arguments as arguments
 import altered.hlp_printing as hlpp
 from altered.hlp_directories import normalize_path as normpath
-from altered.hlp_directories import set_workdir
+# from altered.hlp_directories import set_workdir
+from altered.hlp_dir_context import DirContext
 
 
 def checks(*args, verbose:int=0, **kwargs):
@@ -19,7 +20,8 @@ def checks(*args, verbose:int=0, **kwargs):
     kwargs = clean_kwargs(*args, **kwargs)
     kwargs = prep_sys_infos(*args, **kwargs)
     kwargs = prep_user_info(*args, **kwargs)
-    kwargs = clean_paths(*args, **kwargs)
+    kwargs.update(get_package_data(*args, **kwargs))
+    kwargs.update(clean_paths(*args, **kwargs))
     kwargs = prep_package_info(*args, **kwargs)
     kwargs.update(get_model_alias(*args, **kwargs))
     check_env_vars(*args, **kwargs)
@@ -27,6 +29,28 @@ def checks(*args, verbose:int=0, **kwargs):
     if verbose:
         hlpp.pretty_dict('contracts.checks.kwargs', kwargs, *args, **kwargs)
     return kwargs
+
+def get_package_data(*args, work_dir:str=None, **kwargs) -> dict:
+    """
+    Uses work_dir or cwd to detect package information such as project_dir, package_dir, ect.
+    """
+    work_dir = os.path.abspath(work_dir if work_dir is not None else os.getcwd())
+    # traverses the directory structure to find project and package directories
+    ctx = DirContext()(path=work_dir).__dict__
+    # we only return a subset of the context information
+    obj_names = {'pr_name', 'pg_name', 'work_dir', 'project_dir', 'package_dir', 'is_package'}
+    pg_objs = {k: v for k, v in ctx.items() if k in obj_names}
+    return pg_objs
+
+def clean_paths(*args, **kwargs) -> dict:
+    """
+    WHY: Normalize *_dir/*_path and resolve missing files if path doesn't exist.
+    """
+    normalizeds = {}
+    for n, v in kwargs.items():
+        if isinstance(v, str) and any(t in n for t in {"_dir", "_path"}):
+            normalizeds[n] = normpath(v, *args, **kwargs)
+    return normalizeds
 
 def write_tempfile(*args, api: str, content: str, up_file: str = None, **kwargs):
     """
@@ -117,31 +141,6 @@ def prep_file_match_regex(*args, file_match_regex:str=None, **kwargs):
     if file_match_regex is None or file_match_regex == 'None':
         file_match_regex = ""
     return dict(**kwargs, file_match_regex=file_match_regex)
-
-def clean_paths(*args, **kwargs):
-    """
-    Loops over known path parameters in kwargs, expands user ('~') and
-    environment variables (e.g., '%USERNAME%' or '$HOME'), and
-    converts them to absolute, normalized paths.
-    Returns the kwargs dictionary with path values updated.
-    """
-    # get workdir if provided
-    kwargs.update(set_workdir(*args, **kwargs))
-    cleaned_kwargs = dict(**kwargs)
-    known_paths = {'work_dir', 'deliverable_path', 'project_dir'}
-    for name, values in kwargs.items():
-        if name in known_paths and values:
-            # 1. Expand environment variables (e.g., %VAR% on Windows, $VAR on Unix)
-            #    This handles variables like %USERNAME%, %APPDATA%, $HOME, $USER, etc.
-            expanded_vars_path = os.path.expandvars(values)
-            # 2. Expand user component (e.g., ~ or ~user)
-            expanded_user_path = os.path.expanduser(expanded_vars_path)
-            # 3. Convert to an absolute path.
-            #    Also normalizes path separators (e.g., converts '/' to '\' on Windows)
-            #    and resolves components like '.' or '..'.
-            absolute_path = os.path.abspath(expanded_user_path)
-            cleaned_kwargs[name] = absolute_path
-    return cleaned_kwargs
 
 def check_req_kwargs(*args, api:str, **kwargs):
     """

@@ -17,7 +17,8 @@
         "pg_alias": "alter",
         "appName": "altered",
         "test_color": "GREEN",
-        "port": 9005
+        "port": 9005,
+        "PYTHONUTF8": 1
       },
       "max_restarts": 2
     }

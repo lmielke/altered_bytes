@@ -50,6 +50,8 @@ def thought(*args, api: str, verbose: int, application:str='powershell', **kwarg
     except Exception as e:
         msg = f"ERROR: altered.api_thought.thought: {e}"
         print(f"{Fore.RED}{msg}{Fore.RESET}")
+        with open(os.path.join(sts.logs_dir, 'server', 'api_thought_error.log'), 'a', encoding='utf-8') as f:
+            f.write(f"\n{re.sub(r'([: .])', '-', str(dt.now()))}: \n{args = }\n{kwargs = }\n{msg = }\n")
         return msg
 
 def copy_response(response: str, *args, to_clipboard: bool = False, **kwargs):

@@ -32,7 +32,7 @@ prompt_logs_dir = os.path.join(logs_dir, "prompts")
 get_prompt_log_path = lambda name: os.path.join(prompt_logs_dir,
                                 f"{re.sub(r"([: .])", r"-" , str(dt.now()))}_{name}.md"
                                 )
-
+error_debug_log_path = os.path.join(logs_dir, "server", "error.log")
 apis_json_dir = os.path.join(resources_dir, "apis_json")
 open_ai_func_prefix = "openai"
 

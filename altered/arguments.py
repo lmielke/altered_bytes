@@ -3,7 +3,7 @@ Command-line argument parser for the altered_bytes package.
 Handles API selection and various configuration parameters.
 
 Usage:
-    alter api_name [options]
+    alter api [options]
 
 Example:
     alter thought -v 1 -i sys_info_ops sys_info_usr -p pg_imports pg_requirements pg_tree 

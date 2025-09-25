@@ -27,58 +27,16 @@ def cleanup_data_dir(data_dir:str, max_files:int=sts.max_files, exts:set=None, *
             print(f"{Fore.YELLOW}Removing: {Fore.RESET} {old_file}")
         os.remove(old_file)
 
-def normalize_path(path:str, *args, **kwargs) -> str:
+def normalize_path(path: str, *args, **kwargs) -> str:
     """
-    Normalize the given path to ensure it is absolute and uses the correct separators.
+    WHY: Canonicalize user-supplied paths consistently across OS.
     """
-    n_path = ""
     if not path:
         return path
-    if path.startswith('~'):
-        n_path = os.path.expanduser(path)
-    elif path.startswith('/'):
-        n_path = os.path.join(os.sep, path[1:])
-    elif path.startswith('.'):
-        n_path = os.path.join(os.getcwd(), path[2:])
-    if os.path.exists(n_path):
-        return os.path.normpath(n_path)
-    return path
-
-def set_workdir(*args, work_dir:str=None, **kwargs):
-    """
-    Sets work_dir and project_dir based on provided or current work_dir.
-    Detects both independently. They may be identical or different.
-    """
-    work_dir = os.path.abspath(work_dir if work_dir is not None else os.getcwd())
-    parent_dir = os.path.dirname(work_dir)
-    project_key_file, package_key_file = 'setup.py', '__main__.py'
-    # based on the key files we want to populate package information
-    project_dir, package_dir, is_package = None, None, False
-    # --- Detect package dir
-    if project_key_file in os.listdir(work_dir):
-        project_dir = work_dir
-    elif package_key_file in os.listdir(work_dir):
-        package_dir = work_dir
-        is_package = True
-        if project_key_file in os.listdir(os.path.dirname(work_dir)):
-            project_dir = os.path.dirname(work_dir)
-    if project_dir == work_dir:
-        for d in os.listdir(project_dir):
-            candidate = os.path.join(project_dir, d)
-            if os.path.isdir(candidate) and package_key_file in os.listdir(candidate):
-                package_dir = candidate
-                is_package = True
-    # we also derrive the project name (pr_name) and package_name (pg_name)
-    pr_name = os.path.basename(project_dir) if is_package and project_dir else None
-    pg_name = os.path.basename(package_dir) if is_package and package_dir else None
-    return {
-            'pr_name': pr_name,
-            'pg_name': pg_name,
-            'work_dir': work_dir, 
-            'project_dir': project_dir, 
-            'package_dir': package_dir, 
-            'is_package': is_package,
-            }
+    p = os.path.expanduser(path)
+    if not os.path.isabs(p):
+        p = os.path.abspath(os.path.join(os.getcwd(), p))
+    return os.path.normpath(p)
 
 def manage_log_files(log_dir:str, age_days:int=15, log_max:int=20, *args, **kwargs) -> int:
     """

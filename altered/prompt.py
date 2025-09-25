@@ -2,7 +2,8 @@
 prompt.py
 
 """
-import os, yaml
+import os, re, yaml
+from datetime import datetime as dt
 from colorama import Fore, Style
 from altered.renderer import Render
 from altered.prompt_context import Context
